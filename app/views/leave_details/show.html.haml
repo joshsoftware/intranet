@@ -1,0 +1,25 @@
+%div#remaining_leave.modal.hide.fade{tabindex: "-1", role: 'dialog'}
+  .modal-header
+    %button{type: 'button', class: 'close', data:{dismisss: 'modal'}}
+      x
+    %h3
+      Available Leave
+  .modal-body
+    %table.table.table-striped
+      %tbody
+        %tr
+          %td{width="45%"}
+            Sick Leave
+          %td{width="55%"}
+            = available_leave["Sick"]
+          %td{width="45%"}
+            Casual Leave
+          %td{width="55%"}
+            = available_leave["Casual"]   
+          %td{width="45%"}
+            Privilege Leave
+          %td{width="55%"}
+            = available_leave["TotalPrivilege"]
+  .modal-footer
+    %button{class: 'btn', data:{dismiss: "modal"}} 
+      Close 

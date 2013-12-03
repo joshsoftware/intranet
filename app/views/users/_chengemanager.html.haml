@@ -1,4 +1,0 @@
-= simple_form_for  @user, url: chengemanager_path(@user), method: :post,  html: {:class => 'form-horizontal'} do |f|
-  = f.error_notification
-  = f.input :manager, :collection => current_organization.users.where(:roles => 'Manager'), :label_method => :email, :prompt => "Select manager", :label => 'Manager', :id => 'commanagerid'
-  = f.button :submit, :class => 'btn-success'

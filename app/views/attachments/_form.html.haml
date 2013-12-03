@@ -1,0 +1,14 @@
+= simple_form_for(@attachment, html: { class: "form-horizontal", multipart: true}) do |f|
+  %h2
+    = title
+  = f.input :name
+  = f.input :document
+  = f.hidden_field :document_type, value: "company"
+  = f.label "Visible to all"
+  .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "True", "data-off-label" => "False"}
+    = f.check_box :is_visible_to_all, {}, true, false
+  %br
+  = f.submit 'Save Document', class: "btn controls"
+  = link_to 'Close', {}, class: "btn", data: {'dismiss' =>  'modal'}
+:css
+  .make-switch{ height: 29px; margin-left: 18px; margin-bottom: 10px;}

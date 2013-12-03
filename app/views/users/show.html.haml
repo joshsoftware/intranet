@@ -1,6 +1,5 @@
-
-
-= link_to 'Edit', edit_user_path(@user)
-\|
-= link_to 'Back', users_path
-
+= render 'profile'
+- unless @projects.empty?
+  .projects
+    %table.table
+      = render partial: 'project', collection: @projects

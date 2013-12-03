@@ -1,7 +1,0 @@
-$('.modal-body-approve').html('#{escape_javascript(render :partial => 'approve')}')
-$('#error').html('')
-- if @leave.errors.any?
-  $('.modal-body-approve').html('#{escape_javascript(render :partial => 'approve')}')
-- else
-  - if @leave.update_attributes
-    window.location.href = "leaves"

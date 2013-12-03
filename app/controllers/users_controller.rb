@@ -1,228 +1,131 @@
-class UsersController  < ApplicationController
-  before_filter :authenticate_inviter!, :only => [:new, :create]
-#  load_and_authorize_resource 
-  skip_authorize_resource :only => :index
+class UsersController < ApplicationController
+  before_action :authenticate_user!
+  before_action :load_user, only: [:edit, :update, :show, :public_profile, :private_profile]
+  before_action :load_profiles, only: [:public_profile, :private_profile, :update, :edit]
+  before_action :build_addresses, only: [:public_profile, :private_profile, :edit]
+  before_action :authorize, only: [:public_profile, :edit]
+  before_action :authorize_document_download, only: :download_document
+  after_action :notify_document_download, only: :download_document
 
   def index
-    @users = current_organization.users.ne(email: current_user.email).page(params[:page])
-    Kaminari.paginate_array(@users).page(params[:page])
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @users }
-    end
+    @users = User.employees
   end
 
   def show
-    @user = User.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @user }
-    end
-  end
-
-  def new
-    @user = User.new
-  end
-
-  def edit
-    @user = User.find(params[:id])
-
-    @user.build_profile if @user.profile.nil?
-  end
-
-  def create
-    @user = User.new(params[:user])
-    p params
-    respond_to do |format|
-      if @use.save
-        format.html { redirect_to @user, notice: 'User was successfully created.' }
-        format.json { render json: @user, status: :created, location: @user }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
-    end
+    @projects = @user.projects
   end
 
   def update
-    @user = User.find(params[:id])
-@user.update_attributes(params[:user_roles])
-
-    respond_to do |format|
-      if @user.update_attributes(params[:user])
-        format.html { redirect_to @user, notice: 'User was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: "edit" }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  def destroy
-    @user = User.find(params[:id])
-    @user.destroy
-
-    respond_to do |format|
-      format.html { redirect_to users_url }
-      format.json { head :no_content }
-    end
-  end
-
-  def assignleaves
-    @user = User.find(params[:user_id])
-    @leave_types = current_organization.leave_types.all
-    if request.get?
-      if @user.leave_details[0].nil?
-        @user.leave_details.build(:assign_date => Date.today)
-        @assign_leaves = calculate_leaves
-      else
-        @assign_leaves = @user.leave_details[0].assign_leaves
-      end
-    elsif request.post?
-      @user.leave_details.build if @user.leave_details[0].nil?
-      @user.leave_details[0].assign_date = params[:date]
-      @user.leave_details[0].assign_leaves = params[:assign_leaves]
-      @user.leave_details[0].available_leaves = params[:assign_leaves]
-      @user.leave_details[0].save
-        redirect_to addleaves_path
-    end    
- end
-
-  def chengeroles
-    @user = User.find(params[:user_id])
-      if request.post?
-      respond_to do |format|
-        if @user.update_attributes(params[:user])
-          format.html { redirect_to users_path, notice: 'Role has been changed !'  }
-    end
-     end
-    end
-    end
-
-  def chengemanager
-        @user = User.find(params[:user_id])
-      if request.post?
-      respond_to do |format|
-        if @user.update_attributes(params[:user])
-          format.html { redirect_to users_path, notice: 'Manager has been changed !'  }
-    end
-     end
-    end
-    end
-
-  def profile
-    @user = User.find(params[:user_id])
-    if request.post?
-      respond_to do |format|
-        if @user.update_attributes(params[:user])
-          format.html { redirect_to profile_path(@user), notice: 'Profile was successfully updated!'  }
-        else
-          format.html { render action: "edit" }
-	  format.json { render json: @user.errors, status: :unprocessable_entity }
-        end
-      end
-    end
-  end
-
-  def reinvite
-    @user = User.find(params[:user_id])
-    @user.invite!(current_user)
-  end
-
-def leavessummary  
-    @leave_details = current_user.leave_details.all
-p @leave_details 
-    @leave_types = current_organization.leave_types.all
-  end
-
-  def upload_csv     
-    @organization = Organization.find(params[:organization_id])
-    respond_to do |format|
-       if request.put?
-         if @organization.update_attributes(params[:organization]) 
-            invite_users
-            format.html{ render "upload"}	    
-         else
-           format.html {render action: "upload_csv"}
-	 end
-       else
-          format.html {render action: "upload_csv"}
-      end
-    end
-end
-
-  def invite_users
-    headers = {}
-    @invited_users = []
-    CSV.foreach(current_organization.csv_attachment.path) do |row|
-      invite_params = {}
-      if headers.length ==0
-        # First row is known as headers.
-        # Fill the hash with the headers
-        # Each header value would be key
-        row.each do |k|
-          headers[k] = ""
-        end
-      else
-        # Fill the hash with row values for each key
-        index = 0
-        headers.keys.each do |k|
-          invite_params.store(k, row[index])
-          index = index + 1
-
-        end
-        if invite_params["manager"] != nil
-          invite_params["manager"] = User.find_by(:email => invite_params["manager"]).id
-        end
-        invite_params["organization_id"] = current_organization.id
-        user = User.invite!(invite_params, current_user)
-        if user.errors.messages == {}
-        @leave_types = current_organization.leave_types.all
-        assign_leaves =calculate_leaves
-        user.leave_details.build if user.leave_details[0].nil?
-        user.leave_details[0].assign_date = Date.today
-        user.leave_details[0].assign_leaves = assign_leaves
-        user.leave_details[0].available_leaves = assign_leaves
-        user.leave_details[0].save
-        end
-        @invited_users.push(user)
-      end
-    end
-  end
-
-  def managers
-    organization = Organization.find_by(:name => request.subdomain)
-    user_params = request.query_string.split(",", 2)
-    if user_params != nil
-      email = user_params[0]
-      password = user_params[1]
-      user = organization.users.find_by(:email => email)
-    end
-    if user != nil
-      if user.valid_password?(password) == true
-    users = organization.users.where(:roles => "Manager")
-    responseText = nil
-    users.each do |u|
-      if responseText == nil
-        responseText = u.email
-      else
-        responseText = responseText + "," + u.email
-      end
-    end
-    render :text => responseText, :content_type => "text/plain"
-      end
+    @user.attributes =  user_params
+    if @user.save
+      flash.notice = 'Profile updated Succesfully'
+      #UserMailer.delay.verification(@user.id)
     else
-    render :text => "invalid", :content_type => "text/plain"
+      flash[:error] = "Error #{@user.errors.full_messages.join(' ')}"
+    end
+    redirect_to public_profile_user_path(@user)
+  end
+
+  def public_profile
+    profile = params.has_key?("private_profile") ? "private_profile" : "public_profile"
+    update_profile(profile)
+    load_emails_and_projects
+    @user.attachments.first || @user.attachments.build  
+  end
+
+  def private_profile
+    profile = params.has_key?("private_profile") ? "private_profile" : "public_profile"
+    update_profile(profile)
+  end
+  
+  def update_profile(profile)
+    user_profile = (profile == "private_profile") ? @private_profile : @public_profile
+    if request.put?
+      #Need to change these permit only permit attributes which should be updated by user
+      #In our application there are some attributes like joining date which will be only 
+      #updated by hr of company
+      if user_profile.update_attributes(params.require(profile).permit!)
+        flash.notice = 'Profile Updated Succesfully'
+        #UserMailer.delay.verification(@user.id)
+        redirect_to public_profile_user_path(@user)
+      else
+        render "public_profile"
+      end
     end
   end
 
-    def leave_summary_on_roles
-      @user = User.find(params[:user_id])
-      @leave_details = @user.leave_details.all
-      @leave_types = current_organization.leave_types.all
-    end  
+  def invite_user
+    if request.get?
+      @user = User.new 
+    else
+      @user = User.new(params[:user].permit(:email, :role))
+      @user.password = Devise.friendly_token[0,20]
+      if @user.save
+        flash.notice = 'Invitation sent Succesfully'
+        UserMailer.delay.invitation(current_user.id, @user.id)
+        redirect_to invite_user_path
+      else
+        render 'invite_user'
+      end
+    end
+  end
 
+  def download_document
+    document_type = MIME::Types.type_for(@document.url).first.content_type
+    send_file @document.path, filename: @document.model.name, type: "#{document_type}"
+  end
+
+  private
+  def load_user
+    @user = User.find(params[:id])
+  end
+  
+  def user_params
+    safe_params = [] 
+    if params[:user][:employee_detail_attributes].present?
+      safe_params = [ employee_detail_attributes: [:id, :employee_id, :date_of_relieving,:notification_emails => [] ], :project_ids => [] ]
+    elsif params[:user][:attachments_attributes].present?
+      safe_params = [attachments_attributes: [:id, :name, :document, :_destroy]] 
+    else
+      safe_params = [:status, :role]
+    end
+    params.require(:user).permit(*safe_params)
+  end
+
+  def load_profiles
+    @public_profile = @user.public_profile || @user.build_public_profile
+    @private_profile = @user.private_profile || @user.build_private_profile
+    @user.employee_detail || @user.build_employee_detail
+  end
+
+  def build_addresses
+    if request.get?
+      ADDRESSES.each{|a| @user.private_profile.addresses.build({:type_of_address => a})} if @user.private_profile.addresses.empty?
+      # need atleast two contact persons details
+      2.times {@user.private_profile.contact_persons.build} if @user.private_profile.contact_persons.empty?
+    end
+  end
+
+  def load_emails_and_projects
+    @emails = User.all.collect(&:email)
+    @projects = Project.all.collect { |p| [p.name, p.id] }
+    notification_emails = @user.employee_detail.try(:notification_emails) 
+    @notify_users = User.where(:email.in => notification_emails || []) 
+  end
+
+  def authorize
+    message = "You are not authorize to perform this action"
+    (current_user.can_edit_user?(@user)) || (flash[:error] = message; redirect_to root_url)
+  end
+
+  def authorize_document_download
+    @attachment = Attachment.where(id: params[:id]).first
+    @document = @attachment.document
+    message = "You are not authorize to perform this action"
+    (current_user.can_download_document?(@user, @attachment)) || (flash[:error] = message; redirect_to root_url)
+  end
+
+  def notify_document_download
+    UserMailer.delay.download_notification(current_user.id, @attachment.name)
+  end
 end
-

@@ -1,9 +1,0 @@
-%h1 Leave summary for all users
-- if current_user.roles == "Admin"
-  %td= select_tag 'user', options_from_collection_for_select(current_organization.users.ne(:roles => "Admin").entries, :id, :email), :id => "cmbuseremail", :prompt => "Select user"
-- elsif current_user.roles == "HR"
-  %td= select_tag 'user', options_from_collection_for_select(current_organization.users.in(:roles => ["Manager", "Employee"]).entries, :id, :email), :id => "cmbuseremail", :prompt => "Select user"
-- elsif current_user.roles == "Manager"
-  %td= select_tag 'user', options_from_collection_for_select(current_user.employees.entries, :id, :email), :id => "cmbuseremail", :prompt => "Select user"
-
-%table.table{:id => "tblLeaveSummary"}

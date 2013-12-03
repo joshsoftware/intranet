@@ -1,0 +1,50 @@
+.profile
+  = image_tag(@user.public_profile.image.thumb.url)
+  %h6.employee_id 
+    = "Id: #{@user.employee_detail.try(:employee_id)}" if @user.employee_detail.employee_id
+  .profile-title
+    %h2.name
+      = @user.public_profile.name
+      - if can? :edit, User
+        = link_to "", public_profile_user_path(@user), class: 'icon-edit user-edit', data: {'no-turbolink' =>  true}
+    .skills
+      - if @user.public_profile.skills?
+        = truncate(@user.public_profile.skills, length: 200)
+  .profile-info
+    %table.table{style: "width: 0%"}
+      %tbody
+        - if @user.public_profile.mobile_number?
+          %tr
+            %td.icon-signal{title: "Mobile No."}
+            %td= @user.public_profile.mobile_number
+        - if @user.public_profile.blood_group?
+          %tr
+            %td= image_tag "blood-icon.png", title: "Blood Group"
+            %td= @user.public_profile.blood_group
+        - if @user.public_profile.date_of_birth?
+          %tr
+            %td= image_tag "birth.png", title: "Date of Birth"
+            %td= @user.public_profile.date_of_birth.strftime("%B %d")
+        - if @user.public_profile.skype_id?
+          %tr
+            %td= image_tag "skype.png", title: "Skype id"
+            %td=@user.public_profile.skype_id
+        - if @user.public_profile.github_handle?
+          %tr 
+            %td= image_tag "github_small.png", title: "Github Handle"
+            %td
+              = link_to @user.public_profile.github_handle, "https://github.com/#{@user.public_profile.github_handle}", target: '_blank'
+        - if @user.public_profile.twitter_handle?
+          %tr 
+            %td= image_tag "twitter_small.png", title: "Twitter Handle"
+            %td
+              = link_to @user.public_profile.twitter_handle, "https://twitter.com/#{@user.public_profile.twitter_handle}", target: '_blank'
+        - if @user.public_profile.blog_url?
+          %tr 
+            %td= image_tag "rss_small.png", title: "Blog Url"
+            %td
+              = link_to truncate(@user.public_profile.blog_url, length: 30), "#{@user.public_profile.blog_url}", target: '_blank'
+:css
+  .table{margin-top: 30px;}
+  .table th { border-top: 1px solid #ffffff; }
+  .table td { border-top: 1px solid #ffffff; padding: 2px;}

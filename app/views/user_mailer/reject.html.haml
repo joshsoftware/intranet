@@ -1,0 +1,15 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    %p
+      %i
+        Hello  #{@leave.user.name},
+    %p
+      Leave has been rejected from #{@leave.start_at} to #{@leave.end_at}  
+      - if @leave.reject_reason
+        Reason:
+        = @leave.reject_reason
+    Regards,
+    = @user.organization.name

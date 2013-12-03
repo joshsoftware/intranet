@@ -1,0 +1,26 @@
+= render partial: "layouts/project_menu"
+.form-heading
+  %h2 Projects
+.form-horizontal
+  %table.table.table-hover
+    %thead
+      %tr
+        %th #
+        %th Project Name
+        %th Project Benchmark
+        %th Active
+    %tbody
+      - @projects.each_with_index do |p, i|
+        %tr
+          %td= i+1
+          %td=link_to p.name, project_path(p)
+          %td=raw p.code_climate_snippet
+          %th
+            - status_class = p.is_active ? 'label-success' : 'label-warning'
+            .label{class: status_class}
+              = p.is_active
+          %td
+            - if can? :manage, Project
+              =link_to '', edit_project_path(p), class: "icon-edit", data: {'no-turbolink' =>  true} 
+              =link_to '', project_path(p), method: :delete, "data-confirm" => "Are you sure?", class: "icon-trash"
+        

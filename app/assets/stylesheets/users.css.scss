@@ -1,0 +1,90 @@
+// Place all the styles related to the users controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+.form-horizontal {
+    /*max-width: 300px;*/
+    padding: 19px 29px 29px;
+    margin: 30px auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+
+.form-horizontal .form-heading{
+  padding-bottom: 25px;
+}
+.form-horizontal strong{
+  margin-top: 8px;
+  position: absolute;
+}
+
+.form-horizontal .control-group .controls input {
+  height: 30px;
+}
+#google_oauth2 img{
+  height: 45px;
+}
+.img-polaroid {
+  height: 70px;
+}
+.permanent{
+  margin-top: 5%;
+}
+.document{position: relative;margin-left: 400px;top:-96px;}
+.profile {
+  position: absolute;
+  max-width: 40%;
+  min-width: 40%;
+  max-height: 60%;
+  min-height: 50%;
+  padding: 30px 30px; 
+  background-color: white; 
+  box-shadow: 2px 2px 23px 0px;
+  border-radius: 10px;
+}
+.name{
+/*  position: absolute; top: 4%;left: 30%;margin-top: 3%;*/
+}
+.projects{
+  position: absolute;  
+  max-width: 20%;  
+  min-width: 20%;  
+  max-height: 68%;
+  overflow-y: auto;
+  top: 39%;  
+  left: 28%;
+ /* background-color: white; 
+  box-shadow: 2px 2px 23px 0px;
+  border-radius: 10px;*/
+}
+.active-projects{
+  position: absolute;  
+  max-width: 20%; 
+  min-width: 20%; 
+  max-height: 68%;
+  min-height: 68%;
+  overflow-y: auto;
+  overflow-x: auto;
+  left: 32%;
+  padding: 0px 30px;
+  background-color: white; 
+  box-shadow: 2px 2px 23px 0px;
+  border-radius: 3%;
+}
+.project-heading{position: absolute; top: -10px;}
+.skills{
+  position: relative;
+  margin-top: -10px;
+}
+.profile-title{
+  position: absolute;
+  top: 3%;
+  left: 28%;
+  max-width: 70%;
+}
+

@@ -1,0 +1,29 @@
+= image_tag current_user.public_profile.image.thumb.url, class: 'img-rounded'
+= link_to current_user.public_profile.name, '#', 'data-toggle' => "dropdown", class: "dropdown-toggle user-name"
+%ul.dropdown-menu.drop
+  - if can? :invite_user, User
+    %li
+      = link_to "Invite Employee", invite_user_path
+    %li
+      = link_to "Projects", projects_path
+    %li
+      = link_to "Vendors", vendors_path
+  %li
+    = link_to "Profile", public_profile_user_path(current_user), data: {'no-turbolink' =>  true}
+  - if ["HR", "Admin", "Super Admin"].include?(current_user.role)
+    %li
+      = link_to "Leave Applications", view_leaves_path
+    %li
+      = link_to "Manage Leave", leave_applications_path
+  - if ! ["Admin", "Super Admin"].include?(current_user.role)
+    %li
+      = link_to "Apply Leave", new_user_leave_application_path(current_user)
+  %li.hide
+    = link_to "Calendar", calendar_path
+  %li.divider
+  %li
+    = link_to 'Sign out', destroy_user_session_path, method: :delete
+:css
+  .img-rounded{width: 4%; position: absolute; top: 26px; z-index: 1; margin-left: 10px;height: 36px;}
+  .user-name{position: relative; left: 40px;}
+    

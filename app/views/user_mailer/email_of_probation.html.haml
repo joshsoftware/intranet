@@ -1,0 +1,20 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    %p
+      %i
+        Hello Admin,
+      %br/
+      %br/
+      The person #{@user.email}
+      will going to complete his probation time after 15days from today.
+      %br/
+      On date: #{@date}
+      %br/
+      %br/
+      Regards,
+      %br/
+      = @user.organization.name
+      team

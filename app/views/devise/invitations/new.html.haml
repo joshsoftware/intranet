@@ -1,0 +1,7 @@
+= simple_form_for resource, :as => resource_name, :url => invitation_path(resource_name), :html => {:method => :post, class: "form-horizontal"} do |f|
+  .form-heading
+    %h2= t "devise.invitations.new.header"
+  .control-group
+    - resource.class.invite_key_fields.each do |field|
+      = f.input field
+    = f.submit t("devise.invitations.new.submit_button"), class: 'btn controls'

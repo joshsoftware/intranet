@@ -1,0 +1,34 @@
+= simple_nested_form_for(@vendor, html: { class: "form-horizontal", multipart: true}) do |f|
+  %h3
+    = title
+  %hr
+  = f.input :company, required: false
+  = f.input :category, required: false
+  %h4 Contact Persons
+  %hr
+  - count = 0
+  - contact_class = "contact_person_1"
+  %table
+    %tr
+      = f.simple_fields_for :contact_persons do |c|
+        - count += 1
+        %td.fields
+          = c.input :name
+          = c.input :role
+          = c.input :phone_no
+          = c.input :email
+          = c.link_to_remove 'Remove Contact', class: 'btn controls'
+          %hr
+        - if count%2 == 0
+          %tr
+            %td
+  = f.link_to_add 'Add Contact Person', :contact_persons, class: 'controls btn'
+  %h4 Address
+  %hr
+  = f.simple_fields_for :address do |a|
+    = a.input :address, as: :text
+    = a.input :city
+    = a.input :pin_code
+    = a.input :state
+    = a.input :landline_no, label: 'Landline/Mobile No' 
+  = f.submit 'Save', class: "btn controls"

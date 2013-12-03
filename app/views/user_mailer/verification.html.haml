@@ -1,0 +1,6 @@
+%p
+  Hello Admin,
+%p
+  #{@updated_user.email} profile has been updated, you can verify it through the link below.
+%p
+  = link_to 'Verify Profile', public_profile_user_url(@updated_user)

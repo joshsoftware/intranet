@@ -17,7 +17,9 @@
 #   runner "AnotherModel.prune_old_records"
 # end
 
+
 # Learn more: http://github.com/javan/whenever
+=begin
 set :environment, :development
 
 every :month, :at => 'start of the month at 00:01am' do
@@ -34,4 +36,23 @@ every :year do
 end
 every 1.day, :at => '5:30 am' do
 runner "User.date_of_birth"
+end
+=end
+
+set :output, {error: 'log/cron_error.log', standard: 'log/cron.log'}
+
+every :month, :at => '12:30am' do
+  rake "leave:increment_paid"
+end
+
+every :year, :at => '12:30am' do
+  rake "leave:reset_leave_yearly"
+end
+
+every :day, :at => '10:00am' do
+  rake "notification:birthday"
+end
+
+every :day, :at => '10:00am' do
+  rake "notification:year_of_completion"
 end

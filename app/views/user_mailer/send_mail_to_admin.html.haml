@@ -1,0 +1,32 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    %p
+      Hello Admin,
+      This is list of all employees with there leave details!
+      belows table is showing you employees name and his leaves
+    %table
+      %tr
+        %th
+          Employee's name
+        %th
+          his available leaves
+        %th
+          his assign leaves
+        - @user.each do |user|
+          %tr
+            %td
+              = user.email
+            - user.leave_details.each do |leave|
+              - if leave.assign_date.year == Time.zone.now.year
+                %td
+                  - leave.available_leaves.each do |k, v|
+                    - if v <= 0
+                      0.0
+                    - else
+                      = v.to_s
+                %td
+                  - leave.assign_leaves.each do |k, v|
+                    = v.to_s

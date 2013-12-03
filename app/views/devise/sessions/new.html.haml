@@ -1,0 +1,7 @@
+= simple_form_for(resource, :as => resource_name, :url => session_path(resource_name), html: {class: "form-horizontal"}) do |f|
+  %h2.form-heading
+    Please sign in
+  .control-group
+    = f.input :email, :autofocus => true, placeholder: "Email address" 
+    = f.input :password, placeholder: "Password"
+    = f.submit "Sign in", class: "btn controls"

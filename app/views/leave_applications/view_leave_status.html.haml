@@ -1,0 +1,50 @@
+:css
+  .nav-tabs>.active>a, .nav-tabs>.active>a:hover, .nav-tabs>.active>a:focus{
+    background: -webkit-gradient( linear, left top, left bottom, from(#fff3db), to(rgba(0, 0, 0, 0.39)));
+  }
+.alert-message
+%ul.leave_applicationTab.nav.nav-tabs
+  %li.active
+    %a#pending_link{data:{toggle: 'tab', leave_count: @pending_leave.count}, href: '#unapproved_leave'}
+      Pending (#{@pending_leave.count})
+  %li
+    %a#leave_history_link{data:{toggle: "tab"}, href: '#approved_leave'}
+      Leave History
+   
+.leave_application_tab_content.tab-content
+  #approved_leave.tab-pane.fade
+    = render 'leave_applications/leave_view', leave_data: @approved_leave
+  #unapproved_leave.tab-pane.fade.in.active
+    = render 'leave_applications/leave_view', leave_data: @pending_leave
+:javascript
+  $('.leave_application_tab_content').on('click', '.cancel_leave, .approve_leave', function(){
+    leave_application_id = $(this).data('id');
+    url = "/" + $(this).data('url');
+    action = $(this).data('action');
+ 
+    $.ajax({
+      url: url,
+      type: 'GET',
+      data: {id: leave_application_id, action: action},
+      success: function(){
+        tr_id = "#leave_application_" + leave_application_id;
+        b = $(tr_id).detach();
+        b.children().last().text('Approved');
+        $('#approved_leave table tbody').append(b);
+        message = 'Leave Approved';
+        if(action == 'cancel')
+        {
+          message = 'Leave Cancelled'; 
+          b.children().last().text('Rejected');
+        }
+        $('.alert-message').alert({txt: message, type: 'success'});  
+        leave_count = $('#pending_link').data('leave-count') - 1
+        ls = "Pending (" + leave_count + ")";
+        $('#pending_link').text(ls);
+      },
+      error: function(){
+        $('.alert-message').alert({txt: 'Internal Server Error! Please contact web sysadmin', type: 'error'});  
+      }
+    });  
+    return false;
+  });

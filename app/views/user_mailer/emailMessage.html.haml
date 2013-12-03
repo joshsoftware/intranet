@@ -1,0 +1,19 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    %p
+      %b
+        Hello #{@user.organization.name},
+    %p
+      = @leave.reason
+      %br/
+      = @leave.start_at.strftime("%A, %B %d, %Y")
+      to #{@leave.end_at.strftime("%A, %B %d, %Y")}
+    = link_to 'click hear', leaves_path(only_path: false,       host: [@user.organization.slug, '.',JoshIntranet::Application.config.action_mailer.default_url_options[:host]].join)
+    to take action.
+    %br/
+    %p
+      Thanks & regards!
+      %br/

@@ -1,6 +1,0 @@
-= simple_form_for @leave, :url => rejectStatus_leave_path(@leave), html: {:class => 'form-horizontal'}, :remote =>true do |f|
-  = f.error_notification
-  = f.input :reject_reason, :as => :text, :required => true, :input_html => {:cols => 20, :rows => 5}
-  = f.submit "Submit", class: "btn btn-large btn-success"
-  = link_to "Cancel", leaves_path, class: "btn btn-large btn-success"
-

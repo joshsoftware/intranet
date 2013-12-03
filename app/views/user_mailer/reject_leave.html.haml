@@ -1,0 +1,17 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    %p
+      %i
+        Hello  #{@user.name},
+    %p
+      Leave has been rejected from #{@leave_application.start_at.to_s} to #{@leave_application.end_at.to_s}  
+      - if @leave_application.reject_reason
+        Reason:
+        = @leave_application.reject_reason
+    Regards,
+    %p
+      Josh Software
+

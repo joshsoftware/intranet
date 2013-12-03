@@ -1,0 +1,16 @@
+.form-heading
+  %h2
+    Apply Leave
+= render "leave_details/show", available_leave: @leave_detail.try(:available_leave) || {}
+= simple_form_for @leave_application, url: user_leave_applications_path(current_user) , html:{class: 'form-horizontal'} do|f|
+  = render 'form', f: f, leave_types: @leave_types
+
+:javascript
+
+  $(document).ready(function(){
+    $('[data-behaviour="datepicker"]').datepicker({
+      format: "dd-mm-yyyy",
+      autoclose: true
+    });
+  });
+   

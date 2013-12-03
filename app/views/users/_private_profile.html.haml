@@ -1,0 +1,74 @@
+= simple_form_for(@private_profile, url: private_profile_user_path, :html => { method: :put, class: "form-horizontal private-profile", multipart: true}) do |pri|
+  %h4 Personal Details
+  %table{style: "width:100%;"}  
+    %tr
+      %td
+        = pri.input :pan_number
+      %td
+        = pri.input :personal_email
+    %tr
+      %td
+        = pri.input :passport_number
+      %td
+        = pri.input :qualification
+    %tr
+      %td
+        - disable = ( can? :edit, User ) ? false : true
+        = pri.input :date_of_joining, disabled: disable, input_html: { class: 'datepicker',  'data-behaviour' => 'datepicker', value: @private_profile.date_of_joining.try(:strftime, '%d-%m-%Y')}
+      %td
+        = pri.input :work_experience, placeholder: 'No of years'
+    %tr
+      %td
+        = pri.input :previous_company, as: :text
+      %td
+        = pri.input :bonusly_auth_token
+  %h4 Emergency Contact Details
+  %table{style: "width:100%;"}
+    %tr
+      = pri.simple_fields_for :contact_persons do |r|
+        %td
+          = r.input :relation, placeholder: 'e.g Father, Mother, Brother etc'
+          = r.input :name
+          = r.input :phone_no
+  %table{style: "width:100%;"}
+    %tr
+      = pri.simple_fields_for :addresses do |a|
+        %td
+          - if a.object.type_of_address == ADDRESSES[1]
+            = a.label 'Same as permenent'
+            .make-switch#address_button{"data-on" => "success", "data-off" => "warning", "data-on-label"=>"Yes", "data-off-label"=> "NO"}
+              = a.check_box :same_as_permanent_address, {}, 'true', 'false'
+          %div{class: "#{a.object.type_of_address.downcase}"}
+            %h4
+              = a.object.type_of_address
+              - disable = (a.object.type_of_address == ADDRESSES[1] and a.object.same_as_permanent_address == "true") ? true : false
+            = a.input :type_of_address, as: :hidden
+            = a.input :address, as: :text, disabled: disable
+            = a.input :city, disabled: disable                  
+            = a.input :pin_code, disabled: disable
+            = a.input :state, disabled: disable                
+            = a.input :landline_no, disabled: disable, label: 'Landline/Mobile No' 
+  %br
+  %center
+    = pri.submit "Update Profile", class: 'btn'
+:css
+  .make-switch{ margin-left: 18px;}
+
+:javascript
+  $('#address_button').on('switch-change', function(e, data){
+    var $el = $(data.el)
+      , value = data.value;
+   
+    if(value)
+    {
+      $('div.temporary .control-group .controls input').attr('disabled', 'disabled')
+      $('div.temporary .control-group .controls textarea').attr('disabled', 'disabled')
+      $('#private_profile_addresses_attributes_1_type_of_address').removeAttr('disabled')
+    }
+    else
+    {
+      $('div.temporary .control-group .controls input').removeAttr('disabled')
+      $('div.temporary .control-group .controls textarea').removeAttr('disabled')
+    }
+  
+  });

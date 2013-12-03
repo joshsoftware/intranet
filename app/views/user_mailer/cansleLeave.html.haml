@@ -1,0 +1,22 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    - if @leave.user.profile.nil?
+      %p
+        %i
+          Hello #{@leave.user.email},
+    - else
+      %p
+        %i
+          Hello
+          \#{@leave.user.profile.name},
+    - if @user.profile.nil?
+      %p
+        Your leave has now been canceled by your #{@user.roles} #{@user.email}
+    - else
+      %p
+        Your leave has now been canceled by your #{@user.roles} #{@user.profile.name}
+    Regards,
+    = @user.organization.name

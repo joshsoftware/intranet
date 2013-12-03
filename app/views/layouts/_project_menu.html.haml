@@ -1,0 +1,6 @@
+- if can? :manage, Project
+  .row
+    %div.offset8
+      =link_to 'Add Project', new_project_path, data: {'no-turbolink' =>  true} unless params[:action] == "new"
+      =params[:action] == "show" ? "|" : ''
+      =link_to 'All Projects', projects_path unless params[:action] == "index"

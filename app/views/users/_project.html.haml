@@ -1,0 +1,13 @@
+%tr
+  %td.project-name
+    - if user_signed_in?
+      = link_to project.name, project_path(id: project.id)
+    - else
+      = project.name
+  %td= raw project.code_climate_snippet
+
+:css
+  .table{ margin-top: 30px; }
+  .table th { border-top: 1px solid #ffffff; }
+  .table td { border-top: 1px solid #ffffff; padding: 4px;}
+  .project-name{font-weight: bold;}

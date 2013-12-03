@@ -1,0 +1,18 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    %p
+      %i
+        Hello Admin,
+      %br/
+      %br/
+      The following persons has birthday on #{@date} in your organisation, lets wish them and make something spetial!
+      the persons name as can be follows:
+    %ol
+      %li
+        = @user.name
+        %br/
+        %br/
+        regards,

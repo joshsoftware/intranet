@@ -1,136 +1,86 @@
-require "csv"
 class User
   include Mongoid::Document
-  include Mongoid::Document::Roleable
+  include Mongoid::Slug
+  
+  #model's concern
+  include LeaveAvailable
+  include UserDetail 
 
-  include Mongoid::Paperclip 
-  has_mongoid_attached_file :leaving_Certificate
-
-  paginates_per 10
-
-  embeds_one :profile
-  accepts_nested_attributes_for :profile
-  attr_accessible :profile_attributes
-
-  embeds_many :leave_details
-  accepts_nested_attributes_for :leave_details
-  attr_accessible :leave_details_attributes
-  ROLES = ['Admin', 'HR', 'Manager', 'Employee']
-  # Include default devise modules. Others available are:
-  # :token_authenticatable, :confirmable,
-  # :lockable, :timeoutable and :omniauthable
-  devise :invitable, :database_authenticatable, :registerable,
-    :recoverable, :rememberable, :trackable, :validatable, :confirmable
-
-
+  devise :database_authenticatable, :registerable, :omniauthable,
+         :recoverable, :rememberable, :trackable, :validatable, :omniauth_providers => [:google_oauth2]
+  ROLES = ['Admin', 'Manager', 'HR', 'Employee', 'Intern', 'Finance']
   ## Database authenticatable
-  field :email,              :type => String, :default => ""
-  field :encrypted_password , :default => ""
-  field :join_date, type: Date
-  field :employee_id, type: Integer
-  field :probation_end_date, type: Date
-  field :pay_role, type: Boolean
-  field :next_year_of_probation_date, type: Date
-  validates :join_date, :employee_id, :roles, :presence => true
-  validates :employee_id, :uniqueness => {:scope => :organization_id}
-  validates :email, :uniqueness => {:scope => :organization_id} 
- # validates_attachment :leaving_Certificate, :presence => true, :content_type => { :content_type => ['image/jpg', 'image/png', 'image/jpeg']}
-
-  attr_accessible :email, :password, :password_confirmation, :roles, :organization_id, :join_date, :employee_id, :manager_id, :probation_end_date, :pay_role, :leaving_Certificate
-  ## Recoverable
-  field :reset_password_token,   :type => String
-  field :reset_password_sent_at, :type => Time
-
-	 ## Rememberable
+  field :email,               :type => String, :default => ""
+  field :encrypted_password,  :type => String, :default => ""
+  field :role,                :type => String, :default => "Employee"
+  field :uid,                 :type => String
+  field :provider,            :type => String        
+  field :status,              :type => String, :default => STATUS[0]
+  
+  ## Rememberable
   field :remember_created_at, :type => Time
 
-  ## Trackabler
+  ## Trackable
   field :sign_in_count,      :type => Integer, :default => 0
   field :current_sign_in_at, :type => Time
   field :last_sign_in_at,    :type => Time
-  field :current_sign_in_ip 
+  field :current_sign_in_ip, :type => String
   field :last_sign_in_ip,    :type => String
+    
+  has_many :leave_applications
+  has_many :attachments
+  has_and_belongs_to_many :projects
+  
+  accepts_nested_attributes_for :attachments, reject_if: :all_blank, :allow_destroy => true
+  validates :email, format: {with: /\A.+@joshsoftware.com/, message: "Only Josh email-id is allowed."}
+  validates :role, :email, presence: true
+  validates_associated :employee_detail
 
-  ## Confirmable
-  field :confirmation_token,   :type => String
-  field :confirmed_at,         :type => Time
-  field :confirmation_sent_at, :type => Time
-  field :unconfirmed_email,    :type => String # Only if using reconfirmable
-
-  ## Invitable
-  field :invitation_token
-  field :invitation_sent_at, type: Time
-  field :invitation_accepted_at, type: Time
-  field :invitation_limit, type: Integer
-  field :invited_by_id, type: Integer
-  field :invited_by_type
-  ## Lockable
-  # field :failed_attempts, :type => Integer, :default => 0 # Only if lock strategy is :failed_attempts
-  # field :unlock_token,    :type => String # Only if unlock strategy is :email or :both
-  # field :locked_at,       :type => Time
-
-  ## Token authenticatable
-  # field :authentication_token 
-
-  belongs_to :organization
-  has_many :leaves, class_name: "Leave"
-
-  # using self joyngs to maintain the relationship between employee and manager.
-  has_many :employees, class_name: "User", :foreign_key => "manager_id"
-  belongs_to :manager, class_name: "User"
-
-  # use the name field directly user field for example @user.name
-  delegate :name, :to => :profile
-  def self.date_of_birth
-    date = Date.today+3
-  o  = Organization.all
-  o.each do |organization|
-    admin = organization.users.where(:roles => 'Admin').collect(&:email)
-    users = organization.users.in(:roles => ['HR', 'Manager', 'Employee'])
-    users.each do |user|
-      if user.profile != nil
-      if user.profile.dateOfBirth.try(:strftime, "%j").to_i == Date.today.strftime("%j").to_i+3
-      UserMailer.date_of_birth(user, admin, date).deliver
-      end
-    end
+  scope :employees, all.asc("public_profile.first_name")
+  scope :approved, where(status: 'approved')  
+  #Public profile will be nil when admin invite user for sign in with only email address 
+  delegate :name, to: :public_profile, :allow_nil => true
+  slug :name do|u|
+    u.name.try(:to_url) || u.id.to_s   
   end
-  end
-  end
-  def self.leave_details_every_month
-    organization = Organization.all
-      organization.each do |o|
-    user_admin = User.where(:roles => 'Admin').collect(&:email)
-  users  = o.users.in(:roles => ['HR', 'Manager', 'Employee'])
-#        another_user = User.in(:roles => ['HR', 'Manager', 'Employee']).collect(&:email)
-    users.each do |user|
-        user.leave_details.each do |leave|
-        if leave.assign_date.year == Time.zone.now.year
-    UserMailer.send_leave(user_admin, user.email, leave).deliver
-end
-end
-end
-      end
-      end
-def self.send_mail_to_admin
-    organization = Organization.all
-    organization.each do |o|
 
-    admin = o.users.where(:roles => 'Admin').collect(&:email)
-    user = o.users.in(:roles => ['HR', 'Manager', 'Employee'])
-            UserMailer.send_mail_to_admin(admin, user).deliver
-	    end
+  def sent_mail_for_approval(leave_application_id)
+    notified_users = [
+                      User.find_by(role: 'HR').email, User.find_by(role: 'Admin').try(:email),
+                      self.employee_detail.try(:notification_emails).try(:split, ',')
+                     ].flatten.compact.uniq
+    
+    UserMailer.delay.leave_application(self.email, notified_users, leave_application_id)
   end
-  def self.email_of_probation
-    date = Date.today+15
-    organization = Organization.all
-    organization.each do |o|
-      admin = o.users.where(:roles => 'Admin').collect(&:email)
-      users = o.users.in(:roles => ['HR', 'Manager', 'Employee'])
-      users.each do |user|
-        if user.probation_end_date.try(:strftime, "%j").to_i == Date.today.strftime("%j").to_i+15
-        UserMailer.email_of_probation(admin, user, date).deliver
-        end
-      end
+
+  def role?(role)
+    self.role == role
+  end
+ 
+  def can_edit_user?(user)
+    (["HR", "Admin", "Finance", "Manager", "Super Admin"].include?(self.role)) || self == user 
+  end
+  
+  def can_download_document?(user, attachment)
+    user = user.nil? ? self : user
+    (["HR", "Admin", "Finance", "Manager", "Super Admin"].include?(self.role)) || attachment.user_id == user.id
+  end
+
+  def can_change_role_and_status?(user)
+    return true if (["Admin", "Super Admin"]).include?(self.role)
+    return true if self.role?("HR") and self != user
+    return false
+  end
+
+  def allow_in_listing?
+    return true if self.status == 'approved'
+    return false
+  end
+
+  def set_details(dobj, value)
+    unless value.nil?
+      set("#{dobj}_day" => value.day)
+      set("#{dobj}_month" => value.month)
     end
   end
 end

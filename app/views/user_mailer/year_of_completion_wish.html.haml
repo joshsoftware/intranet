@@ -1,0 +1,21 @@
+%html
+  %head
+    %title
+  %body
+    - @user_hash.each do |k, v|
+      %p
+        - year = "year"  
+        - if k > 1
+          - year += "s"
+        Congratulations 
+        %b
+          #{v.join(', ')} 
+        for completing 
+        %b 
+          #{k} #{year} 
+        at JOSH.
+    %footer
+      %p
+        Regards,
+        %p  
+          Josh Team

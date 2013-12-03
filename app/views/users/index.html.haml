@@ -1,34 +1,37 @@
-%h1 Registered users
-
-= page_entries_info @users
-= paginate @users
-
-%table.table
-  %tr
-    %th Email
-    %th Role
-
-  - @users.each do |user|
-    %tr     
-    - if user.profile.nil?
-      %td= user.email
-    - else
-      %td= link_to user.email, profile_path(user)
-    %td= user.roles
-    %td= user.probation_end_date.to_s
-    - if can? :update, user, :id => user.id
-      %td= link_to 'Edit', edit_user_path(user)
-      %td= link_to 'Delete', user, method: :delete, data: { confirm: 'Are you sure?' }
-      %td= link_to 'Change Roles', chengeroles_path(user)
-      -if user.roles == 'Employee' 
-        %td= link_to 'Change Manager', chengemanager_path(user)
-      - if user.invitation_token != nil
-        %td= link_to 'Resend Invitation', reinvite_path(user), :remote => true
-
-%br
-  - if current_user.profile.nil?
-    = link_to 'Create profile', edit_user_path(current_user), class: 'btn btn-large btn-success'
-  - else
-    = link_to 'My profile', profile_path(current_user), class: 'btn btn-large btn-success'
-    = link_to 'Edit profile', edit_user_path(current_user), class: 'btn btn-large btn-success'
-%br
+.form-heading
+  %h2 Employees
+.form-horizontal
+  %table.table.table-hover
+    %thead
+      %tr
+        %th Id
+        %th
+        %th Employee Name
+        %th Email
+        %th Mobile No
+        - if can? :edit, User
+          %th Role
+          %th Status
+    %tbody
+      - @users.each_with_index do |user, index|
+        %tr
+          - if can? :edit, User
+            %td= user.employee_detail.try(:employee_id) if user.employee_detail
+            %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid') if user.public_profile
+            %td= link_to user.name, user_path(user) if user.public_profile
+            %td= user.email
+            %td= user.public_profile.try(:mobile_number)
+            %td= user.role
+            %td
+              - status_class = (user.status == 'approved') ? 'label-success' : 'label-warning'
+              .label{class: status_class} 
+                = user.status
+            %td= link_to '', public_profile_user_path(user), class: 'icon-edit', data: {'no-turbolink' =>  true}
+          - elsif user.allow_in_listing?
+            %td= user.employee_detail.try(:employee_id) if user.employee_detail
+            %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid') if user.public_profile
+            %td= link_to user.name, user_path(user)
+            %td #{user.email}
+            %td= user.public_profile.try(:mobile_number)
+:css
+  .table td{ vertical-align: middle; }

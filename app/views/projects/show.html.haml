@@ -1,0 +1,17 @@
+= render partial: "layouts/project_menu"
+.form-horizontal
+  %h2= @project.name
+  =raw @project.code_climate_snippet
+  - if !@users.blank?
+    %table.table.table-hover
+      %thead
+        %tr
+          %th
+          %th Name
+          %th Email
+      %tbody
+        - @users.each_with_index do |user|
+          %tr
+            %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid') if user.public_profile
+            %td= link_to user.public_profile.name, user_path(user)
+            %td= user.email

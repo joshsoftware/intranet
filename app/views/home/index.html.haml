@@ -1,4 +1,14 @@
-.main
-  %h1 Leave management System! 
-  %p.lead Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
-  = link_to 'Sign up today', signup_path, class: 'btn btn-large btn-success'
+- unless @projects.blank?
+  .active-projects
+    %table.table
+      = render partial: 'users/project', collection: @projects
+- unless @bonusly_updates.blank?
+  .bonusly-updates
+    %ul.media-list
+      - @bonusly_updates.each do |message|
+        %li.media
+          %a.pull-left
+            = raw message
+        =# render partial: 'bonus', locals: { message: message } 
+
+%script{charset: "UTF-8", language: "JavaScript", src: "http://feed2js.org//feed2js.php?src=http%3A%2F%2Fblog.joshsoftware.com%2Ffeed&chan=y&num=5&au=y&date=y&tz=+5.30&targ=y&utf=y&html=p", type: "text/javascript"}

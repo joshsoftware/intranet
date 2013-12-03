@@ -1,9 +1,0 @@
-= simple_form_for  @user, url: chengeroles_path(@user), method: :post,  html: {:class => 'form-horizontal'} do |f|
-  = f.error_notification
-  .form-inputs
-  %h1 Please select role:
-  = f.input :roles, :collection => ["Admin", "HR", "Manager", "Employee"], :prompt => "Select role"
-  = f.input :manager_id, :collection => current_organization.users.where(:roles => 'Manager'), :label_method => :email, :value_method => :id, :prompt => "Select manager", :label => 'Manager'
-  = f.button :submit, :class => 'btn-success'
-  %br
-= link_to 'Cancel', users_path

@@ -1,0 +1,40 @@
+.form-heading
+  - user_name = @user.public_profile.nil? ? @user.public_profile.first_name.capitalize : @user.email.split('@')[0].capitalize
+  %h2=current_user == @user ? 'My Profile' : "#{user_name}'s Profile"
+- if current_user.can_change_role_and_status?(@user)
+  = render partial: "update_status"
+%div.tabbable
+  %ul.nav.nav-tabs
+    %li.active.public-tab
+      %a{data: {toggle: 'tab'}, href: "#public"} 
+        Public Profile
+    %li.private-tab
+      %a{data: {toggle: "tab"}, href: "#private"} 
+        Personal Details
+    - if can? :edit, User
+      %li.emp-details-tab
+        %a{data: {toggle: "tab"}, href: "#emp-details"}
+          Employee details
+    %li.document-tab
+      %a{data: {toggle: "tab"}, href: "#document"}
+        Documents
+  
+  .tab-content
+    .tab-pane.active#public
+      = render partial: "public_profile"
+    .tab-pane#private
+      = render partial: "private_profile"
+    .tab-pane#emp-details
+      = render partial: "employee_detail"
+    .tab-pane#document
+      = render partial: "document"
+
+:javascript
+  error = #{!@private_profile.errors.full_messages.empty?}
+  if(error){
+    $('.private-tab a').click();
+  }
+  $("[data-behaviour~=datepicker]").datepicker({
+    format: "dd-mm-yyyy",
+    autoclose: true
+  });

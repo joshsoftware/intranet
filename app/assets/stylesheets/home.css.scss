@@ -2,126 +2,79 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 body {
-    padding-top: 20px;
-    padding-bottom: 60px;
-}
-
-/* Custom container */
-.container {
-    margin: 0 auto;
-    max-width: 1000px;
-}
-.container > hr {
-    margin: 30px 0;
-}
-
-/* Main marketing message and sign up button */
-.jumbotron {
-    margin: 60px 0;
-}
-.jumbotron .main {
-   text-align: center;
-}
-.jumbotron h1 {
-    font-size: 100px;
-    line-height: 1;
-}
-.jumbotron .lead {
-    font-size: 24px;
-    line-height: 1.25;
-}
-.jumbotron .btn {
-    font-size: 21px;
-    padding: 14px 24px;
-    color: #fff;
-}
-
-/* Supporting marketing content */
-.marketing {
-    margin: 60px 0;
-}
-.marketing p + h4 {
-    margin-top: 28px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
 }
 
 
-/* Customize the navbar links to be fill the entire space of the .navbar */
-.navbar .navbar-inner {
-    padding: 0;
+/* begin styles for RSS Feed */
+
+.rss-box {
+  position: absolute;
+  left: 2%;
+  min-width: 28%;
+  max-width: 28%;
+  max-height: 68%;
+  min-height: 68%;
+  overflow-y: auto;
+  overflow-x: auto;
+  background-color: #FFFFFF;
+  box-shadow: 2px 2px 23px 0px;
+  border-radius: 3%;
+
 }
-.navbar .nav {
-    margin: 0;
+.rss-item-auth{
+  color: #9B2813;
 }
-.navbar .nav li {
-    display: table-cell;
-    float: none;
+.rss-items {
+  margin-top:0px;
+  padding:0.5em;
+  color: #FFFFFF;
 }
-.navbar .nav li a {
-    font-weight: bold;
-    text-align: center;
-    border-left: 1px solid rgba(255,255,255,.75);
-    border-right: 1px solid rgba(0,0,0,.1);
-}
-.navbar .nav li:first-child a {
-    border-left: 0;
-    border-radius: 3px 0 0 3px;
-}
-.navbar .nav li:last-child a {
-    border-right: 0;
-    border-radius: 0 3px 3px 0;
+p.rss-title {padding:0.5em;}
+.rss-title {
+  text-decoration: none;
+  font-family: small tahoma, "Bitstream Vera Sans", "Trebuchet MS", "Lucida Grande", lucida, helvetica, sans-serif;
+  font-size: 15px;
+  background-color:#9B2813;
+  color:white;
+  font-weight:bold;
+  margin: 0px;
+  padding:0em;
+  text-align: left;
 }
 
-.registration {
-    background: none repeat scroll 0 0 white;
-    border-radius: 5px 5px 5px 5px;
-    box-shadow: 2px 2px 6px #888888;
-    margin: 5px 5px 50px;
-    position: relative;
+.rss-item  {
+  list-style:none;
+  padding-bottom:1em;
 }
 
-.registration .header {
-    background-color: #0088CC;
-    border-radius: 5px 5px 0 0;
-    color: #fff;
-    min-height:90px;
-    margin-bottom: 30px;
+.rss-item a {
+  text-decoration : none;
+  color: #3300FF;
 }
 
-.registration .header h2 {
-    padding-top: 20px;
-    text-align: center;
+.rss-item a:visited {
+  color: #330066;
 }
 
-.registration .content {
-    padding: 30px;
+.rss-date {
+  font-size: 85%;
+  color: black;
 }
 
-.registration .form-inputs input[type='text'], select, input[type='email'],  input[type='password']{
-    width: 320px;
-}
 
-.form-signin {
-  max-width: 300px;
-  padding: 19px 29px 29px;
-  margin: 0 auto 20px;
-  background-color: #fff;
-  border: 1px solid #e5e5e5;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-  -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+.bonusly-updates{
+  position: absolute;  
+  max-width: 35%; 
+  min-width: 35%; 
+  max-height: 68%;
+  min-height: 68%;
+  overflow-y: auto;
+  overflow-x: auto;
+  left: 58%;
+  padding: 0px 30px;
+  background-color: white; 
+  box-shadow: 2px 2px 23px 0px;
+  border-radius: 3%;
 }
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-  margin-bottom: 10px;
-}
-.form-signin input[type="text"],
-.form-signin input[type="password"] {
-  font-size: 16px;
-  height: auto;
-  margin-bottom: 15px;
-  padding: 7px 9px;
-}
-

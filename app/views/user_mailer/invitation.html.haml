@@ -1,0 +1,10 @@
+%p
+  Hello #{@receiver.email}!
+%p
+  #{@sender.email} has invited you to Josh Intranet.
+%p  
+  Use the link below to sign in using Josh Software account and update your profile. 
+%p
+  = link_to 'Sign in', user_omniauth_authorize_url(:google_oauth2) 
+%p 
+  Note: You will be redirected to google sign in page, make sure you have logged in with Josh email account or if you have logged in through personal gmail account then you need to signed out from personal gmail account.

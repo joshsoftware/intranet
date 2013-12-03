@@ -1,8 +1,0 @@
-$('.modal-body').html('#{escape_javascript(render :partial => 'rejectStatus')}')
-$('#error').html('')
-- if @leave.errors.any?
-  console.log('Error');
-  $('.modal-body').html('#{escape_javascript(render :partial => 'rejectStatus')}')
-- else
-  - if @leave.update_attributes
-    window.location.href = "leaves"

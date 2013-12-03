@@ -1,0 +1,15 @@
+/*
+  =require twitter-bootstrap-static/bootstrap
+
+  Use Font Awesome icons (default)
+  To use Glyphicons sprites instead of Font Awesome, replace with "require twitter-bootstrap-static/sprites"
+  =require twitter-bootstrap-static/fontawesome
+  */
+.navbar-inverse .navbar-inner{
+  background-image: linear-gradient(to bottom, #278B96, #278B96);
+  border-color: #278A4D;
+}
+.navbar-inverse .brand {
+  color: white;
+}
+select { width: 206px; height: 30px;}

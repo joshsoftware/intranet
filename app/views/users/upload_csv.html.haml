@@ -1,8 +1,0 @@
-.upload
-  %h1 Upload file
-
-  = simple_form_for @organization, url: upload_csv_path(@organization.id), :method => :put,  html: {:class => 'form-horizontal', :multipart => true} do |f|
-    = f.error_notification
-    = f.file_field :csv_attachment
-    = f.submit "Upload file"
-

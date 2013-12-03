@@ -1,0 +1,51 @@
+
+!!!
+%html
+  %head
+    :css
+      .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: normal;
+        line-height: 1.428571429;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+      }
+
+      .btn-success {
+        color: #fff;
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+      } 
+      .btn-danger{
+        color: #fff;
+        background-color: #d2322d;
+        border-color: #ac2925;
+      }
+    %h1
+      %title
+        #{@user.name} applied for leave
+  %body
+    %p
+      %i
+        Hello #{@receiver}
+      %br/
+      %br/
+      #{@user.public_profile.name} has apply for leave from #{@leave_application.start_at.to_s} to #{@leave_application.end_at.to_s}.
+      %br/ 
+      = link_to "Approve", approve_leave_url(id: @leave_application.id), class: 'btn btn-success'
+      |
+      = link_to "Reject", cancel_leave_url(id: @leave_application.id), class: 'btn btn-danger'
+

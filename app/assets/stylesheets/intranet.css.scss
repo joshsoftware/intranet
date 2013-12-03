@@ -1,0 +1,42 @@
+#header {
+  background: image-url("header_bkg.png") no-repeat center;
+  width:100%;
+  /*float:left;*/
+  height:107px;
+  min-height: 107px;
+  margin-bottom:0px;
+  .wrap {
+    position:relative;
+    margin:0 auto;
+    width:940px;
+    .logo {
+      a {
+        display: block;
+        width: 215px;
+        height: 58px;
+        margin-top: 10px;
+        float: left;
+      }
+    }
+    .main-menu {
+      float: left;
+      /*min-width: 0px;*/
+      min-width: 69%;
+      max-width: 69%;
+      margin: -42px 0 0 460px;
+      /*margin: 26px 0 0 275px;*/
+      font-size: 1.2em;
+      a {
+        color: #586064;
+        /*color: #621003;*/
+        /*padding-bottom:11px;*/
+      }
+    }
+  }
+}
+.drop{
+  //position: relative;
+  top: inherit;
+  left: inherit;
+}
+

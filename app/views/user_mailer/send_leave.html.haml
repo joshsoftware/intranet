@@ -1,0 +1,22 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    Hello There #{@user},
+    %p
+      Your available leaves are
+      %br/
+      %br/
+      - @leave.available_leaves.each do |k, v|
+        - if v <= 0
+          0.0
+        - else
+          = v.to_s
+      %br/
+      And your assigned leaves are:
+      %br/
+      %br/
+      - @leave.assign_leaves.each do |k, v|
+        = v.to_s
+    Thanks!

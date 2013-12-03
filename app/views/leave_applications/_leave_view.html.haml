@@ -1,0 +1,37 @@
+%table.table.table-hover
+  %thead
+    %th
+      From
+    %th
+      Start Date
+    %th
+      Last Date
+    %th
+      Days 
+    %th 
+      Leave Type
+    %th 
+      Reason
+    %th
+      Applied On
+    %th
+      Action  
+  %tbody
+    - leave_data.each do|appr_leave|
+      %tr{id: "leave_application_#{appr_leave.id}"}
+        %td= appr_leave.user.try(:name)
+        %td= appr_leave.start_at
+        %td= appr_leave.end_at
+        %td= appr_leave.number_of_days
+        %td= appr_leave.leave_type.name
+        %td= appr_leave.reason
+        %td= appr_leave.created_at.try(:strftime, "%Y-%m-%d")
+        %td
+          - if appr_leave.leave_status == "Pending" && current_user.role?("Admin")
+            %a{href: '#', class: 'btn btn-success approve_leave', data:{id: appr_leave.id.to_s, url: 'approve_leave_application', action: 'approve'}}
+              Approve 
+            %a{href: '#', class: 'btn btn-danger cancel_leave', data:{id: appr_leave.id.to_s, url: 'cancel_leave_application', action: 'cancel'}}
+              Reject
+          - else
+            = appr_leave.leave_status
+ 
