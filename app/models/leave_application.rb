@@ -4,7 +4,6 @@ class LeaveApplication
   include Mongoid::History::Trackable  
 
   belongs_to :user
-  belongs_to :leave_type
   #has_one :address
 
   field :start_at,        type: Date
@@ -19,11 +18,10 @@ class LeaveApplication
 
   LEAVE_STATUS = ['Pending', 'Approved', 'Rejected']
 
-  validates :start_at, :end_at, :contact_number, :reason, :number_of_days, :user_id, :leave_type_id, presence: true 
+  validates :start_at, :end_at, :contact_number, :reason, :number_of_days, :user_id , presence: true 
   validates :contact_number, numericality: {only_integer: true}, length: {is: 10}
   validate :validate_leave_details, on: :create
   validate :validate_leave_status, on: :update
-  validates :number_of_days, inclusion: {in: 1..2, message: 'should be less than 3'}, if: Proc.new{|obj| obj.leave_type.name == 'Casual'}
   validate :validate_leave_details_on_update, on: :update
   validate :end_date_less_than_start_date, if: 'start_at.present?'
 
