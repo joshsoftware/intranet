@@ -1,10 +1,6 @@
 module LeaveAvailable
   extend ActiveSupport::Concern
   
-  included do
-    has_many :leave_details
-  end  
-   
   def calculate_remaining_leave(total_leave) 
     ((total_leave * (12 - (self.private_profile.date_of_joining.month - 1)))/12).ceil 
   end
