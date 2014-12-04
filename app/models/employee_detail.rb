@@ -14,4 +14,14 @@ class EmployeeDetail
   before_save do 
     self.notification_emails.try(:reject!, &:blank?)
   end
+
+  def deduct_available_leaves(number_of_days)
+    remaining_leaves = available_leaves - number_of_days
+    self.update_attribute(:available_leaves, remaining_leaves)
+  end
+
+  def add_rejected_leave(number_of_days)
+    remaining_leaves = available_leaves + number_of_days
+    self.update_attribute(:available_leaves, remaining_leaves)
+  end
 end
