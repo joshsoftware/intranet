@@ -1,15 +1,16 @@
 = f.hidden_field :user_id
 = f.input :start_at, label: 'Start Date', input_html: {class: 'datepicker', 'data-behaviour' => 'datepicker', required: true, :'data-validation-required-message' => 'You must select start date'}
 = f.input :end_at, label: 'End Date', input_html: {class: 'datepicker', 'data-behaviour' => 'datepicker', required: true, :'data-validation-required-message' => 'You must select end date'}
-= f.association :leave_type, collection: leave_types.map{|leave_type| [leave_type.name, leave_type.id]}, prompt: "Select type of leave", input_html: {required: true, :'data-validation-required-message' => 'Select Leave type'}
 = f.input :number_of_days, as: :decimal, label: 'Days', input_html: {step: 1}, input_html: { required: true, :'data-validation-required-message' => 'Enter the number of days', min: "1", :'data-validation-min-message' => "Number of day can't be zero or negative"}
 = f.input :contact_number, as: :decimal, label: 'Emergency Contact No.', input_html: {required: true, :'data-validation-required-message' => 'You need to enter your emergency number', type: 'text'}
 = f.input :reason, as: :text, label: 'Reason', input_html: {required: true, :'data-validation-required-message' => 'You have to specify valid reason for leave'}
+= "Available leaves: #{@available_leaves}"
 %center
   = f.submit (params[:action] == "new" ? 'Apply' : 'Save Changes'), class: 'btn'
   %a{class: 'btn btn-warning', id: 'available_leave', name: 'leave_details', href: '#leave_app'}
     Leave Availability
 :javascript
+  set_number_of_days()
   DPGlobal = $.fn.datepicker.DPGlobal;
   date_format = 'dd-mm-yyyy';
 

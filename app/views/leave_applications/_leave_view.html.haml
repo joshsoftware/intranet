@@ -4,7 +4,6 @@
     %th Start Date
     %th Last Date
     %th Days 
-    %th Leave Type
     %th Reason
     %th Applied On
     %th Status 
@@ -20,7 +19,6 @@
         %td= appr_leave.start_at
         %td= appr_leave.end_at
         %td= appr_leave.number_of_days
-        %td= appr_leave.leave_type.name
         %td= appr_leave.reason
         %td= appr_leave.created_at.try(:strftime, "%Y-%m-%d")
         - if appr_leave.pending? && (can? :manage, appr_leave)
@@ -36,6 +34,6 @@
           %td= appr_leave.leave_status
           - if !appr_leave.pending?
             %td= appr_leave.reject_reason
-        %td= appr_leave.user.leave_details.last.available_leave[ appr_leave.leave_type.name == "Privilege" ? "TotalPrivilege" : appr_leave.leave_type.name]
+        %td= appr_leave.user.employee_detail.available_leaves
         - if can? :edit, appr_leave
           %td= link_to 'Edit', edit_leave_application_path(appr_leave)

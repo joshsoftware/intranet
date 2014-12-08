@@ -2,13 +2,12 @@ class LeaveApplicationsController < ApplicationController
    
   before_action :authenticate_user!
   load_and_authorize_resource except: [:create, :view_leave_status, :approve_leave, :cancel_leave]
-  after_action :sick_leave_notification, only: [:create, :update]
   before_action :authorization_for_admin, only: [:approve_leave, :cancel_leave]   
  
   def new
     @leave_application = LeaveApplication.new(user_id: current_user.id)
     @leave_types = LeaveType.all.to_a
-    @leave_detail = current_user.leave_details.this_year.first 
+    @available_leaves = current_user.employee_detail.try(:available_leaves)
   end
   
   def index
@@ -28,15 +27,14 @@ class LeaveApplicationsController < ApplicationController
   end 
 
   def edit
-    @leave_types = LeaveType.all.to_a
-    @leave_detail = current_user.leave_details.this_year.first 
+    @available_leaves = current_user.employee_detail.available_leaves
   end
 
   def update
     if @leave_application.update_attributes(strong_params)
       flash[:error] = "Leave Has Been Updated Successfully. !Wait till approved"
     else
-      @leave_types = LeaveType.all.to_a 
+      @available_leaves = current_user.employee_detail.available_leaves
       flash[:error] = @leave_application.errors.full_messages.join("\n")
       render 'edit' and return
     end 
@@ -55,7 +53,7 @@ class LeaveApplicationsController < ApplicationController
 
   def strong_params
     safe_params = [
-                   :user_id, :leave_type_id, :start_at, 
+                   :user_id, :start_at, 
                    :end_at, :contact_number, :number_of_days,
                    :reason, :reject_reason, :leave_status
                   ]
@@ -73,10 +71,6 @@ class LeaveApplicationsController < ApplicationController
 
   private
 
-    def sick_leave_notification
-      flash[:error] = 'You have to submit medical certificate.' if @leave_application.require_medical_certificate?
-    end
-    
     def process_leave(id, leave_status, call_function, reject_reason = '')
       message = LeaveApplication.process_leave(id, leave_status, call_function, reject_reason)
       
@@ -89,8 +83,6 @@ class LeaveApplicationsController < ApplicationController
       end
     end
     
-     
- 
     def authorization_for_admin
       if !current_user.role?("Admin")
         flash[:error] = 'Unauthorize access'

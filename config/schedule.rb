@@ -41,10 +41,6 @@ end
 
 set :output, {error: 'log/cron_error.log', standard: 'log/cron.log'}
 
-every :month, :at => '12:30am' do
-  rake "leave:increment_paid"
-end
-
 every :year, :at => '12:30am' do
   rake "leave:reset_leave_yearly"
 end

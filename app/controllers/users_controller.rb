@@ -9,9 +9,9 @@ class UsersController < ApplicationController
 
   def index
     if params[:query]
-     @users = User.any_of(:email=>Regexp.new(".*" +params[:query] +".*")).to_a
+      @users = User.any_of(:email=>Regexp.new(".*" +params[:query] +".*")).to_a
     else
-     @users = User.all
+      @users = User.all
     end
     @users = @users.sort{|u1, u2| u1.name.to_s <=> u2.name.to_s} 
     respond_to do |format|  
@@ -54,7 +54,7 @@ class UsersController < ApplicationController
     profile = params.has_key?("private_profile") ? "private_profile" : "public_profile"
     update_profile(profile)
   end
-  
+
   def update_profile(profile)
     user_profile = (profile == "private_profile") ? @private_profile : @public_profile
     if request.put?
@@ -92,11 +92,19 @@ class UsersController < ApplicationController
     send_file @document.path, filename: @document.model.name, type: "#{document_type}"
   end
 
+  def update_available_leave
+    user = User.find(params[:id])
+    user.employee_detail.available_leaves = params[:value]
+    user.save
+    render nothing: true
+  end
+
+
   private
   def load_user
     @user = User.find(params[:id])
   end
-  
+
   def user_params
     safe_params = [] 
     if params[:user][:employee_detail_attributes].present?

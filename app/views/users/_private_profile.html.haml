@@ -44,7 +44,7 @@
           %div{class: "#{a.object.type_of_address.downcase}"}
             %h4
               = a.object.type_of_address
-              - disable = (a.object.type_of_address == ADDRESSES[1] and a.object.same_as_permanent_address == "true") ? true : false
+              - disable = (a.object.type_of_address == ADDRESSES[1] and a.object.same_as_permanent_address == true) ? true : false
             = a.input :type_of_address, as: :hidden
             = a.input :address, as: :text, disabled: disable
             = a.input :city, disabled: disable                  
