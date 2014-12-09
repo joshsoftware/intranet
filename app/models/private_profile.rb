@@ -21,8 +21,10 @@ class PrivateProfile
   before_save do
     if self.date_of_joining_changed?
       user = self.user
-      user.assign_leave if user.eligible_for_leave?
-      user.set_details("doj", self.date_of_joining)
+      if date_of_joining_changed?
+        user.assign_leave if user.eligible_for_leave?
+        user.set_details("doj", self.date_of_joining)
+      end
     end
   end
   

@@ -6,7 +6,6 @@ class LeaveApplicationsController < ApplicationController
  
   def new
     @leave_application = LeaveApplication.new(user_id: current_user.id)
-    @leave_types = LeaveType.all.to_a
     @available_leaves = current_user.employee_detail.try(:available_leaves)
   end
   
@@ -19,7 +18,6 @@ class LeaveApplicationsController < ApplicationController
     if @leave_application.save
       flash[:error] = "Leave Applied Successfully. !Wait till approved"
     else
-      @leave_types = LeaveType.all.to_a 
       flash[:error] = @leave_application.errors.full_messages.join("\n")
       render 'new' and return
     end

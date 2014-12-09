@@ -23,7 +23,7 @@ class Ability
   
   def common_admin_hr
     can :invite_user, User
-    can :manage, [Project, LeaveDetail]
+    can :manage, [Project]
     can :manage, Attachment
     can :manage, Vendor
     can :manage, LeaveApplication

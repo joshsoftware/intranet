@@ -3,7 +3,8 @@ module LeaveAvailable
   
   def assign_leave
     date_of_joining = self.private_profile.date_of_joining
-    self.employee_detail.update_attribute(:available_leaves, calculate_leave(date_of_joining))
+    self.employee_detail || self.build_employee_detail
+    self.employee_detail.available_leaves = calculate_leave(date_of_joining)
   end   
  
   def calculate_leave(date_of_joining)
