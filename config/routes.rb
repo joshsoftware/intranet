@@ -1,11 +1,12 @@
 require 'sidekiq/web'
 Intranet::Application.routes.draw do
   
+  mount RedactorRails::Engine => '/redactor_rails'
   devise_for :users, controllers: { omniauth_callbacks: "omniauth_callbacks" }
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
-
+  resources :articles
   get '/unsubscribe/:id' => 'light/users#unsubscribe', as: 'users/unsubscribe'
   match '/subscribe/:id' => 'light/users#subscribe', as: 'users/subscribe', via: [:get, :post]
   devise_scope :user do

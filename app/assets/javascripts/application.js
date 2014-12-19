@@ -28,4 +28,5 @@
 //= require light/users.js
 //= require screamout/filter.js
 //= require screamout/global.js
+//= require redactor-rails
 //= require_tree .

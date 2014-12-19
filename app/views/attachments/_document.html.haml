@@ -1,0 +1,23 @@
+%h2
+  Documents
+- if can? :manage, Attachment
+  = link_to "Add documet", "#document_modal_new", "data-toggle" => "modal",  data: {'no-turbolink' =>  true}
+.form-horizontal
+  - unless @company_docs.empty?
+    %table.table.table-hover
+      %thead
+        %th Document Name
+        %th.pull-right Manage
+      %tbody
+        - @company_docs.each do |doc|
+          %tr
+            - if doc.is_visible_to_all or (can? :manage, Attachment) 
+              = render partial: 'document_row', locals: {doc: doc}
+  - else
+    %h4
+      = "No Documents to Download"
+  = render partial: "document_modal", locals: {title: "New Document", form_type: "new"}
+  .doc-form
+
+:css 
+  .table td{ border-top: 1px solid white; padding: 0px;}

@@ -1,0 +1,14 @@
+= simple_form_for @article, :html => { :class => 'form-horizontal' } do |article|
+  = article.input :title, :input_html => { :class => 'span8', :placeholder => 'Enter title here...' }
+  = article.text_area :content, :placeholder => "Input here..", :class => "redactor", :rows => 20, :cols => 40
+  %br
+  = article.label :is_published
+  .make-switch#article_button{"data-on" => "success", "data-off" => "warning", "data-on-label"=>"Yes", "data-off-label"=> "NO"}
+    = article.check_box :is_published, {}, 'true', 'false'
+
+  %br
+  = article.button :submit, class: "btn btn-primary"
+
+:css
+  .make-switch{ height: 29px; margin-left: 18px; margin-bottom: 10px;}
+

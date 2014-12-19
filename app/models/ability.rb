@@ -24,7 +24,7 @@ class Ability
   def common_admin_hr
     can :invite_user, User
     can :manage, [Project, LeaveDetail]
-    can :manage, Attachment
+    can :manage, [Attachment, Article]
     can :manage, Vendor
     can :manage, LeaveApplication
     can :manage, Schedule
@@ -39,6 +39,7 @@ class Ability
   def employee_abilities(user_id)
     can [:public_profile, :private_profile, :apply_leave], User, id: user_id
     can [:index, :download_document], Attachment
+    can :read, Article
     can :read, Project
     cannot :manage, LeaveApplication
     can [:new, :create], LeaveApplication, user_id: user_id
