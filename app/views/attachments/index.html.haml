@@ -3,13 +3,13 @@
     %li.active.document-tab
       %a{data: {toggle: 'tab'}, href: "#document"}
         Document
-    %li.article-tab
-      %a{data: {toggle: "tab"}, href: "#article"}
-        Article
+    %li.policy-tab
+      %a{data: {toggle: "tab"}, href: "#policy"}
+        Policy
 
   .tab-content
     .tab-pane.active#document
       = render partial: 'document'
 
-    .tab-pane#article
-      = render partial: 'article'
+    .tab-pane#policy
+      = render partial: 'policy'

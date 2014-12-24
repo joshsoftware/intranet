@@ -1,9 +1,0 @@
-%td
-  %h4
-    .remove_underline
-      = link_to article.title, article_path(article.id)
-%td
-  %h4.pull-right
-    -if can? :mannage, Article
-      = link_to "", edit_article_path(article.id), class: "icon-edit", data: {"no-turbolink" => true}
-      = link_to "", article_path(article), data: {method: :delete, confirm: "Are you sure?"}, class: "icon-trash"

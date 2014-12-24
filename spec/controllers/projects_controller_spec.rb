@@ -6,6 +6,7 @@ describe ProjectsController do
    @admin = FactoryGirl.create(:user, role: 'Admin')
    sign_in @admin
   end
+
   describe "GET index" do
     it "should list all projects" do
       get :index

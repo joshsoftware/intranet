@@ -1,0 +1,20 @@
+%h2
+  Policies
+- if can? :manage, Policy
+  = link_to "Add Policy", new_policy_path
+.form-horizontal
+  - unless @policies.empty?
+    %table.table.table-hover
+      %thead
+        %th Policy Title
+        %th.pull-right Manage
+      %tbody
+        - @policies.each do |policy|
+          %tr
+            - if policy.is_published or (can? :manage, Policy) 
+              = render partial: 'policy_row', locals: {policy: policy}
+  - else
+    %h4
+      = "No policies found"
+:css 
+  .table td{ border-top: 1px solid white; padding: 0px;}

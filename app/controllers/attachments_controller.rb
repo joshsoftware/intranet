@@ -7,7 +7,7 @@ class AttachmentsController < ApplicationController
   def index
     @company_docs = Attachment.company_documents  
     @attachment = Attachment.new
-    @articles = Article.all
+    @policies = Policy.all
   end
   
   def create
