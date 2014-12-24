@@ -25,7 +25,7 @@ class LeaveApplicationsController < ApplicationController
   end 
 
   def edit
-    @available_leaves = current_user.employee_detail.available_leaves
+    @available_leaves = @leave_application.user.employee_detail.available_leaves
   end
 
   def update
