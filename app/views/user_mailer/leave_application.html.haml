@@ -47,11 +47,9 @@
       %br
       For reason #{@leave_application.reason}.
       %br
-      Of type : #{@leave_application.leave_type.name}
-      %br
       Days : #{@leave_application.number_of_days}
       %br
-      Remaining leaves: #{User.find(@leave_application.user_id).leave_details.last.available_leave[@leave_application.leave_type.name == "Privilege" ? "TotalPrivilege" : @leave_application.leave_type.name]}
+      Remaining leaves: #{User.find(@leave_application.user_id).employee_detail.available_leaves}
       %br
       = link_to "Approve", approve_leave_url(id: @leave_application.id), class: 'btn btn-success'
       |

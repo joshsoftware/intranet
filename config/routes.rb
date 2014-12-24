@@ -1,7 +1,8 @@
 require 'sidekiq/web'
 Intranet::Application.routes.draw do
-  
+
   mount RedactorRails::Engine => '/redactor_rails'
+
   devise_for :users, controllers: { omniauth_callbacks: "omniauth_callbacks" }
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
@@ -9,6 +10,8 @@ Intranet::Application.routes.draw do
   resources :policies
   get '/unsubscribe/:id' => 'light/users#unsubscribe', as: 'users/unsubscribe'
   match '/subscribe/:id' => 'light/users#subscribe', as: 'users/subscribe', via: [:get, :post]
+  get '/web-version/:id' => 'light/newsletters#web_version', as: 'newsletter/web_version'
+
   devise_scope :user do
     match :invite_user, to: 'users#invite_user', via: [:get, :post]
     match '/admin', to: 'devise/sessions#new', via: [:get]
@@ -24,7 +27,7 @@ Intranet::Application.routes.draw do
     mount Light::Engine => '/newsletter'
     mount Screamout::Engine => '/screamout'
   end
-  
+
   get 'contacts' => 'admins#contacts_from_site', as: 'site_contacts'
 
   get 'calendar' => 'home#calendar', as: :calendar  
@@ -43,8 +46,8 @@ Intranet::Application.routes.draw do
       post :import_vendors
     end
   end
-  
-  put 'available_leave/:type/:id' => 'leave_details#update_available_leave', as: :update_available_leave 
+
+  put 'available_leave/:id' => 'users#update_available_leave', as: :update_available_leave 
   get 'view/leave_applications' => 'leave_applications#view_leave_status', as: :view_leaves 
   get 'cancel_leave_application' => 'leave_applications#cancel_leave', as: :cancel_leave 
   get 'approve_leave_application' => 'leave_applications#approve_leave', as: :approve_leave

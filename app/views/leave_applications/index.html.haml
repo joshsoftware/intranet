@@ -6,31 +6,16 @@
       %th
         Name
       %th
-        = image_tag(asset_url("sick_leave.jpg"), class: "leave-icon")
-        Sick Leave
-      %th
-        = image_tag(asset_url("casual_leave.jpg"), class: "leave-icon")
-        Casual Leave
-      %th
         = image_tag(asset_url("paid_leave.jpg"), class: "leave-icon")
-        Current Year Privilege Leave
-      %th
-        = image_tag(asset_url("paid_leave.jpg"), class: "leave-icon")
-        Total Privilege Leave
+        Available leaves
   %tbody
     - @users.each do|user|
       %tr{hidden: (true if user.status != STATUS[2])}
         %td
           = user.name
-        - leave_detail = user.leave_details.last || user.leave_details.build
         %td
-          = link_to leave_detail.available_leave["Sick"], '#', {class: 'leave_type_sick', id: "sick_#{leave_detail.id}", data:{pk: leave_detail.id.to_s, url: update_available_leave_path(id: leave_detail.id, type: 'Sick'), name: 'Sick'}}
-        %td
-          = link_to leave_detail.available_leave["Casual"], '#', {class: 'leave_type_casual', id: "casual_#{leave_detail.id}", data:{pk: leave_detail.id.to_s, url: update_available_leave_path(id: leave_detail.id, type: 'Casual'), name: 'Casual'}}
-        %td
-          = link_to leave_detail.available_leave["CurrentPrivilege"],  "#", {class: 'leave_type_current', id: "current_paid_#{leave_detail.id}", data:{pk: leave_detail.id.to_s, url: update_available_leave_path(id: leave_detail.id, type: 'CurrentPrivilege'), name: 'CurrentPrivilege'}}
-        %td
-          = link_to leave_detail.available_leave["TotalPrivilege"],  "#", {class: 'leave_type_paid', id: "paid_#{leave_detail.id}", data:{pk: leave_detail.id.to_s, url: update_available_leave_path(id: leave_detail.id, type: 'TotalPrivilege'), name: 'TotalPrivilege'}}
+          = link_to user.employee_detail.try(:available_leaves),'#', {class: 'available_leaves', id: "leave_#{user.try(:id)}", data:{pk: user.id, url: update_available_leave_path(id: user.id)}} if user.status.eql?(STATUS[2])
+
 :coffeescript
   $('tr[hidden]').attr("hide", "true")
   $('#show').click ->
@@ -45,48 +30,7 @@
       
 :javascript
   $.fn.editable.defaults.ajaxOptions = {type: "PUT"}; 
-  $('.leave_type_sick').editable({
-    url: $(this).data('url'),
-    validate: function(value){
-      if(value == '')
-      {
-        return 'Can not be blank'
-      }
-      if(isNaN(value)){
-        return 'Enter only Number'
-      }
-      
-      
-    }
-  });
-  $('.leave_type_casual').editable({
-    url: $(this).data('url'),
-    validate: function(value){
-      if(value == '')
-      {
-        return 'Can not be blank'
-      }
-      if(isNaN(value)){
-        return 'Enter only Number'
-      }
-      
-      
-    }
-  });
-  $('.leave_type_paid').editable({
-    url: $(this).data('url'),
-    validate: function(value){
-      if(value == '')
-      {
-        return 'Can not be blank'
-      }
-      if(isNaN(value)){
-        return 'Enter only Number'
-      }
-    }
-  });
-
-  $('.leave_type_current').editable({
+  $('.available_leaves').editable({
     url: $(this).data('url'),
     validate: function(value){
       if(value == '')

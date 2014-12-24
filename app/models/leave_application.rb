@@ -4,7 +4,6 @@ class LeaveApplication
   include Mongoid::History::Trackable  
 
   belongs_to :user
-  belongs_to :leave_type
   #has_one :address
 
   field :start_at,        type: Date
@@ -19,12 +18,10 @@ class LeaveApplication
 
   LEAVE_STATUS = ['Pending', 'Approved', 'Rejected']
 
-  validates :start_at, :end_at, :contact_number, :reason, :number_of_days, :user_id, :leave_type_id, presence: true 
+  validates :start_at, :end_at, :contact_number, :reason, :number_of_days, :user_id , presence: true 
   validates :contact_number, numericality: {only_integer: true}, length: {is: 10}
-  validate :validate_leave_details, on: :create
+  validate :validate_available_leaves, on: [:create, :update]
   validate :validate_leave_status, on: :update
-  validates :number_of_days, inclusion: {in: 1..2, message: 'should be less than 3'}, if: Proc.new{|obj| obj.leave_type.name == 'Casual'}
-  validate :validate_leave_details_on_update, on: :update
   validate :end_date_less_than_start_date, if: 'start_at.present?'
 
   after_create :deduct_available_leave_send_mail
@@ -33,10 +30,6 @@ class LeaveApplication
   scope :pending, ->{where(leave_status: 'Pending')}
   scope :processed, ->{where(:leave_status.ne => 'Pending')}
  
-  def require_medical_certificate?
-    leave_type.name == 'Sick' and number_of_days >= 3
-  end
-
   def process_after_update(status)
     send("process_#{status}") 
   end
@@ -47,7 +40,7 @@ class LeaveApplication
 
   def process_reject_application
     user = self.user
-    user.get_leave_detail(Date.today.year).add_rejected_leave(leave_type: self.leave_type.name, no_of_leave: self.number_of_days)    
+    user.employee_detail.add_rejected_leave(number_of_days)    
     UserMailer.delay.reject_leave(self.id)
   end
 
@@ -69,41 +62,22 @@ class LeaveApplication
   private
     def deduct_available_leave_send_mail
       user = self.user
-      user.get_leave_detail(Date.today.year).deduct_available_leave(leave_type: self.leave_type.name, no_of_leave: self.number_of_days)    
+      user.employee_detail.deduct_available_leaves(number_of_days)    
       user.sent_mail_for_approval(self.id) 
     end
 
     def update_available_leave_send_mail
       user = self.user
       prev_days, changed_days = number_of_days_change ? number_of_days_change : number_of_days
-      prev_type, changed_type = changed_leave_type
-      user.get_leave_detail(Date.today.year).add_rejected_leave(leave_type: prev_type.name, no_of_leave: prev_days)
-      user.get_leave_detail(Date.today.year).deduct_available_leave(leave_type: changed_type.name, no_of_leave: changed_days||prev_days)
+      user.employee_detail.add_rejected_leave(prev_days)
+      user.employee_detail.deduct_available_leaves(changed_days||prev_days)
       user.sent_mail_for_approval(self.id) 
     end
 
-    def changed_leave_type
-      prev_type_id, changed_type_id = leave_type_id_change ? leave_type_id_change : leave_type_id
-      [LeaveType.find(prev_type_id), LeaveType.find(changed_type_id || leave_type_id)]
-    end
 
-    def validate_leave_details_on_update
-      if number_of_days_change or leave_type_id_change
-      prev_days, changed_days = number_of_days_change ? number_of_days_change : number_of_days
-      prev_type, changed_type = changed_leave_type
-      if leave_type_id_change
-        validate_leave_details(changed_type.name, changed_days || number_of_days)
-      else
-        validate_leave_details(changed_type.name, (changed_days || number_of_days) - prev_days)
-      end
-      end
-    end
-
-    def validate_leave_details(name = leave_type.name, days = number_of_days)
-      leave_detail = self.user.leave_details.where(year: Date.today.year).first
-      if leave_detail.blank? or leave_detail.validate_leave(name, days) 
-        errors.add(:base, 'Not Sufficient Leave !Contact Administrator ') 
-      end
+    def validate_available_leaves
+      available_leaves = self.user.employee_detail.available_leaves
+      errors.add(:base, 'Not Sufficient Leave !Contact Administrator ') if available_leaves < number_of_days
     end
 
     def validate_leave_status

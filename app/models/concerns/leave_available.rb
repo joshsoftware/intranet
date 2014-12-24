@@ -1,52 +1,22 @@
 module LeaveAvailable
   extend ActiveSupport::Concern
   
-  included do
-    has_many :leave_details
-  end  
-   
-  def calculate_remaining_leave(total_leave) 
-    ((total_leave * (12 - (self.private_profile.date_of_joining.month - 1)))/12).ceil 
-  end
-
   def assign_leave
-    leave_details = self.leave_details.find_or_initialize_by(year: Date.today.year)
-    #Logic is that casual and sick leave are 6 per years and paid leave calculated per month
-    leave_details.available_leave["Sick"] = leave_details.available_leave["Casual"] = calculate_remaining_leave(SICK_LEAVE) if self.private_profile.date_of_joining.year == Date.today.year 
-    leave_details.save
+    date_of_joining = self.private_profile.date_of_joining
+    self.employee_detail || self.build_employee_detail
+    self.employee_detail.available_leaves = calculate_leave(date_of_joining)
   end   
-  
-  def total_leave_carry_forward
-    doj = self.private_profile.date_of_joining
-    (doj.month == (Date.today.year - 1))? ((CAN_CARRY_FORWARD/12.to_d).to_d * (12 - (doj.month - 1))).to_s : CAN_CARRY_FORWARD
-  end 
  
-  def privilege_leave_yearly(available_leave, current_leave_details) 
-    no_carry_over_leave = available_leave["CurrentPrivilege"].to_d - total_leave_carry_forward
-    total_paid_leave = available_leave["TotalPrivilege"]  
-    current_leave_details.available_leave["TotalPrivilege"] = no_carry_over_leave >= 0 ? (total_paid_leave.to_d - no_carry_over_leave).to_s : total_paid_leave.to_s
+  def calculate_leave(date_of_joining)
+    leaves = (13 - date_of_joining.month) * PER_MONTH_LEAVE
+    leaves = leaves - 1 if date_of_joining.day > 15
+    leaves
   end
- 
+
   def set_leave_details_per_year
-    available_leave = self.leave_details.where(year: Date.today.year - 1 ).first.available_leave
-    current_leave_details = self.leave_details.build(year: Date.today.year) 
-    current_leave_details.available_leave["Sick"] = current_leave_details.available_leave["Casual"] = SICK_LEAVE
-    privilege_leave_yearly(available_leave, current_leave_details)
-    current_leave_details.save 
+    self.employee_detail.update_attribute(:available_leaves, PER_MONTH_LEAVE*12)
   end
   
-  def assign_monthly_leave
-    available_leave = leave_details.detect{|ld| ld.year == Date.today.year }
-    if available_leave.present?
-      available_leave.monthly_paid_leave()
-      available_leave.save 
-    end
-  end 
-
-  def get_leave_detail(year)
-    leave_details.where(year: year).first   
-  end
-
   def eligible_for_leave?
     !!(self.private_profile.try(:date_of_joining).try(:present?) && ['Admin', 'Intern'].exclude?(self.role))
   end  
