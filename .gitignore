@@ -39,3 +39,6 @@
 .env
 /public/system/
 /public/snapshots/
+/log/*
+/doc/
+/public/newsletter/
