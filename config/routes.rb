@@ -6,7 +6,7 @@ Intranet::Application.routes.draw do
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
-  resources :articles
+  resources :policies
   get '/unsubscribe/:id' => 'light/users#unsubscribe', as: 'users/unsubscribe'
   match '/subscribe/:id' => 'light/users#subscribe', as: 'users/subscribe', via: [:get, :post]
   devise_scope :user do
