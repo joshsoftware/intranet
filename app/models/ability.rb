@@ -31,8 +31,8 @@ class Ability
   end
   
   def intern_abilities 
-    can [:public_profile, :private_profile, :apply_leave], User
-    can :read, :all
+    can [:public_profile, :private_profile], User
+    can :read, [Policy, Attachment, Vendor]
     can :read, Project 
   end
   
