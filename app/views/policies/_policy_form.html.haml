@@ -1,5 +1,5 @@
 = simple_form_for @policy, :html => { :class => 'form-label-left-align form-horizontal' } do |policy|
-  = policy.input :title, :input_html => { :class => 'span8', :placeholder => 'Enter title here...' }
+  = policy.input :title, label: false, :input_html => { :class => 'span8', :placeholder => 'Enter title here...' }
   = policy.text_area :content, :placeholder => "Input here..", :class => "redactor", :rows => 20, :cols => 40
   %br
   = policy.label :is_published
@@ -11,4 +11,4 @@
 
 :css
   .make-switch{ height: 29px; margin-left: 18px; margin-bottom: 10px;}
-
+  .policy_title .controls { margin-left: 0; }
