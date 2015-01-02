@@ -1,9 +1,9 @@
 %td
   %h4
     .remove_underline
-      = link_to policy.title, policy_path(policy.id)
+      = link_to policy.title, policy_path(policy)
 %td
   %h4.pull-right
     -if can? :mannage, Policy
-      = link_to "", edit_policy_path(policy.id), class: "icon-edit", data: {"no-turbolink" => true}
+      = link_to "", edit_policy_path(policy), class: "icon-edit", data: {"no-turbolink" => true}
       = link_to "", policy_path(policy), data: {method: :delete, confirm: "Are you sure?"}, class: "icon-trash"
