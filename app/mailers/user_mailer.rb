@@ -73,6 +73,11 @@ class UserMailer < ActionMailer::Base
          to: 'all@joshsoftware.com')
   end
 
+  def new_policy_notification(policy_id)
+    @policy = Policy.find(policy_id)
+    mail(subject: "New policy has been added",to: 'all@joshsoftware.com' )
+  end
+
   private
 
   def get_user_years(users)

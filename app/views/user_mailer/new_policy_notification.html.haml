@@ -1,0 +1,13 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    %p
+      %i
+        Hello,
+      %br/
+      %br/
+      New policy 
+      = link_to "'#{@policy.title}'", policy_url(@policy)
+      is added to intranet.
