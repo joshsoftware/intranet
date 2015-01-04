@@ -51,7 +51,9 @@ module UserDetail
 
     def send_birthdays_wish
       user_ids = User.approved.where(dob_month: Date.today.month, dob_day: Date.today.day).map(&:id)
-      UserMailer.birthday_wish(user_ids).deliver if user_ids.present?
+      if user_ids.present?
+        user_ids.each{ |user_id| UserMailer.birthday_wish(user_id).deliver}
+      end
     end
 
     def send_year_of_completion

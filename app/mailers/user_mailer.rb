@@ -44,10 +44,9 @@ class UserMailer < ActionMailer::Base
     mail(to: hr.email, subject: "Intranet: #{@downloader.name} has downloaded #{document_name}")
   end
   
-  def birthday_wish(user_ids)
-    users = User.find(user_ids)
-    @names = users.map(&:name).join(', ')  
-    mail(to: "all@joshsoftware.com", subject: "Happy Birthday #{@names}") 
+  def birthday_wish(user_id)
+    @birthday_user = User.find(user_id)
+    mail(to: "all@joshsoftware.com", subject: "Happy Birthday #{@birthday_user.name}")
   end
 
   def year_of_completion_wish(user_ids)
