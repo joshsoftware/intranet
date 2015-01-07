@@ -40,12 +40,14 @@ class UserMailer < ActionMailer::Base
   def download_notification(downloader_id, document_name)
     @downloader = User.find(downloader_id)
     @document_name = document_name
-    hr = User.approved.where(role: 'HR').first
-    mail(to: hr.email, subject: "Intranet: #{@downloader.name} has downloaded #{document_name}")
+    hr = User.approved.where(role: 'HR').try(:first).try(:email) || 'hr@joshsoftware.com'
+    mail(to: hr, subject: "Intranet: #{@downloader.name} has downloaded #{document_name}")
   end
   
   def birthday_wish(user_id)
     @birthday_user = User.find(user_id)
+    url = @birthday_user.public_profile.image.medium.path || "#{Rails.root}/app/assets/images/default_photo.gif"
+    attachments.inline['user.jpg'] = File.read(url)
     mail(to: "all@joshsoftware.com", subject: "Happy Birthday #{@birthday_user.name}")
   end
 
