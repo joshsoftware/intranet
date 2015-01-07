@@ -3,7 +3,7 @@
     %table.table
       = render partial: 'users/project', collection: @projects
 
-/ = render partial: 'bonusly_updates', object: @bonusly_updates
+  = render partial: 'bonusly_updates', object: @bonusly_updates
 .bonusly-updates.blog
   - @blog.each do |blog|
     %br
