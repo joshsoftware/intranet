@@ -3,10 +3,10 @@
     %th From
     %th Start Date
     %th Last Date
-    %th Days 
+    %th Days
     %th Reason
     %th Applied On
-    %th Status 
+    %th Status
     - if (leave_data.present? and !leave_data.first.pending?) or can? :manage, LeaveApplication
       %th Reason for rejecting
     %th Remaining leaves
@@ -16,19 +16,19 @@
     - leave_data.each do|appr_leave|
       %tr{id: "leave_application_#{appr_leave.id}"}
         %td= appr_leave.user.try(:name)
-        %td= appr_leave.start_at
-        %td= appr_leave.end_at
+        %td= appr_leave.start_at.strftime("%d-%m-%Y")
+        %td= appr_leave.end_at.strftime("%d-%m-%Y")
         %td= appr_leave.number_of_days
         %td= appr_leave.reason
-        %td= appr_leave.created_at.try(:strftime, "%Y-%m-%d")
+        %td= appr_leave.created_at.strftime("%d-%m-%Y")
         - if appr_leave.pending? && (can? :manage, appr_leave)
-          %td.spinner.hide= image_tag('select2-spinner.gif', :class => 'spinner') 
+          %td.spinner.hide= image_tag('select2-spinner.gif', :class => 'spinner')
           %td.action
             %a{href: '#', class: 'btn btn-success approve_leave', data:{id: appr_leave.id.to_s, url: 'approve_leave_application', action: 'approve'}}
-              Approve 
+              Approve
             %div{class: 'btn btn-danger cancel_leave'}
               Reject
-          %td.leave_status 
+          %td.leave_status
             %a.reject_reason{data:{id: appr_leave.id.to_s, url: 'cancel_leave_application', action: 'cancel', value: '', type: :textarea}}
         - else
           %td= appr_leave.leave_status

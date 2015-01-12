@@ -16,12 +16,13 @@ class LeaveApplicationsController < ApplicationController
   def create
     @leave_application = LeaveApplication.new(strong_params)
     if @leave_application.save
-      flash[:error] = "Leave Applied Successfully. !Wait till approved"
+      flash[:error] = "Leave applied successfully. Please wait for leave to be approved!!!"
     else
       flash[:error] = @leave_application.errors.full_messages.join("\n")
       render 'new' and return
     end
-    redirect_to public_profile_user_path(current_user) and return 
+    #redirect_to public_profile_user_path(current_user) and return 
+    redirect_to view_leaves_path(current_user) and return 
   end 
 
   def edit
@@ -30,7 +31,7 @@ class LeaveApplicationsController < ApplicationController
 
   def update
     if @leave_application.update_attributes(strong_params)
-      flash[:error] = "Leave Has Been Updated Successfully. !Wait till approved"
+      flash[:error] = "Leave has been updated successfully. Please wait for leave to be approved!!!"
     else
       @available_leaves = current_user.employee_detail.available_leaves
       flash[:error] = @leave_application.errors.full_messages.join("\n")
