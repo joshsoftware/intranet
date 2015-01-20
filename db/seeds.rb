@@ -7,12 +7,14 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 #
 
-admin = User.create(email: "Administrator@joshsoftware.com", password: "josh123", role: "Super Admin")
-hr = User.create(email: "hr@joshsoftware.com", password: "josh123", role: "HR")
-LeaveType.collection.insert(
-  [ {name: 'Sick', number_of_days: SICK_LEAVE},
-    {name: 'Casual', number_of_days: CASUAL_LEAVE},
-    {name: 'Previlege', number_of_days: PRIVILEGE_LEAVE}
-  ])
-admin.build_public_profile(first_name: "Josh", last_name: "Admin").save
-hr.build_public_profile(first_name: "Josh", last_name: "HR").save
+admin = User.new(email: "Administrator@joshsoftware.com", password: "josh123", role: "Admin", status: "approved")
+hr = User.new(email: "testhr@joshsoftware.com", password: "josh123", role: "HR", status: "approved")
+employee = User.new(email: "testemployee@joshsoftware.com", password: "josh123", role: "HR", status: "approved")
+admin.build_public_profile(first_name: "Josh", last_name: "Admin")
+hr.build_public_profile(first_name: "Josh", last_name: "HR")
+employee.build_public_profile(first_name: "Josh", last_name: "Emp")
+hr.build_private_profile(date_of_joining: Date.parse('1-1-2015'))
+employee.build_private_profile(date_of_joining: Date.parse('1-1-2015'))
+admin.save
+hr.save
+employee.save
