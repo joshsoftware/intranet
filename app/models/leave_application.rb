@@ -77,7 +77,7 @@ class LeaveApplication
 
     def validate_available_leaves
       available_leaves = self.user.employee_detail.available_leaves
-      errors.add(:base, 'Not Sufficient Leave !Contact Administrator ') if available_leaves < number_of_days
+      errors.add(:base, 'Not Sufficient Leave! Contact Administrator ') if available_leaves < number_of_days
     end
 
     def validate_leave_status
