@@ -20,7 +20,7 @@
         %td= appr_leave.end_at.strftime("%d-%m-%Y")
         %td= appr_leave.number_of_days
         %td= appr_leave.reason
-        %td= appr_leave.created_at.strftime("%d-%m-%Y")
+        %td= appr_leave.created_at.try(:strftime, "%d-%m-%Y")
         - if appr_leave.pending? && (can? :manage, appr_leave)
           %td.spinner.hide= image_tag('select2-spinner.gif', :class => 'spinner')
           %td.action
