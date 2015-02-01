@@ -94,12 +94,14 @@ class LeaveApplication
   end
 
   def validate_date
-    leave_applications = self.user.leave_applications.ne(leave_status: LEAVE_STATUS[2])
-    leave_applications.each do |leave_application|
-      errors.add(:base, "Already applied for leave on same date") and return if self.start_at.between?(leave_application.start_at, leave_application.end_at) or
-        self.end_at.between?(leave_application.start_at, leave_application.end_at) or
-        leave_application.start_at.between?(self.start_at, self.end_at) or
-        leave_application.end_at.between?(self.start_at, self.end_at)
+    if self.start_at_changed? or self.end_at_changed?
+      leave_applications = self.user.leave_applications.ne(leave_status: LEAVE_STATUS[2])
+      leave_applications.each do |leave_application|
+        errors.add(:base, "Already applied for leave on same date") and return if self.start_at.between?(leave_application.start_at, leave_application.end_at) or
+          self.end_at.between?(leave_application.start_at, leave_application.end_at) or
+          leave_application.start_at.between?(self.start_at, self.end_at) or
+          leave_application.end_at.between?(self.start_at, self.end_at)
+      end
     end
   end
 end
