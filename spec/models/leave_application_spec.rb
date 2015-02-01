@@ -19,7 +19,6 @@ describe LeaveApplication do
     end
 
     it 'end date can be equal to start date' do
-      puts ":::::"
       date = Date.today
       leave_application = FactoryGirl.build(:leave_application, user_id: @user.id, number_of_days: 2, start_at: date, end_at: date)
       expect(leave_application.valid?).to eq(true)
@@ -46,5 +45,4 @@ describe LeaveApplication do
       Sidekiq::Extensions::DelayedMailer.jobs.size.should eq(1)
     end
   end
-
 end

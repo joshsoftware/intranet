@@ -95,7 +95,8 @@ class LeaveApplication
 
   def validate_date
     if self.start_at_changed? or self.end_at_changed?
-      leave_applications = self.user.leave_applications.ne(leave_status: LEAVE_STATUS[2])
+      # While updating leave application do not consider self.. 
+      leave_applications = self.user.leave_applications.ne(leave_status: LEAVE_STATUS[2]).ne(id: self.id)
       leave_applications.each do |leave_application|
         errors.add(:base, "Already applied for leave on same date") and return if self.start_at.between?(leave_application.start_at, leave_application.end_at) or
           self.end_at.between?(leave_application.start_at, leave_application.end_at) or
