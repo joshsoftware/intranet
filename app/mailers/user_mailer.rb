@@ -52,11 +52,11 @@ class UserMailer < ActionMailer::Base
     mail(to: "all@joshsoftware.com", subject: "Congratulations #{@user_hash.collect{|k, v| v }.flatten.join(", ")}") 
   end
 
-  def leaves_reminder
+  def leaves_reminder(leaves)
     hr = User.approved.where(role: 'HR').first
     admin_emails = User.approved.where(role: 'Admin').all.map(&:email)
     @receiver_emails = [admin_emails, hr.try(:email)].flatten.join(',')
-    @leaves = LeaveApplication.where(start_at: Date.today + 1, leave_status: "Approved")
+    @leaves = leaves
     mail(to: @receiver_emails, subject: "Employees on leave tomorrow.") if @leaves.present?
   end
 

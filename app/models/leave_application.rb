@@ -60,6 +60,10 @@ class LeaveApplication
     end
   end
 
+  def self.get_leaves_for_sending_reminder(date) 
+    LeaveApplication.where(start_at: date, leave_status: "Approved")
+  end
+
   private
   def deduct_available_leave_send_mail
     user = self.user
