@@ -3,5 +3,10 @@
   .projects
     %table.table
       = render partial: 'project', collection: @projects
-- unless ( @user.role.eql?('Admin') || @not_found.eql?(true) )
-  = render partial: 'users/bonusly_updates', locals: {bonus_given: @bonus_given, bonus_received: @bonus_recieved, user: @user}
+- unless @user.role.eql?('Admin')
+  #profile-updates-widget.accordion.bonusly-updates.common-bonusly-updates
+    - if @github_entries.present?
+      = render partial: 'users/github_profile', locals: {github_entries: @github_entries}
+    - unless @not_found.eql?(true)
+      = render partial: 'users/bonusly_given', locals: {bonus_given: @bonus_given, user: @user}
+      = render partial: 'users/bonusly_received', locals: {bonus_received: @bonus_received, user: @user}

@@ -1,0 +1,15 @@
+.accordion-group
+  .accordion-heading
+    %a.accordion-toggle{"data-parent" => "#profile-updates-widget", "data-toggle" => "collapse", :href => "#collapseOne"}
+      %h4{align: 'center'}
+        = "Bonus Given"
+  #collapseOne.accordion-body.collapse
+    .accordion-inner
+      %ul.media-list
+        - if bonus_given.size.eql?(0)
+          %li.media
+            %h5{align: 'center'}
+              = "#{user.public_profile.name} has not given any bonus in this month."
+        - else
+          - bonus_given.each do |message|
+            = render partial: 'users/bonusly_updates_display', locals: {message: message}

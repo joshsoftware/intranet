@@ -26,9 +26,10 @@ class UsersController < ApplicationController
     if @bonusly_updates.eql?('Not found')
       @not_found = true
     else
-      @bonus_recieved = @bonusly_updates.select{|message| message["receiver"]["email"] == @user.email}
+      @bonus_received = @bonusly_updates.select{|message| message["receiver"]["email"] == @user.email}
       @bonus_given = @bonusly_updates.select{|message| message["giver"]["email"] == @user.email}
     end
+    @github_entries = get_github_feed
   end
 
   def update
@@ -162,5 +163,15 @@ class UsersController < ApplicationController
     bonusly.bonusly_messages(start_time: Date.today.strftime('%B+1st'), 
                              end_time:   Date.today.end_of_month.strftime('%B+%dst'),
                              user_email: @user.email)
+  end
+
+  def get_github_feed
+    handle = @user.public_profile.github_handle
+    github_feed = Feedjira::Feed.fetch_and_parse "https://github.com/#{handle}.atom"
+    if github_feed != 200
+      github_feed.entries[0..9]
+    else
+      []
+    end
   end
 end
