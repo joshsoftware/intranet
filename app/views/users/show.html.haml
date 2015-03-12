@@ -10,3 +10,5 @@
     - unless @not_found.eql?(true)
       = render partial: 'users/bonusly_given', locals: {bonus_given: @bonus_given, user: @user}
       = render partial: 'users/bonusly_received', locals: {bonus_received: @bonus_received, user: @user}
+    - if @blog_entries.present?
+      = render partial: 'users/blog_feed', locals: {blog_entries: @blog_entries}

@@ -30,6 +30,7 @@ class UsersController < ApplicationController
       @bonus_given = @bonusly_updates.select{|message| message["giver"]["email"] == @user.email}
     end
     @github_entries = get_github_feed
+    @blog_entries   = get_blog_feed
   end
 
   def update
@@ -170,6 +171,16 @@ class UsersController < ApplicationController
     github_feed = Feedjira::Feed.fetch_and_parse "https://github.com/#{handle}.atom"
     if github_feed != 200
       github_feed.entries[0..9]
+    else
+      []
+    end
+  end
+
+  def get_blog_feed
+    blog_url = @user.public_profile.blog_url
+    blog_feed = Feedjira::Feed.fetch_and_parse "#{blog_url}/feed"
+    if blog_feed != 200
+      blog_feed.entries[0..9]
     else
       []
     end
