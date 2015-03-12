@@ -170,7 +170,12 @@ class UsersController < ApplicationController
     handle = @user.public_profile.github_handle
     github_feed = Feedjira::Feed.fetch_and_parse "https://github.com/#{handle}.atom"
     if github_feed != 200
-      github_feed.entries[0..9]
+      github_commits = []
+      github_feed.entries.each do |entry|
+        github_commits.push entry if entry.title.include?("pushed to") || entry.title.include?("wiki")
+        break if github_commits.length == 10
+      end
+      github_commits
     else
       []
     end
