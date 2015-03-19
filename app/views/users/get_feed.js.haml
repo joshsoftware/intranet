@@ -1,0 +1,19 @@
+- case @feed_type 
+  - when "github"
+    - if @github_entries.present?
+      $("#github").html("#{escape_javascript(render(partial: 'users/github_profile', locals: {github_entries: @github_entries} ))}");
+    - else
+      $("#github").html("")
+  - when "blog"
+    - if @blog_entries.present?
+      $("#blog").html("#{escape_javascript(render(partial: 'users/blog_feed', locals: {blog_entries: @blog_entries} ))}");
+    - else
+      $("#blog").html("")
+  - when "bonusly"
+    - unless @not_found.eql?(true)
+      $("#bonus-received").html("#{escape_javascript(render partial: 'users/bonusly_received', locals: {bonus_received: @bonus_received, user: @user})}");
+      $("#bonus-given").html("#{escape_javascript(render partial: 'users/bonusly_given', locals: {bonus_given: @bonus_given, user: @user})}");
+    - else
+      $("#bonus-received").html("");
+      $("#bonus-given").html("");
+  

@@ -98,3 +98,32 @@
 {
     text-align: left !important;
 }
+
+// Github icons customisation
+.octicon {
+  font-size: 16px;
+}
+
+.mega-octicon {
+  font-size: 24px;
+}
+
+.navigation .octicon {
+  width: 16px;
+  text-align: center;
+}
+
+.gravatar {
+  float: left;
+  margin-right: 0.6em;
+  line-height: 0;
+  background-color: #fff;
+  border-radius: 3px;
+}
+
+#github{
+  .project-name {
+    border-bottom: 1px solid;
+    padding-bottom: 5px;
+  }
+}

@@ -17,5 +17,6 @@
  *= require jquery.timepicker.css
  *= require screamout/global
  *= require redactor-rails
+ *= require octicons/octicons.css
  *= require_tree .
  */

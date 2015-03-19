@@ -3,5 +3,27 @@
   .projects
     %table.table
       = render partial: 'project', collection: @projects
-- unless ( @user.role.eql?('Admin') || @not_found.eql?(true) )
-  = render partial: 'users/bonusly_updates', locals: {bonus_given: @bonus_given, bonus_received: @bonus_recieved, user: @user}
+- unless @user.role.eql?('Admin')
+  .bonusly-updates.common-bonusly-updates
+    %ul.nav.nav-tabs
+      %li.active
+        %a{"data-toggle" => "tab", :href => "#github"} Github
+      %li
+        %a{"data-toggle" => "tab", :href => "#bonus-received"} Bonus Received
+      %li
+        %a{"data-toggle" => "tab", :href => "#bonus-given"} Bonus Given
+      %li
+        %a{"data-toggle" => "tab", :href => "#blog"} Blog
+
+    .tab-content
+      .tab-pane.active#github
+        Loading ..
+      .tab-pane#bonus-received
+        Loading ..
+      .tab-pane#bonus-given
+        Loading ..
+      .tab-pane#blog
+        Loading ..
+
+:javascript
+  var user_id = "#{@user.id}";

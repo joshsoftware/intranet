@@ -1,0 +1,8 @@
+%ul.media-list
+  - @blog_entries.each do |entry|
+    %br
+    .project-name
+      %h5{align: 'center'}
+        = link_to entry.title, entry.url
+        = entry.published
+      = raw entry.summary

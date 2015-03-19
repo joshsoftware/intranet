@@ -38,6 +38,7 @@ Intranet::Application.routes.draw do
       match :public_profile, via: [:get, :put]
       match :private_profile, via: [:get, :put]
       get :download_document
+      get '/get_feed/:feed_type' => 'users#get_feed'
     end
   end
 
