@@ -4,11 +4,26 @@
     %table.table
       = render partial: 'project', collection: @projects
 - unless @user.role.eql?('Admin')
-  #profile-updates-widget.accordion.bonusly-updates.common-bonusly-updates
-    - if @github_entries.present?
-      = render partial: 'users/github_profile', locals: {github_entries: @github_entries}
-    - unless @not_found.eql?(true)
-      = render partial: 'users/bonusly_given', locals: {bonus_given: @bonus_given, user: @user}
-      = render partial: 'users/bonusly_received', locals: {bonus_received: @bonus_received, user: @user}
-    - if @blog_entries.present?
-      = render partial: 'users/blog_feed', locals: {blog_entries: @blog_entries}
+  .bonusly-updates.common-bonusly-updates
+    %ul.nav.nav-tabs
+      %li.active
+        %a{"data-toggle" => "tab", :href => "#github"} Github
+      %li
+        %a{"data-toggle" => "tab", :href => "#bonus-received"} Bonus Received
+      %li
+        %a{"data-toggle" => "tab", :href => "#bonus-given"} Bonus Given
+      %li
+        %a{"data-toggle" => "tab", :href => "#blog"} Blog
+
+    .tab-content
+      .tab-pane.active#github
+        Loading ..
+      .tab-pane#bonus-received
+        Loading ..
+      .tab-pane#bonus-given
+        Loading ..
+      .tab-pane#blog
+        Loading ..
+
+:javascript
+  var user_id = "#{@user.id}";

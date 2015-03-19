@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :load_user, only: [:edit, :update, :show, :public_profile, :private_profile]
+  before_action :load_user, only: [:edit, :update, :show, :public_profile, :private_profile, :get_feed]
   before_action :load_profiles, only: [:public_profile, :private_profile, :update, :edit]
   before_action :build_addresses, only: [:public_profile, :private_profile, :edit]
   before_action :authorize, only: [:public_profile, :edit]
@@ -22,15 +22,6 @@ class UsersController < ApplicationController
 
   def show
     @projects = @user.projects
-    @bonusly_updates = get_bonusly_messages
-    if @bonusly_updates.eql?('Not found')
-      @not_found = true
-    else
-      @bonus_received = @bonusly_updates.select{|message| message["receiver"]["email"] == @user.email}
-      @bonus_given = @bonusly_updates.select{|message| message["giver"]["email"] == @user.email}
-    end
-    @github_entries = get_github_feed
-    @blog_entries   = get_blog_feed
   end
 
   def update
@@ -104,6 +95,23 @@ class UsersController < ApplicationController
     render nothing: true
   end
 
+  def get_feed
+    @feed_type = params["feed_type"]
+    case @feed_type
+      when "github"
+        @github_entries = get_github_feed
+      when "bonusly"
+        @bonusly_updates = get_bonusly_messages
+        if @bonusly_updates.eql?('Not found')
+          @not_found = true
+        else
+          @bonus_received = @bonusly_updates.select{|message| message["receiver"]["email"] == @user.email}
+          @bonus_given = @bonusly_updates.select{|message| message["giver"]["email"] == @user.email}
+        end
+      when "blog"
+        @blog_entries   = get_blog_feed
+    end
+  end
 
   private
   def load_user
@@ -168,7 +176,11 @@ class UsersController < ApplicationController
 
   def get_github_feed
     handle = @user.public_profile.github_handle
+    return nil if handle.blank?
+    
     github_feed = Feedjira::Feed.fetch_and_parse "https://github.com/#{handle}.atom"
+    
+    return nil if github_feed.eql?(404) or github_feed.try(:enries).try(:blank?)
     if github_feed != 200
       github_commits = []
       github_feed.entries.each do |entry|
@@ -183,11 +195,14 @@ class UsersController < ApplicationController
 
   def get_blog_feed
     blog_url = @user.public_profile.blog_url
+    return if blog_url.blank?
     blog_feed = Feedjira::Feed.fetch_and_parse "#{blog_url}/feed"
-    if blog_feed != 200
+    return nil if blog_feed.try(:entries).try(:blank?)
+    if blog_feed != 0
       blog_feed.entries[0..9]
     else
       []
     end
   end
+
 end
