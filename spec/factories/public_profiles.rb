@@ -10,5 +10,6 @@ FactoryGirl.define do
     date_of_birth Date.today
     github_handle "abhishekbose87"
     blog_url "rishionrails.wordpress.com"
+    blog_feed_url "rishionrails.wordpress.com/feed"
   end
 end
