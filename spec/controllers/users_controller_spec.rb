@@ -94,5 +94,18 @@ describe UsersController do
       expect(assigns(:blog_entries).count).to eq 10
     end
 
+    it 'should render message if no blog feed url is present' do
+      params = {"feed_type" => "blog", "id" => @user.id}
+      @user.public_profile.update({blog_feed_url: nil})
+      raw_response_file = File.new("spec/sample_feeds/blog_example_feed.xml")
+      allow(Feedjira::Feed).to receive(:fetch_raw).and_return(raw_response_file.read)
+
+      xhr :get, :get_feed, params
+      expect(assigns(:blog_message)).to eq "#{@user.name} has not entered blog feel url yet!!"
+
+      should respond_with(:success)
+      should render_template('users/get_feed')
+    end
+
   end
 end
