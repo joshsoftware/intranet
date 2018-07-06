@@ -4,7 +4,7 @@ class PublicProfile
   include Mongoid::Timestamps
   include  UserDetail
 
-  mount_uploader :image, FileUploader 
+  mount_uploader :image, FileUploader
 
   field :first_name, default: ''
   field :last_name, default: ''
@@ -21,6 +21,7 @@ class PublicProfile
   field :image
   field :linkedin_url
   field :facebook_url
+  field :slack_handle
 
   #validates_attachment :photo, :content_type => { :content_type => "image/jpg" }
 
