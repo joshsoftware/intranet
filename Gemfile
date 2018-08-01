@@ -67,6 +67,8 @@ group :test do
   gem 'database_cleaner'
   gem 'faker'
   gem "codeclimate-test-reporter", require: nil
+  gem 'webmock'
+  gem 'vcr', '2.4.0'
 end
 
 group :development do
@@ -117,3 +119,7 @@ gem 'feedjira'
 gem 'rollbar'
 #gem 'aws-sdk', '~> 2'
 gem "aws-sdk"
+gem 'byebug'
+gem 'slack-ruby-bot'
+
+

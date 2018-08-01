@@ -8,6 +8,7 @@ require 'rspec/rails'
 require 'database_cleaner'
 require 'simplecov'
 require 'sidekiq/testing'
+require 'webmock/rspec'
 SimpleCov.start
 
 # Requires supporting ruby files with custom matchers and macros, etc,

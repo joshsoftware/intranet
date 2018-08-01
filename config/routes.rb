@@ -79,7 +79,9 @@ Rails.application.routes.draw do
     end
   end
 
-
+  resources :slack do
+    post :projects, on: :collection
+  end
 
 
 
