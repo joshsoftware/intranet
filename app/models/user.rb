@@ -161,4 +161,85 @@ class User
     project_ids = user_projects.where(end_date: nil).pluck(:project_id)
     Project.in(id: project_ids)
   end
+  
+  def get_user_projects_from_user(project_id, from_date, to_date)
+    user_projects.where("$and"=>[
+        {
+          "$or" => [
+            {
+              "$and" => [
+                {
+                  :start_date.lte => from_date
+                },
+                {
+                  end_date: nil
+                }
+              ]
+            },
+            {
+              "$and" => [
+                {
+                  :start_date.gte => from_date
+                },
+                {
+                  :end_date.lte => to_date
+                }
+              ]
+            },
+            {
+              "$and" => [
+                {
+                  :start_date.lte => from_date
+                },
+                {
+                  :end_date.lte => to_date
+                },
+                {
+                  :end_date.gte => from_date
+                }
+              ]
+            },
+            {
+              "$and" => [
+                {
+                  :start_date.gte => from_date
+                },
+                {
+                  :end_date.gte => to_date
+                },
+                {
+                  :start_date.lte => to_date
+                }
+              ]
+            },
+            {
+              "$and" => [
+                {
+                  :start_date.gte => from_date
+                },
+                {
+                  end_date: nil
+                },
+                {
+                  :start_date.lte => to_date
+                }
+              ]
+            },
+            {
+              "$and" => [
+                {
+                  :start_date.lte => from_date
+                },
+                {
+                  :end_date.gte => to_date
+                }
+              ]
+            }
+          ]
+        },
+        {
+          project_id: project_id
+        }
+      ])
+  end
 end

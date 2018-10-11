@@ -188,4 +188,79 @@ class Project
     user_id = user_projects.where(end_date: nil).pluck(:user_id)
     User.in(id: user_id)
   end
+  
+  def get_user_projects_from_project(from_date, to_date)
+    user_ids = user_projects.where("$or"=>[
+      {
+        "$and" => [
+          {
+            :start_date.lte => from_date
+          },
+          {
+            end_date: nil
+          }
+        ]
+      },
+      {
+        "$and" => [
+          {
+            :start_date.gte => from_date
+          },
+          {
+            :end_date.lte => to_date
+          }
+        ]
+      },
+      {
+        "$and" => [
+          {
+            :start_date.lte => from_date
+          },
+          {
+            :end_date.lte => to_date
+          },
+          {
+            :end_date.gte => from_date
+          }
+        ]
+      },
+      {
+        "$and" => [
+          {
+            :start_date.gte => from_date
+          },
+          {
+            :end_date.gte => to_date
+          },
+          {
+            :start_date.lte => to_date
+          }
+        ]
+      },
+      {
+        "$and" => [
+          {
+            :start_date.gte => from_date
+          },
+          {
+            end_date: nil
+          },
+          {
+            :start_date.lte => to_date
+          }
+        ]
+      },
+      {
+        "$and" => [
+          {
+            :start_date.lte => from_date
+          },
+          {
+            :end_date.gte => to_date
+          }
+        ]
+      }
+    ]).pluck(:user_id).uniq
+    User.in(id: user_ids)
+  end
 end

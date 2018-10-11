@@ -1,0 +1,24 @@
+= form_tag projects_report_time_sheets_path, method: 'GET', class: 'form form-inline' do
+  %label From Date:
+  =text_field_tag :from_date, params[:from_date], class: "form-control datepicker", placeholder: "From Date", value: @from_date, style: "height: 2em;"
+  %label To Date:
+  =text_field_tag :to_date, params[:to_date], class: "form-control datepicker", placeholder: "To Date", value: @to_date, style: "height: 2em;"
+  = submit_tag "Search", class: "btn btn-primary"
+
+.form-horizontal
+  -if @projects_report_in_json.present?
+    %br
+    %table.table
+      %th Project Name
+      %th No Of Employee
+      %th Total Worked Hours
+      %th Allocated Hours
+      %th Leaves
+      %tbody
+        - @projects_report_in_json.each do |project_report|
+          %tr
+            %td= project_report['project_name']
+            %td= project_report['no_of_employee']
+            %td= project_report['total_hours']
+            %td= project_report['allocated_hours']
+            %td= project_report['leaves']

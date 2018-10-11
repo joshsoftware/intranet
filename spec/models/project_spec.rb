@@ -134,9 +134,131 @@ describe Project do
     let!(:user) { FactoryGirl.create(:user) }
     let!(:project) { FactoryGirl.create(:project) }
     it 'Should give users report' do
-      UserProject.create(user_id: user.id, project_id: project.id, start_date: DateTime.now - 2)
+      UserProject.create(user_id: user.id, project_id: project.id, start_date: Date.today - 2)
       users = project.users
       expect(users.present?).to eq(true)
+    end
+  end
+  
+  context 'Get user project from project' do
+    let!(:user_one) { FactoryGirl.create(:user, email: 'user1@joshsoftware.com') }
+    let!(:user_two) { FactoryGirl.create(:user, email: 'user2@joshsoftware.com') }
+    let!(:user_three) { FactoryGirl.create(:user, email: 'user3@joshsoftware.com') }
+    let!(:user_four) { FactoryGirl.create(:user, email: 'user4@joshsoftware.com') }
+    let!(:user_five) { FactoryGirl.create(:user, email: 'user5@joshsoftware.com') }
+    let!(:user_six) { FactoryGirl.create(:user, email: 'user6@joshsoftware.com') }
+    let!(:user_seven) { FactoryGirl.create(:user, email: 'user7@joshsoftware.com') }
+    let!(:user_eight) { FactoryGirl.create(:user, email: 'user8@joshsoftware.com') }
+    let!(:project) { FactoryGirl.create(:project) }
+
+    it 'Should give users record between from date and to date' do
+      UserProject.create(user_id: user_one.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: nil)
+      UserProject.create(user_id: user_two.id, project_id: project.id, start_date: '06/09/2018'.to_date, end_date: nil)
+      UserProject.create(user_id: user_three.id, project_id: project.id, start_date: '05/09/2018'.to_date, end_date: '15/09/2018'.to_date)
+      UserProject.create(user_id: user_four.id, project_id: project.id, start_date: '08/09/2018'.to_date, end_date: '23/09/2018'.to_date)
+      UserProject.create(user_id: user_five.id, project_id: project.id, start_date: '05/08/2018'.to_date, end_date: '10/09/2018'.to_date)
+      UserProject.create(user_id: user_six.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: '25/08/2018'.to_date)
+      UserProject.create(user_id: user_seven.id, project_id: project.id, start_date: '25/09/2018'.to_date, end_date: '30/09/2018')
+      UserProject.create(user_id: user_eight.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: '10/10/2018'.to_date)
+
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(6)
+      expect(user_projects[0].email).to eq('user1@joshsoftware.com')
+      expect(user_projects[1].email).to eq('user2@joshsoftware.com')
+      expect(user_projects[2].email).to eq('user3@joshsoftware.com')
+      expect(user_projects[3].email).to eq('user4@joshsoftware.com')
+      expect(user_projects[4].email).to eq('user5@joshsoftware.com')
+      expect(user_projects[5].email).to eq('user8@joshsoftware.com')
+    end
+
+    it 'Should not give the user record, Its less than from date and to date' do
+      UserProject.create(user_id: user_six.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: '25/08/2018'.to_date)
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(0)
+    end
+
+    it 'Should not give user record, Its greater than from date and to date' do
+      UserProject.create(user_id: user_seven.id, project_id: project.id, start_date: '25/09/2018'.to_date, end_date: '30/09/2018')
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(0)
+    end
+
+    it "Should give the record if user's project start date is less than from date and end date is nil" do
+      UserProject.create(user_id: user_one.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: nil)
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(1)
+      expect(user_projects[0].email).to eq('user1@joshsoftware.com')
+    end
+
+    it "Should give the record if user's project start date is greater than from date and end date is nil" do
+      UserProject.create(user_id: user_two.id, project_id: project.id, start_date: '06/09/2018'.to_date, end_date: nil)
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(1)
+      expect(user_projects[0].email).to eq('user2@joshsoftware.com')
+    end
+
+    it "Should give the record if user's project start date is greater than from date and end date is less than to date" do
+      UserProject.create(user_id: user_three.id, project_id: project.id, start_date: '05/09/2018'.to_date, end_date: '15/09/2018'.to_date)
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(1)
+      expect(user_projects[0].email).to eq('user3@joshsoftware.com')
+    end
+
+    it "Should give the record if user's project start date is greater than from date and end date is greater than to date " do
+      UserProject.create(user_id: user_four.id, project_id: project.id, start_date: '08/09/2018'.to_date, end_date: '23/09/2018'.to_date)
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(1)
+      expect(user_projects[0].email).to eq('user4@joshsoftware.com')
+    end
+
+    it "Should give the record if user's project start date less than from date and end date less than to date" do
+      UserProject.create(user_id: user_five.id, project_id: project.id, start_date: '05/08/2018'.to_date, end_date: '10/09/2018'.to_date)
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(1)
+      expect(user_projects[0].email).to eq('user5@joshsoftware.com')
+    end
+
+    it "Should give the record if user's project start date is less than from date and end date is greater than to date" do
+      UserProject.create(user_id: user_eight.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: '10/10/2018'.to_date)
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(1)
+      expect(user_projects[0].email).to eq('user8@joshsoftware.com')
+    end
+
+    it "Should not give the record because user's project start date and end date is not between from date and to date" do
+      UserProject.create(user_id: user_six.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: '25/08/2018'.to_date)
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(0)
+      expect(user_projects.present?).to eq(false)
+    end
+
+    it "Should not give the record because user's project start date and end date is not between from date and to date" do
+      UserProject.create(user_id: user_seven.id, project_id: project.id, start_date: '25/09/2018'.to_date, end_date: '30/09/2018')
+      from_date = '01/09/2018'.to_date
+      to_date = '20/09/2018'.to_date
+      user_projects = project.get_user_projects_from_project(from_date, to_date)
+      expect(user_projects.count).to eq(0)
+      expect(user_projects.present?).to eq(false)
     end
   end
 end

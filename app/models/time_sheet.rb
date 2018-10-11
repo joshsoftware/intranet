@@ -18,6 +18,7 @@ class TimeSheet
   MAX_TIMESHEET_COMMAND_LENGTH = 5
   DATE_FORMAT_LENGTH = 3
   MAX_DAILY_STATUS_COMMAND_LENGTH = 2
+  WORKED_HOURSE = 8
 
   def self.parse_timesheet_data(params)
     split_text = params['text'].split
@@ -250,13 +251,6 @@ class TimeSheet
     return time_sheet_log, time_sheet_message
   end
 
-  def self.calculate_hours_and_minutes(total_minutes)
-    hours = total_minutes / 60
-    minutes = total_minutes % 60
-    minutes = '%02i'%minutes
-    return hours, minutes
-  end
-
   def self.generete_employee_timesheet_report(timesheets, from_date, to_date)
     timesheet_reports = []
     timesheets.each do |timesheet|
@@ -269,16 +263,36 @@ class TimeSheet
       timesheet['working_status'].each do |working_status|
         project_info = {}
         project_info['project_name'] = get_project_name(working_status['project_id'])
-        project_info['worked_hours'] = convert_milliseconds_to_hours(working_status['total_time'])
+        worked_hours = convert_milliseconds_to_hours(working_status['total_time'])
+        project_info['worked_hours'] = convert_hours_to_days(worked_hours)
         total_work += working_status['total_time']
         project_details << project_info
         users_timesheet_data['project_details'] = project_details
       end
-      users_timesheet_data['total_worked_hours'] = convert_milliseconds_to_hours(total_work)
+      total_worked_hours = convert_milliseconds_to_hours(total_work)
+      users_timesheet_data['total_worked_hours'] = convert_hours_to_days(total_worked_hours)
       users_timesheet_data['leaves'] = get_user_leaves_count(user, from_date, to_date)
       timesheet_reports << users_timesheet_data
     end
     timesheet_reports.sort{|previous_record, next_record| previous_record['user_name'] <=> next_record['user_name']}
+  end
+
+
+  def self.create_projects_report_in_json_format(projects_report, from_date, to_date)
+    projects_report_in_json = []
+    projects_report.each do |project_report|
+      project_details = {}
+      project = load_project_with_id(project_report['_id']['project_id'])
+      project_details['project_name'] = project.name
+      project_details['no_of_employee'] = project.get_user_projects_from_project(from_date, to_date).count
+      total_hours = convert_milliseconds_to_hours(project_report['totalSum'])
+      project_details['total_hours'] = convert_hours_to_days(total_hours)
+      project_details['allocated_hours'] = get_allocated_hours(project, from_date, to_date)
+      project_details['leaves'] = total_leaves_on_project(project, from_date, to_date)
+      projects_report_in_json << project_details
+      project_details = {}
+    end
+    projects_report_in_json
   end
 
   def self.generate_individual_timesheet_report(user, params)
@@ -320,8 +334,8 @@ class TimeSheet
 
   def self.get_total_work_and_leaves(user, params, total_minutes_worked_on_projects)
     total_work_and_leaves = {}
-    total_worked_hours, total_work_minutes = calculate_hours_and_minutes(total_minutes_worked_on_projects.to_i)
-    total_work_and_leaves['total_work'] = "#{total_worked_hours}:#{total_work_minutes}"
+    total_worked_hours = total_worked_in_hours(total_minutes_worked_on_projects.to_i)
+    total_work_and_leaves['total_work'] = convert_hours_to_days(total_worked_hours)
     total_work_and_leaves['leaves'] = get_user_leaves_count(user, params[:from_date], params[:to_date])
     total_work_and_leaves
   end
@@ -330,13 +344,100 @@ class TimeSheet
     TimeDifference.between(time_sheet.to_time, time_sheet.from_time).in_minutes
   end
 
+  def self.get_allocated_hours(project, from_date, to_date)
+    total_allocated_hourse = 0
+    project.get_user_projects_from_project(from_date, to_date).each do |user|
+      user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+      user_projects.each do |user_project|
+        working_days =
+          if user_project.end_date.present?
+            if from_date <= user_project.start_date
+              get_working_days(user_project.start_date, user_project.end_date)
+            elsif from_date > user_project.start_date
+              get_working_days(from_date, user_project.end_date)
+            end
+          else
+            if from_date <= user_project.start_date
+              get_working_days(user_project.start_date, to_date)
+            elsif from_date > user_project.start_date
+              get_working_days(from_date, to_date)
+            end
+          end
+        allocated_hours = working_days * WORKED_HOURSE
+        total_allocated_hourse += allocated_hours
+      end
+    end
+    convert_hours_to_days(total_allocated_hourse)
+  end
+
+  def self.get_working_days(from_date, to_date)
+    working_days = from_date.business_days_until(to_date)
+    no_of_holiday = get_holiday_count(from_date, to_date)
+    working_days -= no_of_holiday
+  end
+
+  def self.total_leaves_on_project(project, from_date, to_date)
+    total_leaves_count = 0
+    project.get_user_projects_from_project(from_date, to_date).each do |user|
+      user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+      user_projects.each do |user_project|
+        leaves_count =
+          if user_project.end_date.present?
+            if from_date <= user_project.start_date
+              get_user_leaves_count(user, user_project.start_date, user_project.end_date)
+            elsif from_date > user_project.start_date
+              get_user_leaves_count(user, from_date, user_project.end_date)
+            end
+          else
+            if from_date <= user_project.start_date
+              get_user_leaves_count(user, user_project.start_date, to_date)
+            elsif from_date > user_project.start_date
+              get_user_leaves_count(user, from_date, to_date)
+            end
+          end
+        total_leaves_count += leaves_count
+      end
+    end
+    total_leaves_count
+  end
+
+  def self.calculate_hours_and_minutes(total_minutes)
+    hours, minutes = conver_minutes_into_hours(total_minutes)
+    minutes = '%02i'%minutes
+    return hours, minutes
+  end
+
+  def self.conver_minutes_into_hours(total_minutes)
+    hours = total_minutes / 60
+    minutes = total_minutes % 60
+    return hours, minutes
+  end
+
+  def self.total_worked_in_hours(total_minutes)
+    hours, minutes = conver_minutes_into_hours(total_minutes)
+    hours = minutes < 30 ? hours : hours + 1
+    hours
+  end
+
   def self.convert_milliseconds_to_hours(milliseconds)
     hours = milliseconds / (1000 * 60 * 60)
     minutes = milliseconds / (1000 * 60) % 60
-    minutes = '%02i'%minutes
-    "#{hours}:#{minutes}"
+    hours = minutes < 30 ? hours : hours + 1
+    hours
   end
 
+  def self.convert_hours_to_days(total_allocated_hourse)
+    days = hours = 0
+    days = total_allocated_hourse / WORKED_HOURSE
+    hours = total_allocated_hourse % WORKED_HOURSE
+    result = hours > 0 ? "#{days} Days #{hours}H (#{total_allocated_hourse}H)" : "#{days} Days (#{total_allocated_hourse}H)"
+    result
+  end
+
+  def self.get_holiday_count(from_date, to_date)
+    HolidayList.where(holiday_date: {"$gte" => from_date, "$lte" => to_date}).count
+  end
+  
   def self.load_project(user, display_name)
     user.first.projects.where(display_name: /^#{display_name}$/i).first
   end
@@ -363,6 +464,10 @@ class TimeSheet
 
   def self.load_user_with_id(user_id)
     User.find_by(id: user_id)
+  end
+  
+  def self.load_project_with_id(project_id)
+    Project.find_by(id: project_id)
   end
 
   def self.load_timesheet(from_date, to_date)
@@ -405,6 +510,34 @@ class TimeSheet
         }
       ]
     )
+  end
+  
+  def self.load_projects_report(from_date, to_date)
+    TimeSheet.collection.aggregate([
+      {
+        "$match"=>{
+          "date"=>{
+            "$gte"=> from_date,
+            "$lte"=> to_date
+          }
+        }
+      },
+      {
+        "$group"=>{
+          "_id"=>{
+            "project_id"=>"$project_id"
+          },
+          "totalSum"=>{
+            "$sum"=>{
+              "$subtract"=>[
+                "$to_time",
+                "$from_time"
+              ]
+            }
+          }
+        }
+      }
+    ])
   end
 
 end

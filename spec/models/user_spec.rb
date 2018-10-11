@@ -96,7 +96,7 @@ describe User do
     let!(:project) { FactoryGirl.create(:project) }
 
     it 'Should give the project report' do
-      UserProject.create(user_id: user.id, project_id: project.id, start_date: DateTime.now - 2)
+      UserProject.create(user_id: user.id, project_id: project.id, start_date: Date.today - 2)
       projects = user.projects
       expect(projects.present?).to eq(true)
     end
@@ -159,6 +159,101 @@ describe User do
         project_ids << nil
         return_value = user.remove_projects(project_ids)
         expect(return_value).to eq(false)
+      end
+    end
+
+    context 'Get user project from user' do
+      let!(:user) { FactoryGirl.create(:user, email: 'user1@joshsoftware.com') }
+      let!(:project) { FactoryGirl.create(:project) }
+
+      it "Should give the record if user's project start date is less than from date and end date is nil" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: nil)
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(1)
+        expect(user_projects[0].start_date.to_s).to eq('01/08/2018')
+        expect(user_projects[0].end_date).to eq(nil)
+      end
+
+      it "Should give the record if user's project start date is greater than from date and end date is nil" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '06/09/2018'.to_date, end_date: nil)
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(1)
+        expect(user_projects[0].start_date.to_s).to eq('06/09/2018')
+        expect(user_projects[0].end_date).to eq(nil)
+      end
+
+      it "Should give the record if user's project start date is greater than from date and end date is less than to date" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '05/09/2018'.to_date, end_date: '15/09/2018'.to_date)
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(1)
+        expect(user_projects[0].start_date.to_s).to eq('05/09/2018')
+        expect(user_projects[0].end_date.to_s).to eq('15/09/2018')
+      end
+
+      it "Should give the record if user's project start date is greater than from date and end date is greater than to date" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '08/09/2018'.to_date, end_date: '23/09/2018'.to_date)
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(1)
+        expect(user_projects[0].start_date.to_s).to eq('08/09/2018')
+        expect(user_projects[0].end_date.to_s).to eq('23/09/2018')
+      end
+
+      it "Should give the record if user's project start date less than from date and end date less than to date" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '05/08/2018'.to_date, end_date: '10/09/2018'.to_date)
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(1)
+        expect(user_projects[0].start_date.to_s).to eq('05/08/2018')
+        expect(user_projects[0].end_date.to_s).to eq('10/09/2018')
+      end
+
+      it "Should give the record if user's project start date is less than from date and end date is greater than to date" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: '10/10/2018'.to_date)
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(1)
+        expect(user_projects[0].start_date.to_s).to eq('01/08/2018')
+        expect(user_projects[0].end_date.to_s).to eq('10/10/2018')
+      end
+  
+      it "Should give the record if user remove from project and added to same project in searching period" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: '10/10/2018'.to_date)
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '11/09/2018'.to_date, end_date: nil)
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(2)
+        expect(user_projects[0].start_date.to_s).to eq('01/08/2018')
+        expect(user_projects[0].end_date.to_s).to eq('10/10/2018')
+        expect(user_projects[1].start_date.to_s).to eq('11/09/2018')
+      end
+  
+      it "Should not give the record because user's project start date and end date is not between from date and to date" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '01/08/2018'.to_date, end_date: '25/08/2018'.to_date)
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(0)
+        expect(user_projects.present?).to eq(false)
+      end
+
+      it "Should not give the record because user's project start date and end date is not between from date and to date" do
+        UserProject.create(user_id: user.id, project_id: project.id, start_date: '25/09/2018'.to_date, end_date: '30/09/2018')
+        from_date = '01/09/2018'.to_date
+        to_date = '20/09/2018'.to_date
+        user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+        expect(user_projects.count).to eq(0)
+        expect(user_projects.present?).to eq(false)
       end
     end
   end
