@@ -2,7 +2,6 @@ require 'csv'
 
 desc "Add holidays in holiday list model"
 task :add_holidays => [:environment] do
-  
   csv = CSV.read(ENV['filename'], skip_blanks: true, headers: true)
   csv.each do |row|
     puts row['Holiday date']

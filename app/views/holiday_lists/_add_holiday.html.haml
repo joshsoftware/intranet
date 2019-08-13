@@ -1,0 +1,15 @@
+.pull-left
+  %input{onclick: "history.back()", type: "button", value: "Back" ,class: "btn btn-success"}  
+%center
+  .giving_top_margin_to_form
+    = simple_form_for @holiday, url: holiday_lists_path do |f|
+      = f.error_notification
+      %span.a
+        Holiday Date
+        = f.input :holiday_date ,label: false , input_html: { class: 'datepicker', 'data-behaviour' => 'datepicker', value: @holiday.holiday_date.try(:strftime, "%d-%m-%Y")}
+      %span.a
+        Reason
+        = f.input :reason ,label:false ,input_html: { class: "form-control", required: true } 
+      -#= f.file_field :holiday_list , accept: 'text/csv'
+      .giving_top_margin_to_form
+        = f.button :submit ,value: "Add Holiday"

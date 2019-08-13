@@ -44,7 +44,7 @@ class User
   has_and_belongs_to_many :managed_projects, class_name: 'Project', foreign_key: 'managed_project_ids', inverse_of: :managers
 
   after_update :delete_team_cache, if: :website_fields_changed?
-  before_create :associate_employee_id
+  # before_create :associate_employee_id
   after_update :associate_employee_id_if_role_changed
 
 

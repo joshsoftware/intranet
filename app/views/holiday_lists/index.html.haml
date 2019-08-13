@@ -1,0 +1,28 @@
+%head
+%div
+  %center
+    %h1 Holiday List #{@a}
+  .table-sizes
+    %table.table.table-striped
+      %thead
+        %tr
+          %th
+            Date
+          %th
+            Reason
+          -if can? :manage, Policy
+            %th.pull-right Manage
+      %tbody
+        -@all_holidays.each do |holiday|
+          %tr
+            - if(@a == holiday["holiday_date"].year)
+              %td
+                #{holiday["holiday_date"].to_date}
+              %td
+                #{holiday["reason"]}
+              %td
+                %h4.pull-right
+                  -if can? :mannage, Policy
+                    -#= link_to "", edit_holiday_list_path(holiday), class: "icon-edit", data: {"no-turbolink" => true, method: :get}
+                    = link_to "", holiday_list_path(holiday), data: {method: :delete, confirm: "Are you sure?"}, class: "icon-trash"
+
