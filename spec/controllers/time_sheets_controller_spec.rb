@@ -460,6 +460,7 @@ RSpec.describe TimeSheetsController, type: :controller do
     let!(:user) { FactoryGirl.create(:admin) }
     let!(:project) { FactoryGirl.create(:project) }
     let!(:employee) { FactoryGirl.create(:user) }
+    let!(:manager) { FactoryGirl.create(:manager) }
 
     context 'should successfully update timesheet' do
       it 'if all attributes are valid' do
@@ -500,6 +501,77 @@ RSpec.describe TimeSheetsController, type: :controller do
           to eq('testing API and call with client')
       end
 
+      it 'if timesheet date is less than 7 days' do
+        sign_in user
+        FactoryGirl.create(:user_project,
+          user: user,
+          project: project,
+          start_date: Date.today - 15
+        )
+        time_sheet = FactoryGirl.create(:time_sheet,
+          user: user,
+          project: project,
+          date: Date.today - 1,
+          from_time: "#{Date.today - 1} 10",
+          to_time: "#{Date.today - 1} 11:30"
+        )
+        params = {
+          time_sheets_attributes: {
+            "0" => {
+              project_id: project.id,
+              date: Date.today - 12,
+              from_time: "#{Date.today - 12} 10:00",
+              to_time: "#{Date.today - 12} 11:00",
+              description: 'testing API',
+              id: time_sheet.id
+            }
+          },
+          id:user.id
+        }
+        put :update_timesheet, user_id: user.id,
+          user: params,
+          time_sheet_date: Date.today - 1
+         expect(flash[:notice]).to eq(
+          "Timesheet Updated Succesfully"
+        )
+      end
+
+
+      it 'if timesheet date is less than 7 days for manager' do
+        sign_in manager
+        FactoryGirl.create(:user_project,
+          user: manager,
+          project: project,
+          start_date: Date.today - 15
+        )
+        time_sheet = FactoryGirl.create(:time_sheet,
+          user: user,
+          project: project,
+          date: Date.today - 1,
+          from_time: "#{Date.today - 1} 10",
+          to_time: "#{Date.today - 1} 11:30"
+        )
+        params = {
+          time_sheets_attributes: {
+            "0" => {
+              project_id: project.id,
+              date: Date.today - 12,
+              from_time: "#{Date.today - 12} 10:00",
+              to_time: "#{Date.today - 12} 11:00",
+              description: 'testing API',
+              id: time_sheet.id
+            }
+          },
+          id:user.id
+        }
+        put :update_timesheet, user_id: user.id,
+          user: params,
+          time_sheet_date: Date.today - 1
+         expect(flash[:notice]).to eq(
+          "Timesheet Updated Succesfully"
+        )
+      end
+
       it 'if timesheet date is not less than 2 days in case of Employee' do
         sign_in employee
         FactoryGirl.create(:user_project,
@@ -526,7 +598,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: employee.id,
+        put :update_timesheet, user_id: employee.id,
           user: params,
           time_sheet_date: Date.today - 1
         expect(time_sheet.reload.from_time.to_s).
@@ -561,7 +633,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
           user: params,
           time_sheet_date: Date.today - 4
         expect(time_sheet.reload.from_time.to_s).
@@ -600,7 +672,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
           user: params,
           time_sheet_date: Date.today - 1
         assigns(:time_sheets)[0].errors.full_messages ==
@@ -635,7 +707,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
           user: params,
           time_sheet_date: Date.today - 1
         assigns(:time_sheets)[0].errors.full_messages ==
@@ -671,47 +743,13 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
           user: params,
           time_sheet_date: Date.today - 1
         assigns(:time_sheets)[0].errors.full_messages ==
           ["To time Invalid time format. Format should be HH:MM"]
         expect(time_sheet.reload.to_time).
           to eq(Time.parse("#{Date.today - 1} 11:30"))
-        should render_template(:edit_timesheet)
-      end
-
-      it 'if timesheet date is less than 7 days' do
-        sign_in user
-        FactoryGirl.create(:user_project,
-          user: user,
-          project: project,
-          start_date: Date.today - 15
-        )
-        time_sheet = FactoryGirl.create(:time_sheet,
-          user: user,
-          project: project,
-          date: Date.today - 1,
-          from_time: "#{Date.today - 1} 10",
-          to_time: "#{Date.today - 1} 11:30"
-        )
-        params = {
-          time_sheets_attributes: {
-            "0" => {
-              project_id: project.id,
-              date: Date.today - 12,
-              from_time: "#{Date.today - 12} 10:00",
-              to_time: "#{Date.today - 12} 11:00",
-              description: 'testing API',
-              id: time_sheet.id
-            }
-          },
-          id:user.id
-        }
-        post :update_timesheet, user_id: user.id,
-          user: params,
-          time_sheet_date: Date.today - 1
-        expect(time_sheet.reload.date).to eq(Date.today - 1)
         should render_template(:edit_timesheet)
       end
 
@@ -743,7 +781,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: employee.id,
+        put :update_timesheet, user_id: employee.id,
           user: params,
           time_sheet_date: Date.today - 9
         expect(time_sheet.reload.from_time).

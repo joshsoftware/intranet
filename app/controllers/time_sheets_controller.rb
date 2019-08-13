@@ -61,7 +61,7 @@ class TimeSheetsController < ApplicationController
     @time_sheet_date = params[:time_sheet_date]
     @time_sheets = @user.time_sheets.where(date: params[:time_sheet_date].to_date)
     if(current_user.is_employee_or_intern? && @time_sheets.last.valid_date_for_update?) ||
-      current_user.is_admin_or_hr?
+      current_user.is_admin_or_hr? || current_user.is_manager?
       return_value, @time_sheets = TimeSheet.update_time_sheet(@time_sheets, timesheet_params)
       unless return_value.include?(false)
         flash[:notice] = 'Timesheet Updated Succesfully'
