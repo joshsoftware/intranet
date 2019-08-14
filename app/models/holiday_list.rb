@@ -4,6 +4,7 @@ class HolidayList
   field :reason, type: String
 
   validates :holiday_date, :reason, presence: true
+  validates :holiday_date, uniqueness: true
 
   def self.is_holiday?(date)
     date.strftime("%A").eql?("Saturday") or date.strftime("%A").eql?("Sunday") or

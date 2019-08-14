@@ -82,6 +82,7 @@ group :development do
   gem 'brakeman', :require => false
   gem 'quiet_assets'
   gem "letter_opener"
+  gem "awesome_print"
 end
 
 group :production do

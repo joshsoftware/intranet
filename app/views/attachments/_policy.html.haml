@@ -2,17 +2,29 @@
   Policies
 - if can? :manage, Policy
   = link_to "Add Policy", new_policy_path
+  %span{:style => "margin-left:20px;"}
+  = link_to "Add Holiday", new_holiday_list_path 
 .form-horizontal
   - unless @policies.empty?
     %table.table.table-hover
       %thead
         %th Policy Title
-        %th.pull-right Manage
+        - if can? :manage, Policy
+          %th.pull-right Manage
       %tbody
         - @policies.each do |policy|
           %tr
             - if policy.is_published or (can? :manage, Policy) 
               = render partial: 'policy_row', locals: {policy: policy}
+          %tr
+            %td
+              %h4
+                = link_to "Holiday List" , holiday_lists_path
+            %td
+              %h4.pull-right
+                -if can? :mannage, Policy
+                  = link_to "", edit_policy_path(policy), class: "icon-edit", data: {"no-turbolink" => true}
+                  = link_to "", policy_path(policy), data: {method: :delete, confirm: "Are you sure?"}, class: "icon-trash"
   - else
     %h4
       = "No policies found"
