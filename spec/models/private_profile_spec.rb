@@ -8,7 +8,6 @@ describe PrivateProfile do
                           :passport_number,
                           :qualification,
                           :date_of_joining,
-                          :end_of_probation,
                           :previous_work_experience,
                           :previous_company
                          )
@@ -89,18 +88,6 @@ describe PrivateProfile do
 
     it 'because joining date is present, role is HR' do
       user.role = 'HR'
-    end
-  end
-
-  context 'probation period notification' do
-    let!(:user) { FactoryGirl.create(:user, status: 'approved') }
-    let!(:hr_user) { FactoryGirl.create(:user, role: 'HR', status: 'approved')}
-    it 'send mail before 7 days when probation period ends' do
-      private_profile = FactoryGirl.create(:private_profile, user: user,
-        end_of_probation: Date.today + 7)
-      PrivateProfile.notify_probation_end
-      expect( ActionMailer::Base.deliveries[0].subject).to eq('End of probation period')
-      expect(ActionMailer::Base.deliveries.count).to eq(1)
     end
   end
 

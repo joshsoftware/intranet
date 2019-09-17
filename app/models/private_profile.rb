@@ -5,8 +5,7 @@ class PrivateProfile
   field :personal_email
   field :passport_number
   field :qualification
-  field :date_of_joining,  :type => Date
-  field :end_of_probation, :type => Date
+  field :date_of_joining, :type => Date
   field :work_experience
   field :previous_company
   field :bonusly_auth_token
@@ -40,12 +39,6 @@ class PrivateProfile
                    user.status == STATUS[STATUS.find_index('approved')]
 
     return false
-  end
-
-  def self.notify_probation_end
-    date  = Date.today + 7
-    users = User.approved.employees.where('private_profile.end_of_probation': date)
-    UserMailer.notify_probation(users, date).deliver_now if users.present?
   end
   
   #validates_presence_of :qualification, :date_of_joining, :personal_emailid, :on => :update

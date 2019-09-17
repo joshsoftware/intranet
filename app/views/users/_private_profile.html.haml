@@ -15,8 +15,6 @@
       %td
         - disable = ( can? :edit, User ) ? false : true
         = pri.input :date_of_joining, disabled: disable, input_html: { class: 'datepicker',  'data-behaviour' => 'datepicker', value: @private_profile.date_of_joining.try(:strftime, '%d-%m-%Y')}
-        - if can? :edit, User
-          = pri.input :end_of_probation, input_html: { class: 'datepicker',  'data-behaviour' => 'datepicker', value: @private_profile.end_of_probation.try(:strftime, '%d-%m-%Y')}, label: 'End of probation (Date after 90 days)'
       %td
         = pri.input :previous_work_experience, placeholder: 'No of Months', input_html: {type: 'number'}, label: 'Previous Work Experience (in Months)'
     %tr

@@ -88,7 +88,3 @@ end
 every :day, :at => '09:30am' do
   rake "leave_reminder:pending_leave"  
 end
-
-every :day, :at => '10:00am' do
-  rake "probation_notification:probation_end"
-end

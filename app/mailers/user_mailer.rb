@@ -98,16 +98,6 @@ class UserMailer < ActionMailer::Base
     )
   end
 
-  def notify_probation(users, date)
-    @users    = users
-    @date     = date
-    hr_emails = User.get_hr_emails
-    mail(
-      subject: 'End of probation period',
-      to: hr_emails
-    )
-  end
-
   private
 
   def get_leave(id)
