@@ -18,6 +18,9 @@
     %li.document-tab
       %a{data: {toggle: "tab"}, href: "#document"}
         Documents
+    %li.vpn-tab
+      %a{data: {toggle: "tab"}, href: "#vpn"}
+        VPN
   
   .tab-content
     .tab-pane.active#public
@@ -28,6 +31,8 @@
       = render partial: "employee_detail"
     .tab-pane#document
       = render partial: "document"
+    .tab-pane#vpn
+      = render partial: "vpn"
 
 :javascript
   error = #{!@private_profile.errors.full_messages.empty?}

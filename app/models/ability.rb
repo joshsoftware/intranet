@@ -6,6 +6,7 @@ class Ability
     if user.role? 'Super Admin'
       can :manage, :all
     elsif user.role? 'Admin'
+      common_admin_devops
       admin_abilities
     elsif user.role? 'HR'
       hr_abilities
@@ -23,7 +24,10 @@ class Ability
       employee_abilities(user.id)
     elsif user.role? 'Intern'
       intern_abilities(user.id)
+    elsif user.role? 'DevOps'
+      common_admin_devops
     end
+    can :register_vpn, User
   end
 
   def common_admin_hr
@@ -36,6 +40,10 @@ class Ability
     can :manage, Company
     can :manage, TimeSheet
     can :manage, HolidayList
+  end
+
+  def common_admin_devops
+    can [:register_vpn, :revoke_vpn], User
   end
 
   def intern_abilities(user_id)

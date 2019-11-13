@@ -1,0 +1,17 @@
+-if can?(:register_vpn, User) && can?(:revoke_vpn, User)
+    %div.tabbable
+        %ul.nav.nav-tabs
+            %li.active.register-tab
+                %a{data: {toggle: 'tab'}, href: "#register"} 
+                    Register VPN
+            %li.revoke-tab
+                %a{data: {toggle: "tab"}, href: "#revoke"} 
+                    Revoke VPN
+        
+        .tab-content
+            .tab-pane.active#register
+                = render partial: "register_vpn", locals: {email: "", id: current_user.id}
+            .tab-pane#revoke
+                = render partial: "revoke_vpn", locals: {email: "", id: current_user.id}
+- else
+    = render partial: "register_vpn", locals: {email: current_user.email, id: current_user.id}

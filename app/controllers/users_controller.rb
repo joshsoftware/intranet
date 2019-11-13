@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :load_user, only: [:edit, :update, :show, :public_profile, :private_profile, :get_feed]
+  before_action :load_user, only: [:edit, :update, :show, :public_profile, :private_profile, :get_feed, :register_vpn, :revoke_vpn]
   before_action :load_profiles, only: [:public_profile, :private_profile, :update, :edit]
   before_action :build_addresses, only: [:public_profile, :private_profile, :edit]
   before_action :authorize, only: [:public_profile, :edit]
@@ -119,6 +119,49 @@ class UsersController < ApplicationController
 
   def resource_list
     @users = User.employees.approved
+  end
+
+  def register_vpn
+    vpn = VPN.new
+    email = params[:user][:email]
+    password = params[:user][:password]
+    if email !~ Devise.email_regexp
+      flash[:error] = "Invalid email address"
+      redirect_to :back
+      return
+    end
+    # result = vpn.revoke(params[:user][:email])
+    # unless result[:success]
+    #   flash[:error] = "Failed to Revoke Previous VPN Certificate"
+    #   redirect_to :back
+    #   return
+    # end
+    result = vpn.register(email, password)
+    if result[:success]
+      flash[:notice] = "Successfully Register to VPN. Certificate will be sent to #{email}"
+      mac_attachment = Attachment.content(Attachment::MAC_VPN_ATTACHMENT_NAME)
+      linux_attachment = Attachment.content(Attachment::LINUX_VPN_ATTACHMENT_NAME)
+      UserMailer.delay.vpn_certificate(email, result[:data], mac_attachment, linux_attachment)
+      redirect_to :back
+    else
+      flash[:error] = "Failed to Register VPN"
+      redirect_to :back
+    end
+  end
+
+  def revoke_vpn
+    vpn = VPN.new
+    email = params[:user][:email]
+    result = vpn.revoke(email)
+    if result[:success]
+      flash[:notice] = "VPN Revoked for #{email}"
+    else
+      flash[:error] = "Failed to Revoked VPN for #{email}"
+    end
+    redirect_to :back
+  end
+
+  def vpn
   end
 
   private

@@ -45,6 +45,8 @@ Rails.application.routes.draw do
     member do
       match :public_profile, via: [:get, :put]
       match :private_profile, via: [:get, :put]
+      match :vpn, via: [:get]
+      match :register_vpn, :revoke_vpn, via: [:post]
       get :download_document
       get '/get_feed/:feed_type' => 'users#get_feed'
     end

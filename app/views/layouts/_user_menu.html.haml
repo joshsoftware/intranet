@@ -44,6 +44,9 @@
             = link_to "Projects", main_app.projects_report_time_sheets_path, class: 'menu-font'
           %li
             = link_to "Export Project Report", main_app.export_project_report_time_sheets_path, class: 'menu-font'
+  - if can?(:register_vpn, User) && can?(:revoke_vpn, User)
+    %li
+      = link_to "VPN", main_app.vpn_user_path(current_user), data: {'no-turbolink' => true}
   %li.divider
   %li
     = link_to 'Sign out', main_app.destroy_user_session_path, method: :delete

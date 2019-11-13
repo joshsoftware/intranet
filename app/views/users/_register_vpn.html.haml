@@ -1,0 +1,7 @@
+.form-heading
+  %h2 Register VPN
+  = simple_form_for(:user, url: register_vpn_user_path) do |f|
+    = f.input :email, as: :string, disabled: false, input_html: {value: "#{email}"}
+    = f.input :id, as: :hidden, input_html: {value: "#{id}"}
+    = f.input :password, as: :string, required: false
+    = f.submit 'Register to VPN', class: 'btn', data: { disable_with: "Please wait..." }
