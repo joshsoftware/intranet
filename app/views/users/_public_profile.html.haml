@@ -6,11 +6,11 @@
         = pub.input :last_name
         = pub.input :gender, collection: GENDER, prompt: 'Select'
         = pub.input :mobile_number
-      %td.photo
-        = image_tag(pub.object.image.medium.url, class: 'controls profile-image', size: '100x100')
-        %br
-        %br
-        = pub.input :image, label: 'Photo', id: 'upload-photo'
+      - if ['Super Admin', 'Admin', 'HR'].include?(current_user.role)
+        %td.photo
+          %br
+          %br
+          = pub.input :image, label: 'Photo', id: 'upload-photo'
 
   = pub.input :blood_group, collection: BLOOD_GROUPS, prompt: 'Select'
   = pub.input :date_of_birth, input_html: {class: 'datepicker', 'data-behaviour' => 'datepicker', value: @public_profile.date_of_birth.try(:strftime, "%d-%m-%Y")}
