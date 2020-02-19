@@ -5,13 +5,16 @@
       #{new_project ? 'Create' : 'Update'} Project
   %li
     = link_to 'Tech Details', '#project_info', data:{toggle: ('tab' unless new_project )}, class: :tech_details
+  %li
+    = link_to 'Team Details', '#project_team_detail', data:{toggle: ('tab' unless new_project )}, class: :team_details
       
 .project_tab_content.tab-content
   #project_form.tab-pane.fade.in.active
     = render 'projects/project_form'
   #project_info.tab-pane.fade
     = render 'projects/project_info_form'
-
+  #project_team_detail.tab-pane.fade
+    = render 'project_team_detail'
 
 :javascript
   $('.tech_details').click(function(){

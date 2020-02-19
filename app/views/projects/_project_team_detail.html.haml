@@ -1,0 +1,18 @@
+= simple_nested_form_for @project, :html => {class: "form-horizontal"} do |f|
+  = hidden_field_tag :team_details, true
+  %h4 Team Details
+  = f.simple_fields_for :user_projects do|u|
+    .row
+      .col-md-2
+        = u.input :start_date, label:"Start date"
+      .col-md-2
+        = u.input :end_date
+      .col-md-2
+        = u.input :user_id, collection:employee_name
+      .col-md-2
+        = u.input :allocation, placeholder: "mongo, mysql, postgres, etc."
+        -# = u.input :database_version 
+        -# = u.input :deployment_server, placeholder: "AWS, digital ocean, heroku etc."
+  = f.link_to_add 'Add More', :user_projects, class: 'btn btn-success'
+  .row
+    .span8.pull-right= f.submit :save, class: 'btn controls'

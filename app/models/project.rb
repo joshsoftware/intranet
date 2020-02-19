@@ -50,6 +50,7 @@ class Project
 
   has_many :time_sheets, dependent: :destroy
   has_many :user_projects
+  accepts_nested_attributes_for :user_projects
   belongs_to :company
   has_and_belongs_to_many :managers, class_name: 'User', foreign_key: 'manager_ids', inverse_of: :managed_projects
   validates_presence_of :name
