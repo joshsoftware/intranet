@@ -77,12 +77,48 @@
                                                       %br/
                                                       For Reason: #{@leave_application.reason}.
                                                       %br/
-                                                      Days : #{@leave_application.number_of_days}
+                                                      Days: #{@leave_application.number_of_days}
                                                       %br/
                                                       - if @leave_application.leave_request?
                                                         Remaining leaves: #{User.find(@leave_application.user_id).employee_detail.available_leaves}
                                                       %br/
                                                       Sanctioning Manager: #{@user.get_managers_names.join(', ')}
+                                                      %br
+                                                      - if @older_leaves && @older_leaves.count > 0
+                                                        %h4 Previously Approved Leaves
+                                                        %table{:border => '1px solid black;', :style => 'border-collapse: collapse;', :width => '600'}
+                                                          %tr
+                                                            %th{:width => "15%"} Start Date
+                                                            %th{:width => "15%"} End Date
+                                                            %th{:width => "15%"} No of days
+                                                            %th{:width => "35%"} Reason
+                                                            %th{:width => "30%"} Approved By
+                                                          - @older_leaves.each do |leave|
+                                                            %tr
+                                                              %td #{leave.start_at}
+                                                              %td #{leave.end_at}
+                                                              %td #{leave.number_of_days}
+                                                              %td #{leave.reason}
+                                                              %td #{leave.processed_by_name || 'N/A'}
+                                                      - if @next_planned_leaves && @next_planned_leaves.count > 0
+                                                        %br
+                                                        %h4 Upcoming Leaves
+                                                        %table{:border => '1px solid black;', :style => 'border-collapse: collapse;', :width => '600'}
+                                                          %tr
+                                                            %th{:width => "13%"} Start Date
+                                                            %th{:width => "13%"} End Date
+                                                            %th{:width => "13%"} No of days
+                                                            %th{:width => "28%"} Reason
+                                                            %th{:width => "20%"} Contact Number
+                                                            %th{:width => "13%"} Status
+                                                          - @next_planned_leaves.each do |leave|
+                                                            %tr
+                                                              %td #{leave.start_at}
+                                                              %td #{leave.end_at}
+                                                              %td #{leave.number_of_days}
+                                                              %td #{leave.reason}
+                                                              %td #{leave.contact_number}
+                                                              %td #{leave.leave_status}
                                                       %br
 
                                                       = link_to "Approve", process_leave_url(id: @leave_application.id, leave_action: 'approve'), class: 'btn btn-success'
@@ -136,5 +172,3 @@
                               %tbody
                                 %tr
                                   %td.rowContainer.kmFloatLeft{:style => "border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0", :valign => "top"}
-
-

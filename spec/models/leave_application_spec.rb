@@ -98,7 +98,7 @@ describe LeaveApplication do
     end
 
     context 'self.process_leave ' do
-    
+
       before do
         @user = FactoryGirl.create(:user)
         @user = FactoryGirl.create(:user)
@@ -182,7 +182,7 @@ describe LeaveApplication do
       end
 
       context 'should not deduct leaves if status ' do
-        
+
         it 'changed from pending to approved' do
           leave_application = FactoryGirl.create(:leave_application,
             user: @user
@@ -256,6 +256,36 @@ describe LeaveApplication do
         it 'should not send mail if leave application is empty' do
           LeaveApplication.pending_leaves_reminder
           expect(ActionMailer::Base.deliveries.count).to eq(0)
+        end
+      end
+    end
+
+    context 'Class methods' do
+      before do
+        @user = FactoryGirl.create(:user)
+        #Past leave
+        FactoryGirl.create(:leave_application, start_at: Date.today - 2.months, end_at: Date.today - 2.months, number_of_days: 1, leave_status: PENDING, user: @user)
+        FactoryGirl.create(:leave_application, start_at: Date.today - 2.months - 1, end_at: Date.today - 2.months - 1, number_of_days: 1, leave_status: APPROVED, user: @user)
+        FactoryGirl.create(:leave_application, start_at: Date.today - 6.months - 1, end_at: Date.today - 6.months - 1, number_of_days: 1, leave_status: APPROVED, user: @user)
+        FactoryGirl.create(:leave_application, start_at: Date.today - 2.months - 2, end_at: Date.today - 2.months - 2, number_of_days: 1, leave_status: REJECTED, user: @user)
+        #Upcoming leave
+        FactoryGirl.create(:leave_application, start_at: Date.today + 2.months, end_at: Date.today + 2.months, number_of_days: 1, leave_status: PENDING, user: @user)
+        FactoryGirl.create(:leave_application, start_at: Date.today + 2.months + 1, end_at: Date.today + 2.months + 1, number_of_days: 1, leave_status: APPROVED, user: @user)
+        FactoryGirl.create(:leave_application, start_at: Date.today + 6.months + 1, end_at: Date.today + 6.months + 1, number_of_days: 1, leave_status: APPROVED, user: @user)
+        FactoryGirl.create(:leave_application, start_at: Date.today + 2.months + 2, end_at: Date.today + 2.months + 2, number_of_days: 1, leave_status: REJECTED, user: @user)
+      end
+
+      context 'self.get_users_past_leaves' do
+        it 'should give past 6 month approved leaves only' do
+          past_leaves = LeaveApplication.get_users_past_leaves(@user.id)
+          expect(past_leaves.count).to eq(1)
+        end
+      end
+
+      context 'self.get_users_upcoming_leaves' do
+        it 'should give upcoming unrejected leaves only' do
+          past_leaves = LeaveApplication.get_users_upcoming_leaves(@user.id)
+          expect(past_leaves.count).to eq(3)
         end
       end
     end

@@ -19,6 +19,10 @@ class UserMailer < ActionMailer::Base
   def leave_application(sender_email, receivers, leave_application_id)
     @user = User.find_by(email: sender_email)
     @receivers = receivers
+    @older_leaves = LeaveApplication.get_users_past_leaves(@user.id)
+    @next_planned_leaves = LeaveApplication.get_users_upcoming_leaves(@user.id).where(
+      :id.ne => leave_application_id
+    )
     @leave_application = LeaveApplication.where(id: leave_application_id).first
     mail(from: @user.email, to: receivers, subject: "#{@user.name} has applied for #{@leave_application.leave_type}")
   end
