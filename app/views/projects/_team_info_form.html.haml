@@ -1,0 +1,33 @@
+= nested_form_for @project, :html => {class: "form-horizontal"} do |f|
+  %h2 Team Members for #{@project.name}
+  %table.table.table-hover#team-members
+    %tr
+      %th Active?
+      %th Name
+      %th Start Date
+      %th End Date
+      %th Timesheet Required?
+    = f.fields_for :user_projects, :wrapper => false do |project_user_form|
+      %tr
+        %td
+          .make-switch{"data-on" => "success", "data-off" => "danger", "data-on-label" => "Yes", "data-off-label" => "No"}
+            = project_user_form.check_box :active, {}, 'true', 'false'
+        %td 
+          = project_user_form.select :user_id, options_from_collection_for_select(User.where(:role.nin => ['HR','Finance'], :status => STATUS[2]).to_a, :id, :name,project_user_form.object.user_id)
+        %td
+          = project_user_form.text_field :start_date, class: :datepicker, style: "height: 32px"
+        %td
+          = project_user_form.text_field :end_date, class: :datepicker, style: "height: 32px"
+        %td
+          .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "REQ", "data-off-label" => "NREQ"}
+            = project_user_form.check_box :time_sheet
+  = f.link_to_add "Add team member", :user_projects, data: {target: '#team-members'}, class: "btn btn-success"
+  = f.submit :Save, class: 'btn controls btn-info'
+
+:javascript
+  $(document).on('nested:fieldAdded', function(event){
+  // this field was just inserted into your form
+  var field = event.field;
+  // it's a jQuery object already! Now you can find date input
+  field.css("background-color: blue")
+  })

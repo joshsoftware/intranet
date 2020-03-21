@@ -103,7 +103,8 @@ class ProjectsController < ApplicationController
     :code_climate_coverage_snippet, :is_active, :timesheet_mandatory, :ruby_version, :rails_version, :database, :database_version, :deployment_server,
     :deployment_script, :web_server, :app_server, :payment_gateway, :image_store, :index_server, :background_jobs, :sms_gateway,
     :other_frameworks,:other_details, :image, :url, :description, :case_study,:logo, :visible_on_website, :website_sequence_number,
-    :code, :number_of_employees, :invoice_date, :company_id, :billing_frequency, :type_of_project, :is_activity, :manager_ids => [])
+    :code, :number_of_employees, :invoice_date, :company_id, :billing_frequency, :type_of_project, :is_activity, :manager_ids => [],
+    user_projects_attributes: [:start_date, :end_date, :time_sheet, :allocation, :active, :id, :user_id])
   end
 
   def load_project
