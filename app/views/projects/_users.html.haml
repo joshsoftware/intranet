@@ -1,34 +1,26 @@
 .form-horizontal.row
   %h3
-    Users
-    -if can? :manage, Project
-      .offset4{style: "float: right;"}
-        .remove_underline
-          %button.btn.btn-info.btn-lg{"data-target" => "#new-team-member", "data-toggle" => "modal", :type => "button"} Add Team members
+    = "#{@project.name} Team Members"
   %table.table.table-hover
     %thead
       %tr
         %th Profile Image
         %th Name
         %th Email
-        -if can? :manage, Project
-          %th Action
+        %th Role
     %tbody
       - if @managers.present?
         -@managers.each do |manager|
-          %tr{style: "background-color: #DDFC90;"}
+          %tr
             %td= image_tag(manager.public_profile.image.thumb.url, class: 'img-polaroid') if manager.public_profile
             %td= link_to manager.public_profile.name, user_path(manager)
             %td= manager.email
-            -if can? :manage, Project
-              %td= link_to '', remove_team_member_project_path(@project, user_id: manager.id, role: ROLE[:manager]), method: :delete, remote: true, "data-confirm" => "Are you sure?", class: "icon-trash"
+            %td
+              .project-role manager
       -if @users.present?
         - @users.each do |user|
           %tr
             %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid') if user.public_profile
             %td= link_to user.public_profile.name, user_path(user)
             %td= user.email
-            -if can? :manage, Project
-              %td= link_to '', remove_team_member_project_path(@project, user_id: user.id, role: ROLE[:team_member]), method: :delete, remote: true, "data-confirm" => "Are you sure?", class: "icon-trash"
-
-= render 'team_member_form'
+            %td
