@@ -7,27 +7,38 @@
       %th Start Date
       %th End Date
       %th Timesheet Required?
+      %th Allocation Percent
     = f.fields_for :user_projects, :wrapper => false do |project_user_form|
-      %tr
+      %tr{:class => 'fields'}
         %td
           .make-switch{"data-on" => "success", "data-off" => "danger", "data-on-label" => "Yes", "data-off-label" => "No"}
-            = project_user_form.check_box :active, {}, 'true', 'false'
+            = project_user_form.check_box :active, {class: "active-check-box"}, 'true', 'false'
         %td 
-          = project_user_form.select :user_id, options_from_collection_for_select(User.where(:role.nin => ['HR','Finance'], :status => STATUS[2]).to_a, :id, :name,project_user_form.object.user_id)
+          = project_user_form.select :user_id, options_from_collection_for_select(User.where(:role.nin => ['HR','Finance'], :status => STATUS[2]).to_a, :id, :name, project_user_form.object.user_id)
         %td
           = project_user_form.text_field :start_date, class: :datepicker, style: "height: 32px"
         %td
-          = project_user_form.text_field :end_date, class: :datepicker, style: "height: 32px"
+          = project_user_form.text_field :end_date, class: :datepicker, style: "height: 32px", id: "end-date"
         %td
           .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "REQ", "data-off-label" => "NREQ"}
             = project_user_form.check_box :time_sheet
-  = f.link_to_add "Add team member", :user_projects, data: {target: '#team-members'}, class: "btn btn-success"
-  = f.submit :Save, class: 'btn controls btn-info'
+        %td
+          = project_user_form.select :allocation, options_for_select(ALLOCATION.map {|percent| ["#{percent}%", percent]},project_user_form.object.allocation), {}, {style: "width: 70px"}
+  .offset3
+    = f.link_to_add "Add team member", :user_projects, data: {target: '#team-members'}, class: "btn btn-success", id: "add-team-members-button"
+    = f.submit :Save, class: 'btn controls btn-info'
 
 :javascript
+  $(".active-check-box").each(function(key2,checkBox){
+    var endDate = $(checkBox).parent().parent().parent().find("#end-date").val()
+    if(!checkBox.checked &&  endDate != ""){
+        $(checkBox).parent().parent().parent().find("input").prop("disabled", "true")
+        $(checkBox).parent().parent().parent().find("select").prop("disabled", "true")
+    }
+  })
+
   $(document).on('nested:fieldAdded', function(event){
-  // this field was just inserted into your form
-  var field = event.field;
-  // it's a jQuery object already! Now you can find date input
-  field.css("background-color: blue")
+    var checkBoxes = $(".make-switch")
+    checkBoxes.bootstrapSwitch()
+    var field = event.field;
   })
