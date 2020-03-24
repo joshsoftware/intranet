@@ -23,7 +23,7 @@
           .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "REQ", "data-off-label" => "NREQ"}
             = project_user_form.check_box :time_sheet
         %td
-          = project_user_form.select :allocation, options_for_select(ALLOCATION.map {|percent| ["#{percent}%", percent]},project_user_form.object.allocation), {}, {style: "width: 70px"}
+          = project_user_form.number_field( :allocation, {min: 0, max: 100, step: 1, value: project_user_form.object.allocation, style: "height: 32px; width: 70px"})
   .offset3
     = f.link_to_add "Add team member", :user_projects, data: {target: '#team-members'}, class: "btn btn-success", id: "add-team-members-button"
     = f.submit :Save, class: 'btn controls btn-info'

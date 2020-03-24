@@ -25,4 +25,3 @@ DEFAULT_TIMESHEET_MANAGERS = []
 
 MANAGEMENT = ["Admin", "HR", "Manager", "Finance"]
 TIMESHEET_MANAGEMENT = ['Admin', 'HR', 'Manager']
-ALLOCATION = [0, 10, 20, 33, 50, 66, 80, 90, 100]
