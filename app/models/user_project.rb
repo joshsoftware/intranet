@@ -11,8 +11,6 @@ class UserProject
   belongs_to :user
   belongs_to :project
   
-  validates :start_date, presence: {message: "Team member start date cannot be blank"}
-  validates :end_date, presence: {unless: "active", message: "End date is mandatory to mark inactive"}
-  validates :allocation, presence: true
-  validates :user_id, :project_id, presence: true
+  validates :user_id, :project_id, :start_date, :active, :allocation, presence: true
+  validates :end_date, presence: {unless: "!!active || active.nil?", message: "is mandatory to mark inactive"}
 end

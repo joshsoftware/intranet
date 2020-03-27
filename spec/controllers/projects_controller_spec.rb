@@ -278,4 +278,130 @@ describe ProjectsController do
         to eq(false)
     end
   end
+
+  describe 'Update team details' do
+    it 'should add valid team member' do
+      project = FactoryGirl.create(:project)
+      user_one = FactoryGirl.create(:user)
+      user_two = FactoryGirl.create(:user)
+      user_three = FactoryGirl.create(:user)
+      user_project_one = FactoryGirl.create(:user_project, user_id: user_one.id, project_id: project.id)
+      user_project_two = FactoryGirl.create(:user_project, user_id: user_two.id, project_id: project.id)
+      params = {:project=>
+        {:user_projects_attributes=>
+          {
+            "0" => 
+            {
+              :active => "true",
+              :user_id => user_three.id,
+              :project_id => project.id,
+              :start_date => "09/01/2020",
+              :end_date => "",
+              :time_sheet => "0",
+              :allocation => "50",
+            }
+          }
+        },
+        :id => project.slug
+      }
+      expect(project.user_projects.count).to eq(2)
+      patch :update, params
+      project.reload
+      expect(project.user_projects.count).to eq(3)
+    end
+
+    it 'should NOT add invalid team member' do
+      project = FactoryGirl.create(:project)
+      user_one = FactoryGirl.create(:user)
+      user_two = FactoryGirl.create(:user)
+      user_three = FactoryGirl.create(:user)
+      user_project_one = FactoryGirl.create(:user_project, user_id: user_one.id, project_id: project.id)
+      user_project_two = FactoryGirl.create(:user_project, user_id: user_two.id, project_id: project.id)
+      params = {:project=>
+        {:user_projects_attributes=>
+          {
+            "0" => 
+            {
+              :active => "false",
+              :user_id => user_three.id,
+              :project_id => project.id,
+              :start_date => "09/01/2020",
+              :end_date => "",
+              :time_sheet => "0",
+              :allocation => "50",
+            }
+          }
+        },
+        :id => project.slug
+      }
+      expect(project.user_projects.count).to eq(2)
+      patch :update, params
+      project.reload
+      expect(project.user_projects.count).to eq(2)
+    end
+
+    it 'should update valid team member' do
+      project = FactoryGirl.create(:project)
+      user_one = FactoryGirl.create(:user)
+      user_two = FactoryGirl.create(:user)
+      user_three = FactoryGirl.create(:user)
+      user_project_one = FactoryGirl.create(:user_project, user_id: user_one.id, project_id: project.id)
+      user_project_two = FactoryGirl.create(:user_project, user_id: user_two.id, project_id: project.id)
+      params = {:project=>
+        {:user_projects_attributes=>
+          {
+            "0" => 
+            {
+              :id => user_project_two.id,
+              :active => "true",
+              :user_id => user_two.id,
+              :project_id => project.id,
+              :start_date => "09/01/2020",
+              :end_date => "",
+              :time_sheet => "0",
+              :allocation => "50",
+            }
+          }
+        },
+        :id => project.slug
+      }
+      expect(project.user_projects.count).to eq(2)
+      patch :update, params
+      project.reload
+      expect(project.user_projects.count).to eq(2)
+      expect(project.user_projects.find_by(id: user_project_two.id).allocation).to eq(50)
+    end
+
+    it 'should NOT update invalid team member' do
+      project = FactoryGirl.create(:project)
+      user_one = FactoryGirl.create(:user)
+      user_two = FactoryGirl.create(:user)
+      user_three = FactoryGirl.create(:user)
+      user_project_one = FactoryGirl.create(:user_project, user_id: user_one.id, project_id: project.id)
+      user_project_two = FactoryGirl.create(:user_project, user_id: user_two.id, project_id: project.id)
+      params = {:project=>
+        {:user_projects_attributes=>
+          {
+            "0" => 
+            {
+              :id => user_project_two.id,
+              :active => "false",
+              :user_id => user_two.id,
+              :project_id => project.id,
+              :start_date => "09/01/2020",
+              :end_date => "",
+              :time_sheet => "0",
+              :allocation => "50",
+            }
+          }
+        },
+        :id => project.slug
+      }
+      expect(project.user_projects.count).to eq(2)
+      patch :update, params
+      project.reload
+      expect(project.user_projects.count).to eq(2)
+      expect(project.user_projects.find_by(id: user_project_two.id).active).to eq(true)
+    end
+  end
 end
