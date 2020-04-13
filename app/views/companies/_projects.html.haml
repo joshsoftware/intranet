@@ -5,14 +5,17 @@
       %th No of employees
       %th URL
       %th Status
+      %th Action
   %tbody
     - projects.each do |project|
       %tr
         %td= link_to project.name, project_path(project)
-        %td= link_to project.url
+        %td= project.working_employees_count
+        %td
+          = link_to project.url, project.url, target: :_blank
         %td
           .label{ "class": set_label(project.is_active) }
-            = project.is_active
+            = project.is_active ? 'Active' : 'Inactive'
         %td
           - if can? :manage, Project
             =link_to '', edit_company_project_path(@company, project), class: "icon-edit", data: {'no-turbolink' =>  true}

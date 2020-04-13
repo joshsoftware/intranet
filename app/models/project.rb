@@ -68,7 +68,9 @@ class Project
   scope :all_active, ->{where(is_active: true).asc(:name)}
   scope :visible_on_website, -> {where(visible_on_website: true)}
   scope :sort_by_position, -> { asc(:position)}
-  attr_accessor :allocated_employees, :manager_name, :employee_names
+
+  attr_accessor :allocated_employees, :manager_name, :employee_names, :working_employees_count
+
   # validates_uniqueness_of :code, allow_blank: true, allow_nil: true
 
   MANERIAL_ROLE = ['Admin', 'Manager']

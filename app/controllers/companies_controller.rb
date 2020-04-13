@@ -36,6 +36,16 @@ class CompaniesController < ApplicationController
 
   def show
     @projects = @company.projects.group_by(&:is_active)
+    if(@projects.key?(true))
+      @projects[true].each do |project|
+        project.working_employees_count = UserProject.where(project_id: project._id, end_date: nil).count
+      end
+    end
+    if(@projects.key?(false))
+      @projects[false].each do |project|
+        project.working_employees_count = 0
+      end
+    end
     respond_to do |format|
       format.html
       format.json{ render json: @projects.to_json}
