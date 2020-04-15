@@ -46,4 +46,23 @@ describe AttachmentsController do
       end
     end
   end
+
+  describe '#create' do
+    context 'document creation' do
+      it 'should create a document' do
+        params = FactoryGirl.attributes_for(:attachment, is_visible_to_all: true)
+        post :create, {:attachment => params}
+        expect(flash[:notice]).to eq "Document saved successfully"
+      end
+    end
+  end
+
+  describe '#destroy' do
+    it 'should delete attachment' do
+      attachment = FactoryGirl.create(:attachment)
+      delete :destroy, id: attachment.id
+      expect(Attachment.count).to eq(0)
+      expect(response).to redirect_to(attachments_path)
+    end
+  end
 end

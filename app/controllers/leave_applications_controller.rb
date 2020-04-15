@@ -127,8 +127,8 @@ class LeaveApplicationsController < ApplicationController
     end_of_year = today.end_of_year.strftime("%d-%m-%Y")
     if params[:from].present?
       to = params[:to].empty? ? today.strftime("%d-%m-%Y") : params[:to]
-      start_at =  { start_at: params[:from]..to  }
-      end_at = { end_at: params[:from]..to }
+      start_at =  { start_at: params[:from].to_date..to.to_date }
+      end_at = { end_at: params[:from].to_date..to.to_date }
       [start_at, end_at]
     else
       start_at =  { start_at: beginning_of_year..end_of_year }

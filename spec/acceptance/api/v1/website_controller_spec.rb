@@ -25,6 +25,8 @@ resource "Website Apis" do
 
       do_request
       res = JSON.parse(response_body)
+      res["leaders"] = res["leaders"].sort_by { |user| user["email"] }
+      res["members"] = res["members"].sort_by { |user| user["email"] }
       expect(status).to eq 200
       expect(res["leaders"].count).to eq 2
       expect(res["leaders"].last.keys).to eq ["email", "public_profile", "employee_detail"]
@@ -65,6 +67,17 @@ resource "Website Apis" do
 
       do_request
       expect(status).to eq 401
+    end
+  end
+
+  get "/api/v1/news" do
+    example "Get all news" do
+      header 'Referer', "http://#{ORGANIZATION_DOMAIN}"
+      news = FactoryGirl.create_list(:news, 5)
+      do_request
+      res = JSON.parse(response_body)
+      expect(status).to eq 200
+      expect(res["news"]["2020"].count).to eq(5)
     end
   end
 

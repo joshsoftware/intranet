@@ -1,6 +1,6 @@
 require 'time_difference'
 namespace :timesheet_reminder do
-  desc "Remainds to employee to fill timesheet"
+  desc "Reminds to employee to fill timesheet"
   task :ts_reminders => :environment do
     unless HolidayList.is_holiday?(Date.today)
       @time_sheet = TimeSheet.new

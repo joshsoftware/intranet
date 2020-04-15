@@ -102,7 +102,7 @@ describe PrivateProfile do
       private_profile = FactoryGirl.create(:private_profile, user: user,
         end_of_probation: Date.today + 7)
       PrivateProfile.notify_probation_end
-      expect( ActionMailer::Base.deliveries[0].subject).to eq('End of probation period')
+      expect(ActionMailer::Base.deliveries[0].subject).to eq('Action Required: Probation period of employees ending soon')
       expect(ActionMailer::Base.deliveries.count).to eq(1)
     end
 

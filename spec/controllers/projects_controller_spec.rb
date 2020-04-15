@@ -46,7 +46,7 @@ describe ProjectsController do
   describe "GET create" do
     it "should create new project" do
       post :create, { project: FactoryGirl.attributes_for(:project) }
-      flash[:success].should eql("Project created Succesfully")
+      expect(flash[:success]).to eq("Project created Succesfully")
       should redirect_to projects_path
     end
 
@@ -134,7 +134,7 @@ describe ProjectsController do
   describe "GET generate_code" do
     it "should respond with json" do
       get :generate_code, {format: :json}
-      response.header['Content-Type'].should include 'application/json'
+      expect(response.header['Content-Type']).to include 'application/json'
     end
 
     it "should generate 6 digit aplphanuric code" do
@@ -152,6 +152,16 @@ describe ProjectsController do
       expect(last.position).to eq(3)
       xhr :post, :update_sequence_number, id: projects.last.id, position: 1
       expect(last.reload.position).to eq(1)
+    end
+  end
+
+  context 'GET export_project_report' do
+    it "should send project team data report" do
+      projects = FactoryGirl.create_list(:project, 3)
+      Sidekiq::Extensions::DelayedMailer.jobs.clear
+      xhr :get, :export_project_report
+      expect(flash[:success]).to eq("You will receive project team data report to your mail shortly.")
+      expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
     end
   end
 

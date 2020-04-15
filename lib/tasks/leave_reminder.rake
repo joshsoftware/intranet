@@ -9,7 +9,7 @@ namespace :leave_reminder do
     end
   end
 
-  desc "Reminds managers and HR whose leave biginning in next two days and leave is pending"
+  desc "Reminds managers and HR whose leave beginning in next two days and leave is pending"
   task :pending_leave => :environment do
     unless HolidayList.is_holiday?(Date.today)
       LeaveApplication.pending_leaves_reminder

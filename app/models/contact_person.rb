@@ -7,6 +7,6 @@ class ContactPerson
   field :email
 
   embedded_in :private_profile
-  embedded_in :vender
+  embedded_in :vendor
   embedded_in :company
 end

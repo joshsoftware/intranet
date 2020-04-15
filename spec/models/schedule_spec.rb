@@ -11,7 +11,7 @@ RSpec.describe Schedule, :type => :model do
     it "should not have incorrect time format" do
       schedule = FactoryGirl.build(:schedule)
       schedule.interview_time = "59/23/11"
-      schedule.interview_time.should_not match(
+      expect(schedule.interview_time).not_to match(
         /(([0-1][0-9])|(2[0-3])){1}(:([0-5][0-9])){2}/
       )
     end
@@ -35,37 +35,36 @@ RSpec.describe Schedule, :type => :model do
     context "interview type telephonic" do
       it "should have valid telephone no" do
         schedule = FactoryGirl.build(:schedule)
-        schedule.candidate_details[:telephone].should match(/^([0-9]{10})$/)
+        expect(schedule.candidate_details[:telephone]).to match(/^([0-9]{10})$/)
       end
 
       it "should not have invalid telephone no" do
         schedule = FactoryGirl.build(:schedule)
         schedule.candidate_details['telephone'] = 3433
-        schedule.candidate_details['telephone'].
-          should_not match(/^([0-9]{10})$/)
+        expect(schedule.candidate_details['telephone']).
+          not_to match(/^([0-9]{10})$/)
       end
     end
 
     context "interview type skype" do
       it "should have valid skype id" do
         schedule = FactoryGirl.build(:schedule)
-        schedule.candidate_details[:skype].should match(/^(\w{6,20})$/)
+        expect(schedule.candidate_details[:skype]).to match(/^(\w{6,20})$/)
       end
 
       it "should not have invalid skype id" do
         schedule = FactoryGirl.build(:schedule)
         schedule.candidate_details[:skype] = 'test@11'
-        schedule.candidate_details['skype'].should_not match(/^(\w{6,20})$/)
+        expect(schedule.candidate_details['skype']).not_to match(/^(\w{6,20})$/)
       end
     end 
 
     context "interview type face to face" do
       it "should have valid phone no or email id" do
         schedule = FactoryGirl.build(:schedule)
-        (schedule.candidate_details[:telephone].should match(/^([0-9]{10})$/) or
-          schedule.candidate_details[:email].
-            should match(/^([a-z0-9][\w_+]*)*[a-z0-9]@(\w+\.)+\w+$/i)
-        ).should eq(true)
+        expect(schedule.candidate_details[:telephone]).to match(/^([0-9]{10})$/) or
+        expect(schedule.candidate_details[:email]).
+            to match(/^([a-z0-9][\w_+]*)*[a-z0-9]@(\w+\.)+\w+$/i)
       end
     end
 
@@ -75,29 +74,29 @@ RSpec.describe Schedule, :type => :model do
     context "profile should be github profile" do
       it "should have valid github profile" do
         schedule = FactoryGirl.build(:schedule)
-        schedule.public_profile[:git].should match(/^http:\/\/github.com\/\w*$/)
+        expect(schedule.public_profile[:git]).to match(/^http:\/\/github.com\/\w*$/)
       end
 
       it "should not have invalid github profile" do
         schedule = FactoryGirl.build(:schedule)
         schedule.public_profile[:git] = 'http://github.in/78%'
-        schedule.public_profile['git'].
-          should_not match(/^http:\/\/github.com\/\w*$/)
+        expect(schedule.public_profile['git']).
+          not_to match(/^http:\/\/github.com\/\w*$/)
       end
     end
 
     context "profile should be linkedin profile" do
       it "should have valid linkedin profile" do
         schedule = FactoryGirl.build(:schedule)
-        schedule.public_profile[:linkedin].
-          should match(/^http:\/\/in.linkedin.com\/pub\/(\w|[-\/])*$/)
+        expect(schedule.public_profile[:linkedin]).
+          to match(/^http:\/\/in.linkedin.com\/pub\/(\w|[-\/])*$/)
       end
 
       it "should not have invalid linkedin profile" do
         schedule = FactoryGirl.build(:schedule)
         schedule.public_profile[:linkedin] = 'http://in.linkedin.com/ad$'
-        schedule.public_profile['linkedin'].
-          should_not match(/^http:\/\/in.linkedin.com\/pub\/(\w|[-\/])*$/)
+        expect(schedule.public_profile['linkedin']).
+          not_to match(/^http:\/\/in.linkedin.com\/pub\/(\w|[-\/])*$/)
       end
     end
   end
@@ -106,14 +105,14 @@ RSpec.describe Schedule, :type => :model do
     context "pdf document" do
       it "should have document type .pdf" do
         schedule = FactoryGirl.build(:schedule)
-        schedule.file.file.extension.downcase.should eq('pdf')
+        expect(schedule.file.file.extension.downcase).to eq('pdf')
       end
 
       it "should not have other format" do
         schedule = FactoryGirl.create(:schedule,
           file: fixture_file_upload('spec/fixtures/files/sample1.doc')
         )
-        schedule.file.file.extension.downcase.should_not eq('pdf')
+        expect(schedule.file.file.extension.downcase).not_to eq('pdf')
       end
     end
 
@@ -122,14 +121,14 @@ RSpec.describe Schedule, :type => :model do
         schedule = FactoryGirl.create(:schedule,
           file: fixture_file_upload('spec/fixtures/files/sample1.doc')
         )
-        (['doc','docx'].include?(schedule.file.file.extension.downcase)).
-          should eq(true)
+        expect(['doc','docx'].include?(schedule.file.file.extension.downcase)).
+          to eq(true)
       end
 
       it "should not have other format" do
         schedule = FactoryGirl.create(:schedule)
-        (['doc','docx'].include?(schedule.file.file.extension.downcase)).
-          should_not eq(true)
+        expect(['doc','docx'].include?(schedule.file.file.extension.downcase)).
+          not_to eq(true)
       end
     end
   end
@@ -138,7 +137,7 @@ RSpec.describe Schedule, :type => :model do
     it "should have registered email" do
       schedule = FactoryGirl.create(:schedule)
       email = schedule.users.first.email
-      User.where(email:email).last.valid?.should eq(true)
+      expect(User.where(email:email).last.valid?).to eq(true)
     end
 
     it "should not have non registered email" do

@@ -48,12 +48,25 @@ RSpec.describe HolidayListsController, type: :controller do
   context '#update' do
     let!(:holiday) { FactoryGirl.create(:holiday) } 
     it 'update holiday' do
-     params  = {
-      holiday_date: '05/09/2019',
-      reason: 'test' 
-     }   
-     put :update, id: holiday.id, holiday_list: params
-     expect(flash[:success]).to eq('Holiday Updated Succesfully')
+      params  = {
+        holiday_date: '05/09/2019',
+        reason: 'test'
+      }
+      put :update, id: holiday.id, holiday_list: params
+      expect(flash[:success]).to eq('Holiday Updated Succesfully')
+    end
+  end
+
+  context '#holiday_list' do
+    before do
+      FactoryGirl.create(:holiday)
+      @user = FactoryGirl.create(:user)
+      sign_in @user
+    end
+
+    it 'render holiday list' do
+      get :holiday_list
+      expect(response).to have_http_status(:success)
     end
   end
 end

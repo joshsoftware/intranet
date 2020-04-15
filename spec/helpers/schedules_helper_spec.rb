@@ -10,5 +10,5 @@
 #   end
 # end
 RSpec.describe SchedulesHelper, :type => :helper do
-  pending "add some examples to (or delete) #{__FILE__}"
+  # pending "add some examples to (or delete) #{__FILE__}"
 end

@@ -26,4 +26,13 @@ RSpec.describe Company, type: :model do
     FactoryGirl.create(:address, company: company)
     expect(company.addresses.count).to eq(1)
   end
+
+  it 'should return project codes in json' do
+    company = FactoryGirl.create(:company)
+    project1 = FactoryGirl.create(:project, company: company)
+    project2 = FactoryGirl.create(:project, company: company)
+    expected_json = [ project1.as_json(only: [:name,:code]),
+                      project2.as_json(only: [:name,:code])]
+    expect(company.project_codes).to eq(expected_json)
+  end
 end

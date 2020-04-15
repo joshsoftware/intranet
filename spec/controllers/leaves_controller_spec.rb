@@ -45,28 +45,28 @@ describe LeaveApplicationsController do
 
       it "should show only his leaves if user is not admin" do
         get :view_leave_status
-        assigns(:pending_leaves).count.should eq(1)
+        expect(assigns(:pending_leaves).count).to eq(1)
       end
 
       it "user is admin he could see all leaves" do
         sign_out @user
         sign_in @admin
         get :view_leave_status
-        assigns(:pending_leaves).count.should eq(2)
+        expect(assigns(:pending_leaves).count).to eq(2)
       end
 
       it "user is manager then he could see all leaves" do
         sign_out @user
         sign_in @manager
         get :view_leave_status
-        assigns(:pending_leaves).count.should eq(2)
+        expect(assigns(:pending_leaves).count).to eq(2)
       end
 
       it 'should search all leaves if search parameters are empty' do
         sign_out @user
         sign_in @admin
         get :view_leave_status, { user_id: '', from: '', to: ''}
-        assigns(:pending_leaves).count.should eq(2)
+        expect(assigns(:pending_leaves).count).to eq(2)
       end
 
       # it 'should search leaves by employee first name' do
@@ -89,7 +89,7 @@ describe LeaveApplicationsController do
         sign_out @user
         sign_in @admin
         get :view_leave_status, { user_id: @user.id, from: '', to: ''}
-        assigns(:pending_leaves).count.should eq(1)
+        expect(assigns(:pending_leaves).count).to eq(1)
       end
 
       # it 'should search leaves for case insensetive employee name' do
@@ -105,7 +105,7 @@ describe LeaveApplicationsController do
         sign_in @admin
         @user.public_profile.update(first_name: 'Test', last_name: 'Search')
         get :view_leave_status, { user_id: @user.id, from: '', to: ''}
-        assigns(:pending_leaves).count.should eq(1)
+        expect(assigns(:pending_leaves).count).to eq(1)
       end
 
       it 'should search leaves between from and to date' do
@@ -119,7 +119,7 @@ describe LeaveApplicationsController do
           from: Date.today + 5.days,
           to: Date.today + 10.days
         }
-        assigns(:pending_leaves).count.should eq(1)
+        expect(assigns(:pending_leaves).count).to eq(1)
       end
 
       it 'should show leaves by employee name, leave start_date and end_date' do
@@ -136,7 +136,7 @@ describe LeaveApplicationsController do
           from: Date.today + 5.days,
           to: Date.today + 10.days
         }
-        assigns(:pending_leaves).count.should eq(1)
+        expect(assigns(:pending_leaves).count).to eq(1)
       end
     end
 
@@ -152,7 +152,7 @@ describe LeaveApplicationsController do
         user_id: @user.id,
         leave_application: @leave_application.attributes
       }
-      LeaveApplication.count.should == 1
+      expect(LeaveApplication.count).to eq(1)
       @user.reload
       expect(@user.employee_detail.available_leaves).to eq(remaining_leave)
     end
@@ -221,7 +221,7 @@ describe LeaveApplicationsController do
         id: leave_application.id,
         leave_action: :approve
       }
-      Sidekiq::Extensions::DelayedMailer.jobs.size.should eq(1)
+      expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
     end
 
     it "Role(admin) should able to accept/reject as many times as he wants" do
@@ -272,13 +272,13 @@ describe LeaveApplicationsController do
     end
   end
 
-  context "Canceling leaves" do
+  context "Cancelling leaves," do
     it "Should be credited in corresponding account"
-    it "Admin should be canceled after accepting or rejecting"
+    it "Admin should be cancelled after accepting or rejecting"
     it "Employee should be able to cancel when leaves are not accepted/rejected"
-    it "After accepting leaves, employee should not be canceled"
+    it "After accepting leaves, employee should not be able to cancel"
     it "If employee cancel leaves then admin should be notified"
-    it "Admin cancel leaves then employee should be notified"
+    it "If Admin cancel leaves then employee should be notified"
   end
 
   context 'If user is not Admin should not able to ' do
@@ -359,7 +359,7 @@ describe LeaveApplicationsController do
         id: leave_application.id,
         leave_action: :reject
       }
-      Sidekiq::Extensions::DelayedMailer.jobs.size.should eq(1)
+      expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
     end
 
     it "should not deduct leaves if rejected already rejected leave" do
@@ -401,8 +401,8 @@ describe LeaveApplicationsController do
         number_of_days: days
       }
       l_app = assigns(:leave_application)
-      l_app.number_of_days.should eq(days)
-      l_app.end_at.should eq(end_at)
+      expect(l_app.number_of_days).to eq(days)
+      expect(l_app.end_at).to eq(end_at)
     end
 
     it 'Employee should be able to update his own leave' do
@@ -414,8 +414,8 @@ describe LeaveApplicationsController do
         number_of_days: days
       }
       l_app = assigns(:leave_application)
-      l_app.number_of_days.should eq(days)
-      l_app.end_at.should eq(end_at)
+      expect(l_app.number_of_days).to eq(days)
+      expect(l_app.end_at).to eq(end_at)
     end
 
     it 'Employee should not be able to update leave of other employee' do
@@ -443,8 +443,8 @@ describe LeaveApplicationsController do
         number_of_days: days
       }
       l_app = assigns(:leave_application)
-      l_app.number_of_days.should eq(days)
-      l_app.end_at.should eq(end_at)
+      expect(l_app.number_of_days).to eq(days)
+      expect(l_app.end_at).to eq(end_at)
       expect(employee.reload.employee_detail.available_leaves).
         to eq(number_of_leaves - days)
     end
