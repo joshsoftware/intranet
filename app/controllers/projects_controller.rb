@@ -2,7 +2,9 @@ class ProjectsController < ApplicationController
   load_and_authorize_resource
   skip_load_and_authorize_resource :only => :create
   before_action :authenticate_user!
+
   before_action :load_project, except: [:index, :new, :create, :remove_team_member, :add_team_member, :generate_code, :export_project_report]
+  before_action :load_users, only: [:edit, :update]
 
   include RestfulAction
 
@@ -109,5 +111,12 @@ class ProjectsController < ApplicationController
 
   def load_project
     @project = Project.find(params[:id])
+  end
+
+  def load_users
+    @users = User.project_engineers
+    @users.each do |user|
+      user.user_projects.sort("user.public_profile.first_name")
+    end
   end
 end

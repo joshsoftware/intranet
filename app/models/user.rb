@@ -55,6 +55,7 @@ class User
   validates :email, format: {with: /\A.+@#{ORGANIZATION_DOMAIN}/, message: "Only #{ORGANIZATION_NAME} email-id is allowed."}
   validates :role, :email, presence: true
   validates_associated :employee_detail
+  scope :project_engineers, ->{where(:role.nin => ['HR','Finance'], :status => STATUS[2]).asc("public_profile.first_name")}
   scope :employees, ->{all.asc("public_profile.first_name")}
   scope :approved, ->{where(status: 'approved')}
   scope :visible_on_website, -> {where(visible_on_website: true)}

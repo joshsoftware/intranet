@@ -1,4 +1,4 @@
-= nested_form_for @project, :html => {class: "form-horizontal"} do |f|
+= simple_nested_form_for @project, :html => {class: "form-horizontal"} do |f|
   %h2 Team Members for #{@project.name}
   %table.table.table-hover#team-members
     %tr
@@ -9,12 +9,14 @@
       %th Timesheet Required?
       %th Allocation Percent
     = f.fields_for :user_projects, :wrapper => false do |project_user_form|
+      - project_user_form.object.errors.full_messages.each do |msg|
+        %li= msg
       %tr{:class => 'fields'}
         %td
           .make-switch{"data-on" => "success", "data-off" => "danger", "data-on-label" => "Yes", "data-off-label" => "No"}
             = project_user_form.check_box :active, {class: "active-check-box"}, 'true', 'false'
         %td 
-          = project_user_form.select :user_id, options_from_collection_for_select(User.where(:role.nin => ['HR','Finance'], :status => STATUS[2]).to_a, :id, :name, project_user_form.object.user_id)
+          = project_user_form.select :user_id, options_from_collection_for_select(users.to_a, :id, :name, project_user_form.object.user_id), {}, class: "user_select"
         %td
           = project_user_form.text_field :start_date, class: :datepicker, style: "height: 32px"
         %td
@@ -37,8 +39,15 @@
     }
   })
 
+  $(document).ready(function(){
+    $(".user_select").select2()
+  })
+
   $(document).on('nested:fieldAdded', function(event){
     var checkBoxes = $(".make-switch")
     checkBoxes.bootstrapSwitch()
-    var field = event.field;
+    var selectField = event.field.find(".user_select")
+    selectField.select2()
   })
+
+  

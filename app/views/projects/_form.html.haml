@@ -14,8 +14,7 @@
   #project_info.tab-pane.fade
     = render 'projects/project_info_form'
   #team_info.tab-pane.fade
-    = render 'projects/team_info_form'
-
+    = render 'projects/team_info_form', users: users
 
 :javascript
   $('.tech_details').click(function(){
