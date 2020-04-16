@@ -25,17 +25,18 @@ class UserMailer < ActionMailer::Base
       :id.ne => leave_application_id
     )
     @leave_application = LeaveApplication.where(id: leave_application_id).first
-    mail(from: @user.email, to: receivers, subject: "#{@user.name} has applied for #{@leave_application.leave_type}")
+    @leave_type = get_leave_type(@leave_application.leave_type)
+    mail(from: @user.email, to: receivers, subject: "#{@user.name} has applied for #{@leave_type}")
   end
 
   def reject_leave(leave_application_id)
     get_leave(leave_application_id)
-    mail(to: @notification_emails, subject: "#{@leave_application.leave_type} Request got rejected")
+    mail(to: @notification_emails, subject: "#{@leave_type} Request got rejected")
   end
 
   def accept_leave(leave_application_id)
     get_leave(leave_application_id)
-    mail(to: @notification_emails, subject: "Congrats! #{@leave_application.leave_type} Request got accepted")
+    mail(to: @notification_emails, subject: "Congrats! #{@leave_type} Request got accepted")
   end
 
   def send_accept_leave_notification(leave_id, emails)
@@ -77,14 +78,15 @@ class UserMailer < ActionMailer::Base
     mail(to: 'all@joshsoftware.com', subject: "Congratulations #{@user_hash.collect{|k, v| v }.flatten.join(', ')}")
   end
 
-  def leaves_reminder(leaves)
+  def leaves_reminder(leaves, leave_type)
     user_ids = leaves.map(&:user_id)
     @receiver_emails = User.leave_notification_emails(user_ids)
     leaves.map do |leave|
       leave.sanctioning_manager = User.where(id: leave.processed_by).first.try(:name)
     end
     @leaves = leaves
-    mail(to: @receiver_emails, subject: 'Employees on leave tomorrow.') if leaves.present?
+    @leave_type = leave_type
+    mail(to: @receiver_emails, subject: "Employees on #{@leave_type.downcase} tomorrow.")
   end
 
   def invalid_blog_url(user_id)
@@ -167,9 +169,14 @@ class UserMailer < ActionMailer::Base
 
   def get_leave(id)
     @leave_application = LeaveApplication.where(id: id).first
+    @leave_type = get_leave_type(@leave_application.leave_type)
     @user = @leave_application.user
     @processed_by = User.find(@leave_application.processed_by)
     @notification_emails = [@user.email, User.leave_notification_emails(@user.id)].flatten.compact.uniq.join(', ')
+  end
+
+  def get_leave_type(leave_type)
+    leave_type == LeaveApplication::WFH ? leave_type : LeaveApplication::LEAVE.capitalize
   end
 
   def get_leave_message

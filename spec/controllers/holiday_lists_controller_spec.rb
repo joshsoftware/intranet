@@ -1,12 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe HolidayListsController, type: :controller do
+  before(:each) do
+    @admin = FactoryGirl.create(:admin)
+    sign_in @admin
+  end
+
   context '#create' do
     it 'create holiday' do
       date = Date.today
       date = date - 2.days if date.saturday? || date.sunday?
       params = FactoryGirl.attributes_for(:holiday, holiday_date: date)
-      post :create, {:holiday_list => params}
+      post :create, {holiday_list: params}
       expect(flash[:success]).to eq('Holiday Created Successfully')
     end
   end
@@ -59,14 +64,36 @@ RSpec.describe HolidayListsController, type: :controller do
 
   context '#holiday_list' do
     before do
-      FactoryGirl.create(:holiday)
+      @holiday = FactoryGirl.create(:holiday)
       @user = FactoryGirl.create(:user)
       sign_in @user
     end
 
     it 'render holiday list' do
       get :holiday_list
+      
+      holiday_list = JSON.parse response.body
       expect(response).to have_http_status(:success)
+      expect(holiday_list.first['country']).to eq(@holiday.country)
+      expect(holiday_list.first['holiday_date']).to eq(@holiday.holiday_date.strftime("%Y-%m-%d"))
+      expect(holiday_list.first['holiday_type']).to eq(@holiday.holiday_type)
+      expect(holiday_list.first['reason']).to eq(@holiday.reason)
+    end
+
+    it 'render holiday list by location and leave type (Optional)' do
+      holiday = FactoryGirl.create(:holiday, holiday_type: HolidayList::OPTIONAL, country: 'USA')
+      params = {
+        location: LOCATIONS[0],
+        leave_type: HolidayList::OPTIONAL
+      }
+      get :holiday_list
+      
+      holiday_list = JSON.parse response.body
+      expect(response).to have_http_status(:success)
+      expect(holiday_list.first['country']).to eq('USA')
+      expect(holiday_list.first['holiday_date']).to eq(holiday.holiday_date.strftime("%Y-%m-%d"))
+      expect(holiday_list.first['holiday_type']).to eq(HolidayList::OPTIONAL)
+      expect(holiday_list.first['reason']).to eq(holiday.reason)
     end
   end
 end

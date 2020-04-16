@@ -41,7 +41,7 @@
                                                   %td.kmTextContent{:style => "border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0;color:#505050;font-family:Helvetica, Arial;font-size:14px;line-height:150%;text-align:left;color:#FFFFFF;padding-bottom:9px;text-align:left;padding-right:18px;padding-left:18px;padding-top:20px;background-color:#1A1515;", :valign => "top"}
                                                     %p{:style => "margin:0;padding-bottom:2px;text-align: right;"}
                                                       %span{:style => "font-size:24px;"}
-                                                        %span{:style => "color: rgb(255, 240, 245);"} #{@leave_application.leave_type} Request
+                                                        %span{:style => "color: rgb(255, 240, 245);"} #{@leave_type} Request
                         %tr
                           %td{:align => "center", :style => "border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0", :valign => "top"}
                             %table.templateRow{:border => "0", :cellpadding => "0", :cellspacing => "0", :style => "border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0", :width => "100%"}
@@ -68,14 +68,16 @@
                                               %tbody
                                                 %tr
                                                   %td.kmTextContent{:style => "border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0;color:#505050;font-family:Helvetica, Arial;font-size:14px;line-height:150%;text-align:left;padding-top:9px;padding-bottom:9px;padding-left:18px;padding-right:18px;", :valign => "top"}
-                                                    %h1{:style => "color:#222;display:block;font-family:Helvetica, Arial;font-size:26px;font-style:normal;font-weight:bold;line-height:110%;letter-spacing:normal;margin:0;margin-bottom:9px;text-align:left"} #{@leave_application.leave_type} Application
+                                                    %h1{:style => "color:#222;display:block;font-family:Helvetica, Arial;font-size:26px;font-style:normal;font-weight:bold;line-height:110%;letter-spacing:normal;margin:0;margin-bottom:9px;text-align:left"} #{@leave_type} Application
                                                     %p{:style => "margin:0;padding-bottom:1em"}
                                                       Hello #{@receiver}
                                                       %br/
                                                     %p
-                                                      #{@user.public_profile.name} has applied for #{@leave_application.leave_type} from #{@leave_application.start_at.to_s} to #{@leave_application.end_at.to_s}.
+                                                      #{@user.public_profile.name} has applied for #{@leave_type} from #{@leave_application.start_at.to_s} to #{@leave_application.end_at.to_s}.
                                                       %br/
                                                       For Reason: #{@leave_application.reason}.
+                                                      %br/
+                                                      Leave Type: #{@leave_application.leave_type}
                                                       %br/
                                                       Days: #{@leave_application.number_of_days}
                                                       %br/

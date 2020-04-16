@@ -5,7 +5,7 @@
   .btn_position
     = link_to "Add Policy", new_policy_path
   .btn_margin
-    = link_to " Add Holiday", new_holiday_list_path
+    = link_to 'Add Holiday', new_holiday_list_path
 
 .form-horizontal
   - unless @policies.empty?
@@ -20,8 +20,8 @@
               = render partial: 'policy_row', locals: {policy: policy}
   - else
     %h4
-      = "No policies found"
+      = 'No policies found'
   .holiday_list
-    = link_to "Holiday List", holiday_lists_path
+    = link_to 'Holiday List', holiday_lists_path
 :css 
   .table td{ border-top: 1px solid white; padding: 0px;}

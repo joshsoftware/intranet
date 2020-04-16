@@ -8,8 +8,9 @@ class LeaveApplication
 
   LEAVE = 'LEAVE'
   WFH = 'WFH'
+  OPTIONAL = 'OPTIONAL'
 
-  LEAVE_TYPES = [LEAVE, WFH]
+  LEAVE_TYPES = [LEAVE, WFH, OPTIONAL]
 
   field :start_at,        type: Date
   field :end_at,          type: Date
@@ -34,12 +35,15 @@ class LeaveApplication
   validates :contact_number, numericality: {only_integer: true}, length: {is: 10}
   validate :validate_available_leaves, on: [:create, :update], if: :leave?
   validate :end_date_less_than_start_date, if: 'start_at.present?'
-  validate :validate_date, on: [:create, :update]
+  validate :validate_date, on: [:create, :update], unless: :optional_leave?
+  validate :validate_optional_leave, on: [:create, :update], if: :optional_leave?
+  validate :update_leave_count, on: :update, if: :previous_leave_type?
 
   after_save do
     deduct_available_leave_send_mail
     send_leave_notification
   end
+
   after_update :update_available_leave_send_mail, if: 'pending?'
 
   scope :pending, ->{where(leave_status: PENDING)}
@@ -58,6 +62,43 @@ class LeaveApplication
 
   def leave_count
     (self.end_at - self.start_at).to_i + 1
+  end
+
+  def previous_leave_type?
+    self.leave_status == PENDING &&
+    self.leave_type_changed? &&
+    (self.leave_type_was == LEAVE || self.leave_type == LEAVE)
+  end
+
+  def update_leave_count
+    if self.leave_type_was == LEAVE
+      user.employee_detail.add_rejected_leave(self.number_of_days_was)
+    else
+      user.employee_detail.deduct_available_leaves(self.number_of_days)
+    end
+  end
+  
+  def optional_leave?
+    leave_type == OPTIONAL
+  end
+
+  def validate_optional_leave
+    leaves = LeaveApplication.unrejected.where(
+      user_id: user_id,
+      leave_type: OPTIONAL,
+      end_at: {
+        '$gte': Date.today.beginning_of_year,
+        '$lte': Date.today.end_of_year
+      }
+    )
+    leave_count = if self.new_record? || self.leave_type_was != OPTIONAL
+                    leaves.count + 1
+                  else
+                    leaves.count
+                  end
+    if leave_count > 2
+      errors.add(:leave_type, 'Cannot apply for more than 2 Optional leaves')
+    end
   end
 
   def process_after_update(status)
@@ -143,11 +184,19 @@ class LeaveApplication
     )
   end
 
+  def self.get_optional_holiday_request(date)
+    LeaveApplication.where(
+      start_at: date,
+      leave_status: APPROVED,
+      leave_type: OPTIONAL
+    )
+  end
+
   def self.get_users_past_leaves(user_id)
     LeaveApplication.where(
       user_id: user_id,
       start_at: Date.today - 6.month...Date.today,
-      leave_status: 'Approved'
+      leave_status: APPROVED
     ).order_by(:start_at.desc)
   end
 
@@ -159,20 +208,21 @@ class LeaveApplication
     ).order_by(:start_at.asc)
   end
 
-  def self.pending_leaves_reminder
+  def self.pending_leaves_reminder(country)
     count = 0
     date  = Date.today
     while count < 2
-      date  += 1
-      count += 1 unless HolidayList.is_holiday?(date)
+      date += 1
+      HolidayList.is_holiday?(date, country) ? next : count += 1
       #checking count for 2 days - sending mail only for 1 and 2 day remaining leaves.
-      if count == 1 || 2
-        leave_applications = LeaveApplication.where(start_at: date, leave_status: PENDING)
-        next if leave_applications.empty?
-        leave_applications.each do |leave_application|
-          managers = leave_application.user.get_managers_emails
-          UserMailer.pending_leave_reminder(leave_application.user, managers, leave_application).deliver_now
-        end
+      leave_applications = LeaveApplication.where(
+        start_at: date,
+        leave_status: PENDING,
+      )
+      next if leave_applications.empty?
+      leave_applications.each do |leave_application|
+        managers = leave_application.user.get_managers_emails
+        UserMailer.pending_leave_reminder(leave_application.user, managers, leave_application).deliver_now
       end
     end
   end
@@ -192,7 +242,7 @@ class LeaveApplication
 
   def update_available_leave_send_mail
     user = self.user
-    if leave?
+    if !leave_type_changed? && leave?
       prev_days, changed_days = number_of_days_change ? number_of_days_change : number_of_days
       user.employee_detail.add_rejected_leave(prev_days)
       user.employee_detail.deduct_available_leaves(changed_days||prev_days)

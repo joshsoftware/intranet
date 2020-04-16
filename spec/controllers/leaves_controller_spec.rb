@@ -548,6 +548,38 @@ describe LeaveApplicationsController do
       expect(leave_count).to eq(24)
     end
 
+    it 'should deduct leave count if leave type updated to LEAVE' do
+      sign_in @user
+      @leave.save
+      leave_count = @user.employee_detail.available_leaves - @leave.number_of_days
+      params = {
+        id: @leave.id,
+        leave_application: @leave.attributes.merge(leave_type: LeaveApplication::LEAVE)
+      }
+      put :update, params
+
+      expect(flash[:success]).to eq('Your request has been updated successfully.' +
+        ' Please wait for the approval.')
+      expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
+      expect(@leave.reload.leave_type).to eq(LeaveApplication::LEAVE)
+    end
+
+    it 'should not deduct leave count if leave type updated to Optional' do
+      sign_in @user
+      @leave.save
+      leave_count = @user.employee_detail.available_leaves
+      params = {
+        id: @leave.id,
+        leave_application: @leave.attributes.merge(leave_type: LeaveApplication::OPTIONAL)
+      }
+      put :update, params
+
+      expect(flash[:success]).to eq('Your request has been updated successfully.' +
+        ' Please wait for the approval.')
+      expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
+      expect(@leave.reload.leave_type).to eq(LeaveApplication::OPTIONAL)
+    end
+
     it 'should not deduct leave count after approving the WFH request' do
       sign_in @admin
       @leave.save
@@ -600,6 +632,88 @@ describe LeaveApplicationsController do
       @user_project_two.update_attributes(end_date: DateTime.now, active: false)
       controller.params = ActionController::Parameters.new({active_or_all_flag: "all", project_id: @project.id})
       expect(controller.send(:user_ids)).to eq(@user_ids)
+    end
+  end
+
+  context 'Optional Leave' do
+    before(:each) do
+      @user = FactoryGirl.create(:user, status: 'approved')
+      @leave = FactoryGirl.build(:leave_application,
+        leave_type: LeaveApplication::OPTIONAL,
+        user: @user
+      )
+    end
+
+    it 'should not deduct any leave count' do
+      sign_in @user
+      leave_count = @user.employee_detail.available_leaves
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+
+      expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
+    end
+
+    it 'should deduct leave if leave type updated to LEAVE' do
+      sign_in @user
+      @leave.save
+      leave_count = @user.employee_detail.available_leaves - @leave.number_of_days
+      params = {
+        id: @leave.id,
+        leave_application: @leave.attributes.merge(leave_type: LeaveApplication::LEAVE)
+      }
+      put :update, params
+
+      expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
+      expect(@leave.reload.leave_type).to eq(LeaveApplication::LEAVE)
+    end
+
+    it 'should not deduct any leave if leave type updated to WFH' do
+      sign_in @user
+      @leave.save
+      leave_count = @user.employee_detail.available_leaves
+      params = {
+        id: @leave.id,
+        leave_application: @leave.attributes.merge(leave_type: LeaveApplication::WFH)
+      }
+      put :update, params
+
+      expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
+      expect(@leave.reload.leave_type).to eq(LeaveApplication::WFH)
+    end
+
+    it 'should not deduct leave count after approving the Optional request' do
+      admin = FactoryGirl.create(:admin, status: 'approved')
+      sign_in admin
+      @leave.save
+      params = {
+        id: @leave.id,
+        leave_action: :approve
+      }
+      xhr :get, :process_leave, params
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(@leave.reload.leave_status).to eq(APPROVED)
+      expect(@leave.leave_type).to eq(LeaveApplication::OPTIONAL)
+      expect(leave_count).to eq(24)
+    end
+
+    it 'should not add or deduct leave count after reject the Optional request' do
+      admin = FactoryGirl.create(:admin, status: 'approved')
+      sign_in admin
+      @leave.save
+      params = {
+        id: @leave.id,
+        leave_action: :reject
+      }
+      xhr :get, :process_leave, params
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(@leave.reload.leave_status).to eq(REJECTED)
+      expect(@leave.leave_type).to eq(LeaveApplication::OPTIONAL)
+      expect(leave_count).to eq(24)
     end
   end
 end

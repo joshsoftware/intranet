@@ -1,23 +1,28 @@
 %h3 Holiday List- #{@year}
 - unless holidays.empty?
-  %table.table.table-bordered.table-width
-    %thead
-      %tr
-        %th Date
-        %th Day
-        %th Reason
-        - if can? :edit, HolidayList
-          %th Actions
+  - COUNTRIES.each do |country|
+    %h3= country
+    %table.table.table-bordered.table-width
+      %thead
+        %tr
+          %th Date
+          %th Day
+          %th Type
+          %th Reason
+          - if can? :edit, HolidayList
+            %th Actions
 
-    %tbody
-    - holidays.each do |holiday|
-      %tr
-        %td= holiday.holiday_date.strftime("%d-%b-%Y")
-        %td= holiday.holiday_date.strftime("%A")
-        %td= holiday.reason
-        - if can? :edit, HolidayList
-          %td
-            = link_to "", edit_holiday_list_path(holiday.id), class: "icon-edit", data: {"no-turbolink" => true}
-            = link_to "", holiday_list_path(holiday.id), data: {method: 'delete', confirm: "Are you sure? Do you want to delete holiday?"}, class: "icon-trash"
+      %tbody
+        - holidays.list(country).each do |holiday|
+          %tr
+            %td= holiday.holiday_date.strftime('%d-%b-%Y')
+            %td= holiday.holiday_date.strftime('%A')
+            %td= holiday.holiday_type.capitalize
+            %td= holiday.reason
+            - if can? :edit, HolidayList
+              %td
+                = link_to '', edit_holiday_list_path(holiday.id), class: 'icon-edit', data: {'no-turbolink' => true}
+                = link_to '', holiday_list_path(holiday.id), data: {method: 'delete', confirm: 'Are you sure? Do you want to delete holiday?'}, class: 'icon-trash'
+
 - else
   %h4 No records found. Please Contact System Admin
