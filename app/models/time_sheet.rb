@@ -338,13 +338,13 @@ class TimeSheet
       next if last_filled_time_sheet_date.nil?
       date_difference = calculate_date_difference(last_filled_time_sheet_date)
       if date_difference < 2 && last_filled_time_sheet_date < Date.today
-        next if HolidayList.is_holiday?(last_filled_time_sheet_date)
+        next if HolidayList.is_holiday?(last_filled_time_sheet_date, user.country)
         unless user_on_leave?(user, last_filled_time_sheet_date)
           unfilled_timesheet = last_filled_time_sheet_date unless time_sheet_filled?(user, last_filled_time_sheet_date)
         end
       else
         while(last_filled_time_sheet_date < Date.today)
-          next last_filled_time_sheet_date += 1 if HolidayList.is_holiday?(last_filled_time_sheet_date)
+          next last_filled_time_sheet_date += 1 if HolidayList.is_holiday?(last_filled_time_sheet_date, user.country)
           unless user_on_leave?(user, last_filled_time_sheet_date)
             unfilled_timesheet = last_filled_time_sheet_date unless time_sheet_filled?(user, last_filled_time_sheet_date)
             break
@@ -466,19 +466,21 @@ class TimeSheet
 
   def self.generate_individual_project_report(project, params, convert_hrs = true)
     individual_project_report = {}
+    from_date = params[:from_date].to_date
+    to_date = params[:to_date].to_date
     total_minutes = 0
     total_minutes_worked_on_projects = 0
-    project.get_user_projects_from_project(params[:from_date], params[:to_date]).includes(:time_sheets).each do |user|
+    project.get_user_projects_from_project(from_date, to_date).includes(:time_sheets).each do |user|
       report_details = {}
       time_sheet_log = []
-      user.time_sheets.where(project_id: project.id, date: {"$gte" => params[:from_date], "$lte" => params[:to_date]}).order_by(date: :asc).each do |time_sheet|
+      user.time_sheets.where(project_id: project.id, date: {'$gte': from_date, '$lte': to_date}).order_by(date: :asc).each do |time_sheet|
         working_minutes = calculate_working_minutes(time_sheet)
         total_minutes += working_minutes
         total_minutes_worked_on_projects += working_minutes
       end
-      user_projects = user.get_user_projects_from_user(project.id, params[:from_date].to_date, params[:to_date].to_date)
-      allocated_hours = total_allocated_hours(user_projects, params[:from_date].to_date, params[:to_date].to_date)
-      leaves_count = total_leaves_count(user, user_projects, params[:from_date].to_date, params[:to_date].to_date)
+      user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
+      allocated_hours = total_allocated_hours(user_projects, from_date, to_date, user.country)
+      leaves_count = total_leaves_count(user, user_projects, from_date, to_date)
       report_details['total_work'] = convert_hrs ?
         convert_hours_to_days(total_worked_in_hours(total_minutes.to_i)) :
         total_worked_in_hours(total_minutes.to_i)
@@ -506,7 +508,7 @@ class TimeSheet
           user_projects = user.get_user_projects_from_user(project.id, from_date.to_date, to_date.to_date)
           total_days_work = convert_hours_to_days(total_worked_in_hours(total_minutes.to_i))
           leaves_count = total_leaves_count(user, user_projects, from_date, to_date)
-          holidays_count = get_holiday_count(from_date, to_date)
+          holidays_count = get_holiday_count(from_date, to_date, user.country)
           if total_minutes != 0
             time_sheet_log.push(user.name, project.name, total_days_work, leaves_count, holidays_count)
             weekly_report << time_sheet_log
@@ -520,12 +522,15 @@ class TimeSheet
 
   def self.generate_and_send_weekend_report(holiday_list, start_date)
     weekend_report = []
-    holiday_list.each do |date|
+    holiday_list.each do |holiday|
+      date = holiday[:date]
+      country = holiday[:country]
       project_ids = TimeSheet.where(date: date).map(&:project_id).uniq
       project_ids.each do |project|
-        users = TimeSheet.where(date: date, project_id: project)
-                         .order(:start_time.asc)
-                         .map(&:user_id).uniq
+        user_ids = TimeSheet.where(date: date, project_id: project)
+                            .only(:id, :user_id)
+                            .pluck(:user_id).uniq
+        users = User.get_employees(country).where(:id.in => user_ids).pluck(:id)
         users.each do |user|
           timesheets = TimeSheet.where(date: date, project_id: project, user_id: user)
           weekend_report += timesheets.map { |i| [ i.project.name,
@@ -730,15 +735,15 @@ class TimeSheet
     total_allocated_hours = 0
     project.get_user_projects_from_project(from_date, to_date).each do |user|
       user_projects = user.get_user_projects_from_user(project.id, from_date, to_date)
-      allocated_hours = total_allocated_hours(user_projects, from_date, to_date)
+      allocated_hours = total_allocated_hours(user_projects, from_date, to_date, user.country)
       total_allocated_hours += allocated_hours
     end
     convert_hours_to_days(total_allocated_hours)
   end
 
-  def self.get_working_days(from_date, to_date)
+  def self.get_working_days(from_date, to_date, country_name)
     working_days = from_date.business_days_until(to_date)
-    no_of_holiday = get_holiday_count(from_date, to_date)
+    no_of_holiday = get_holiday_count(from_date, to_date, country_name)
     working_days -= no_of_holiday
   end
 
@@ -752,21 +757,21 @@ class TimeSheet
     total_leaves_count
   end
 
-  def self.total_allocated_hours(user_projects, from_date, to_date)
+  def self.total_allocated_hours(user_projects, from_date, to_date, country_name)
     total_allocated_hours = 0
     user_projects.each do |user_project|
       working_days =
         if user_project.end_date.present?
           if from_date <= user_project.start_date
-            get_working_days(user_project.start_date, user_project.end_date)
+            get_working_days(user_project.start_date, user_project.end_date, country_name)
           elsif from_date > user_project.start_date
-            get_working_days(from_date, user_project.end_date)
+            get_working_days(from_date, user_project.end_date, country_name)
           end
         else
           if from_date <= user_project.start_date
-            get_working_days(user_project.start_date, to_date)
+            get_working_days(user_project.start_date, to_date, country_name)
           elsif from_date > user_project.start_date
-            get_working_days(from_date, to_date)
+            get_working_days(from_date, to_date, country_name)
           end
         end
       allocated_hours = working_days * ALLOCATED_HOURS
@@ -890,7 +895,7 @@ class TimeSheet
       unless timesheet_data.empty?
         (from_date..to_date).each do |date|
           date_wise = []
-          next if HolidayList.is_holiday?(date)
+          next if HolidayList.is_holiday?(date, user.country)
           next if user_on_leave?(user, date)
           next if time_sheet_filled?(user, date)
           date_wise.push(user.employee_detail.employee_id, user.name, user.email, date)
@@ -908,8 +913,11 @@ class TimeSheet
     TimeSheet.where(date: {"$gte" => from_date, "$lte" => to_date}).where(user_id: user.id)
   end
 
-  def self.get_holiday_count(from_date, to_date)
-    HolidayList.where(holiday_date: {"$gte" => from_date, "$lte" => to_date}).count
+  def self.get_holiday_count(from_date, to_date, country_name)
+    HolidayList.where(
+      holiday_date: {'$gte': from_date, '$lte': to_date},
+      country: country_name
+    ).count
   end
 
   def self.time_sheet_present_for_reminder?(user)

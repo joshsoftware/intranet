@@ -1,18 +1,34 @@
 = f.hidden_field :user_id
-= f.input :leave_type, as: :radio_buttons, collection: [LeaveApplication::LEAVE, LeaveApplication::WFH], :item_wrapper_class => 'inline',
-  checked: @leave_application.leave_type || LeaveApplication::LEAVE
-= f.input :start_at, label: 'Start Date', input_html: { type: 'date', class: 'date-picker', min: Date.today.beginning_of_year.try(:strftime, '%Y-%m-%d'), max: Date.today.end_of_year.try(:strftime, '%Y-%m-%d'), data: { 'validation-required-message': 'You must select start date'}, required: true, value: f.object.start_at.try(:strftime, '%Y-%m-%d')}
-= f.input :end_at, label: 'End Date', input_html: { type: 'date', min: Date.today.beginning_of_year.try(:strftime, '%Y-%m-%d'), max: Date.today.end_of_year.try(:strftime, '%Y-%m-%d'), class: 'date-picker', data: { 'validation-required-message': 'You must select end date'}, required: true, value: f.object.end_at.try(:strftime, '%Y-%m-%d')}
+= f.input :leave_type, collection: LeaveApplication::LEAVE_TYPES, prompt: 'Select Leave Type'
+#leave_list
+= f.input :start_at, label: 'Start Date', input_html: { type: 'date', class: 'date-picker', min: Date.today.beginning_of_year.strftime('%Y-%m-%d'), data: { 'validation-required-message': 'You must select start date'}, required: true, value: f.object.start_at.try(:strftime, '%Y-%m-%d')}
+= f.input :end_at, label: 'End Date', input_html: { type: 'date', class: 'date-picker',  min: Date.today.beginning_of_year.strftime('%Y-%m-%d'), data: { 'validation-required-message': 'You must select end date'}, required: true, value: f.object.end_at.try(:strftime, '%Y-%m-%d')}
 = f.input :number_of_days, as: :decimal, label: 'Days', input_html: {step: 1}, input_html: { required: true, :'data-validation-required-message' => 'Enter the number of days', min: "1", :'data-validation-min-message' => "Number of day can't be zero or negative"}, readonly: true
 = f.input :contact_number, as: :decimal, label: 'Emergency Contact No.', input_html: {required: true, :'data-validation-required-message' => 'You need to enter your emergency number', type: 'text', maxlength: 10}
 = f.input :reason, as: :text, label: 'Reason', input_html: {required: true, :'data-validation-required-message' => 'You have to specify valid reason for leave'}
+- @end_of_year = Date.today.end_of_year.strftime('%Y-%m-%d')
+- @location = current_user.country
 %center
-  = f.submit (params[:action] == "new" ? 'Apply' : 'Save Changes'), class: 'btn'
+  = f.submit (params[:action] == "new" ? 'Apply' : 'Save Changes'), class: 'btn leave_submit'
 
 :javascript
   $("input,select,textarea").not("[type=submit]").jqBootstrapValidation();
 
   $(document).ready(function(){
+    var location = "#{@location}"
+    var end_of_year = "#{@end_of_year}"
+    set_number_of_days(location)
+  
+    if ($('#leave_application_leave_type').val() == 'OPTIONAL'){
+      $('#leave_list').html(input_leave_list)
+      date = $('#leave_application_leave_list').val()
+      $('#leave_application_leave_list').val(date).change()
+    }
+    else{
+      $('#leave_application_start_at').attr('max', end_of_year)
+      $('#leave_application_end_at').attr('max', end_of_year)
+    }
+    
     $('form').submit(function(){
       start_date_div = $('#leave_application_start_at')
       end_date_div = $('#leave_application_end_at')
@@ -27,10 +43,4 @@
         $('.end_date_error').remove()
       }
     });
-    set_number_of_days()
   });
-
-:css
-  #leave_application_leave_type_leave, #leave_application_leave_type_wfh {
-    height: auto;
-  }

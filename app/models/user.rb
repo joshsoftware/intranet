@@ -8,7 +8,7 @@ class User
 
   devise :database_authenticatable, :omniauthable,
          :recoverable, :rememberable, :trackable, :validatable, :omniauth_providers => [:google_oauth2]
-  INTERN_ROLE = "Intern"
+  INTERN_ROLE = 'Intern'
   ROLES = ['Super Admin', 'Admin', 'Manager', 'HR', 'Employee', INTERN_ROLE, 'Finance', 'Consultant']
 
   ## Database authenticatable
@@ -63,6 +63,7 @@ class User
   validates :role, :email, presence: true
   validates_associated :employee_detail
   scope :project_engineers, ->{where(:role.nin => ['HR','Finance'], :status => STATUS[2]).asc("public_profile.first_name")}
+  scope :get_employees, -> (country) {where( :'employee_detail.location'.in => User.get_cities(country))}
   scope :employees, ->{all.asc("public_profile.first_name")}
   scope :approved, ->{where(status: 'approved')}
   scope :visible_on_website, -> {where(visible_on_website: true)}
@@ -140,6 +141,10 @@ class User
 
   def call_monitor_service
     CodeMonitoringWorker.perform_async({ event_type: 'User Resigned', user_id: id.to_s })
+  end
+
+  def self.get_cities(country)
+    CityCountryMapping.map { |i| i[:city] if i[:country] == country }.compact
   end
 
   def sent_mail_for_approval(leave_application_id)
@@ -398,6 +403,14 @@ class User
           user.public_profile.skills,
           user.projects.collect(&:name).join(', ')
         ]
+      end
+    end
+  end
+
+  def country
+    CityCountryMapping.each do |city_country|
+      if self.employee_detail.try(:location) == city_country[:city]
+        return city_country[:country]
       end
     end
   end

@@ -57,6 +57,10 @@ every :day, :at => '09:30am' do
   rake "leave_reminder:daily"
 end
 
+every :day, at: '09:30am' do
+  rake 'leave_reminder:optional_holiday'
+end
+
 every '0 10 15 * *' do
   rake "light:remove_bounced_emails"
 end

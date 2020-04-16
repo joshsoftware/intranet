@@ -448,7 +448,7 @@ RSpec.describe TimeSheet, type: :model do
           from_time: "#{date} 9:00",
           to_time: "#{date} 10:00"
         )
-        expect(HolidayList.is_holiday?(user.time_sheets[0].date + 1)).
+        expect(HolidayList.is_holiday?(user.time_sheets[0].date + 1, user.country)).
           to eq(false)
         expect(TimeSheet.time_sheet_present_for_reminder?(user)).to eq(true)
         expect(TimeSheet.user_on_leave?(user, user.time_sheets[0].date + 1)).
@@ -1370,7 +1370,7 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:holiday, holiday_date: '11/10/2018'.to_date)
       from_date = '05/10/2018'.to_date
       to_date = '15/10/2018'.to_date
-      count = TimeSheet.get_holiday_count(from_date, to_date)
+      count = TimeSheet.get_holiday_count(from_date, to_date, COUNTRIES[0])
       expect(count).to eq(2)
     end
 
@@ -1379,7 +1379,7 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:holiday, holiday_date: '11/10/2018'.to_date)
       from_date = '01/10/2018'.to_date
       to_date = '05/10/2018'.to_date
-      count = TimeSheet.get_holiday_count(from_date, to_date)
+      count = TimeSheet.get_holiday_count(from_date, to_date, COUNTRIES[0])
       expect(count).to eq(0)
     end
   end
@@ -2144,7 +2144,7 @@ RSpec.describe TimeSheet, type: :model do
                                         project: project)
       date = Date.today - Date.today.wday
       FactoryGirl.create(:time_sheet, date: date, user: user, project: project )
-      TimeSheet.generate_and_send_weekend_report([date], @start_date)
+      TimeSheet.generate_and_send_weekend_report([{date: date, country: COUNTRIES[0]}], @start_date)
 
       expect(ActionMailer::Base.deliveries.count).to eq(1)
       expect(ActionMailer::Base.deliveries.first.subject).to eq(
@@ -2157,9 +2157,9 @@ RSpec.describe TimeSheet, type: :model do
                                         user: user,
                                         project: project)
       date = Date.today - 1
-      FactoryGirl.build(:holiday, holiday_date: date, reason: 'Test')
+      FactoryGirl.build(:holiday, holiday_date: date, reason: 'Test', country: COUNTRIES[0])
       FactoryGirl.create(:time_sheet, date: date, user: user, project: project )
-      TimeSheet.generate_and_send_weekend_report([date], @start_date)
+      TimeSheet.generate_and_send_weekend_report([{date: date, country: COUNTRIES[0]}], @start_date)
 
       expect(ActionMailer::Base.deliveries.count).to eq(1)
       expect(ActionMailer::Base.deliveries.first.subject).to eq(

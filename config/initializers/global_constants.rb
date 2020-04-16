@@ -12,6 +12,12 @@ PENDING = 'Pending'
 APPROVED = 'Approved'
 REJECTED = 'Rejected'
 LOCATIONS = ['Bengaluru', 'Plano', 'Pune']
+COUNTRIES = [ 'India', 'USA']
+CityCountryMapping = [
+  { city: 'Bengaluru', country: 'India'},
+  { city: 'Pune', country: 'India'},
+  { city: 'Plano', country: 'USA'}
+]
 
 ORGANIZATION_DOMAIN = 'joshsoftware.com'
 ORGANIZATION_NAME = 'Josh Software'

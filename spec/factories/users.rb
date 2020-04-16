@@ -4,6 +4,7 @@ FactoryGirl.define do
     allow_backdated_timesheet_entry { false }
     sequence(:email) { |n| "emp#{n}@#{ORGANIZATION_DOMAIN}" }
     password { Faker::Internet.password }
+    status { 'approved' }
     employee_detail_attributes { FactoryGirl.attributes_for(:employee_detail) }
     before(:create) do |user|
       user.public_profile = FactoryGirl.create(:public_profile, user: user)
@@ -40,6 +41,7 @@ FactoryGirl.define do
 
   factory :manager, class: User do
     role { 'Manager' }
+    status { 'approved' }
     sequence(:email) { |n| "manager#{n}@#{ORGANIZATION_DOMAIN}" }
     password { Faker::Internet.password }
   end
@@ -47,6 +49,7 @@ FactoryGirl.define do
   factory :user_with_designation, class: User do |u|
     role { 'Employee' }
     allow_backdated_timesheet_entry { false }
+    status { 'approved' }
     sequence(:email) { |n| "emp#{n}@#{ORGANIZATION_DOMAIN}" }
     password { Faker::Internet.password }
     before(:create) do |user|
@@ -58,6 +61,7 @@ FactoryGirl.define do
 
   factory :admin_with_designation, class: User do |u|
     role { 'Admin' }
+    status { 'approved' }
     sequence(:email) { |n| "admin#{n}@#{ORGANIZATION_DOMAIN}" }
     password { Faker::Internet.password }
     before(:create) do |user|

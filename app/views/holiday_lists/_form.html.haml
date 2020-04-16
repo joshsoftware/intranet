@@ -1,6 +1,8 @@
-= link_to '', attachments_path, class: 'icon-arrow-left', title: 'Back'
+= link_to '', holiday_lists_path, class: 'icon-arrow-left', title: 'Back'
 = simple_form_for @holiday, html: {class: 'form-horizontal'} do |f|
   = f.input :holiday_date, input_html: { type: :date, class: 'date-picker', value: @holiday.holiday_date.try(:strftime, '%Y-%m-%d') }
+  = f.input :holiday_type, as: :select, collection: HolidayList::HOLIDAY_TYPES.sort, label: 'Holiday Type', prompt: 'Select Holiday Type'
   = f.input :reason, as: :text
+  = f.input :country, as: :select, collection: COUNTRIES, selected: f.object.try(:country), prompt: 'Select Country'
   .submit_holiday
     = f.button :submit

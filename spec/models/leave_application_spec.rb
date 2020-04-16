@@ -254,7 +254,7 @@ describe LeaveApplication do
 
         it 'send reminder mail if leave begins in next 2 day' do
           leave_application = FactoryGirl.create(:leave_application, user: user)
-          LeaveApplication.pending_leaves_reminder
+          LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
           expect(ActionMailer::Base.deliveries.count).to eq(1)
         end
 
@@ -264,12 +264,12 @@ describe LeaveApplication do
             start_at: Date.today + 1,
             end_at: Date.today + 1,
           )
-          LeaveApplication.pending_leaves_reminder
+          LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
           expect(ActionMailer::Base.deliveries.count).to eq(1)
         end
 
         it 'should not send mail if leave application is empty' do
-          LeaveApplication.pending_leaves_reminder
+          LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
           expect(ActionMailer::Base.deliveries.count).to eq(0)
         end
       end
