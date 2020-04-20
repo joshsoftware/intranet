@@ -115,8 +115,5 @@ class ProjectsController < ApplicationController
 
   def load_users
     @users = User.project_engineers
-    @users.each do |user|
-      user.user_projects.sort("user.public_profile.first_name")
-    end
   end
 end
