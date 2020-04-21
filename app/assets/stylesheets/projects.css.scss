@@ -81,7 +81,7 @@
 }
 
 .user_select {
-  width: 200px;
+  width: 180px;
   font-size: 14px;
 }
 
@@ -90,3 +90,39 @@
   line-height: 30px;
 }
 
+.teamForm {
+  .make-switch {
+    margin-left: 4px;
+    margin-right: 15px;
+  }
+  .row, .span2 {
+    margin-left: 5px;
+  }
+  .headers {
+    text-align: center;
+  }
+  .controls {
+    margin-left: 0px !important;
+  }
+  .controls .string {
+    width: 80%;
+  }
+  .string.allotment {
+    width: 140px;
+  }
+  .width10 {
+    width: 10%;
+  }
+  .width12 {
+    width: 12%;
+  }
+  .width15 {
+    width: 15%;
+  }
+  .width18 {
+    width: 18%;
+  }
+  .width20 {
+    width: 20%;
+  }
+}

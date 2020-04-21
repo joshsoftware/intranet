@@ -1,19 +1,21 @@
 - new_project = !@project.persisted?
+- team_detail_error = @project.errors.full_messages.first == "User projects is invalid"
 %ul.nav.nav-tabs
-  %li.active
+  %li{:class => ("active" unless team_detail_error)}
     %a{data:{toggle: 'tab'}, href: '#project_form'}
       #{new_project ? 'Create' : 'Update'} Project
   %li
     = link_to 'Tech Details', '#project_info', data:{toggle: ('tab' unless new_project )}, class: :tech_details
-  %li
+  %li{:class => ("active" if team_detail_error)}
     = link_to 'Team Details', '#team_info', data:{toggle: ('tab' unless new_project)}, class: :team_details
-      
+
+
 .project_tab_content.tab-content
-  #project_form.tab-pane.fade.in.active
+  #project_form.tab-pane.fade{:class => ("in active" unless team_detail_error)}
     = render 'projects/project_form'
   #project_info.tab-pane.fade
     = render 'projects/project_info_form'
-  #team_info.tab-pane.fade
+  #team_info.tab-pane.fade{:class => ("in active" if team_detail_error)}
     = render 'projects/team_info_form', users: users
 
 :javascript
@@ -28,3 +30,5 @@
       alert('Please first create project to fill team details.')
     }
   })
+
+

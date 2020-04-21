@@ -10,17 +10,18 @@
         %th Role
     %tbody
       - if @managers.present?
-        -@managers.each do |manager|
+        - @managers.each do |manager|
           %tr
             %td= image_tag(manager.public_profile.image.thumb.url, class: 'img-polaroid') if manager.public_profile
             %td= link_to manager.public_profile.name, user_path(manager)
             %td= manager.email
             %td
               .project-role manager
-      -if @users.present?
-        - @users.each do |user|
+      - if @team_members.present?
+        - @team_members.each do |user|
           %tr
             %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid') if user.public_profile
             %td= link_to user.public_profile.name, user_path(user)
             %td= user.email
             %td
+              

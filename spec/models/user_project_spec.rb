@@ -65,6 +65,25 @@ RSpec.describe UserProject, type: :model do
         expect(UserProject.find(user_project)).to eq(user_project)
       end
     end
-    
+
+    context 'user_id should be unique for active users' do
+      it 'Should fail because duplcate active users are not allowed' do
+        project = FactoryGirl.create(:project)
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:user_project, project_id: project.id, user_id: user.id)
+        user_project = FactoryGirl.build(:user_project, project_id: project.id, user_id: user.id)
+        user_project.save
+        expect(user_project.errors.full_messages).to eq(["User is already taken"])
+      end
+
+      it 'Should pass because duplicate inactive users are allowed' do
+        project = FactoryGirl.create(:project)
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:user_project, project_id: project.id, user_id: user.id, active: false, end_date: Date.today)
+        user_project = FactoryGirl.build(:user_project, project_id: project.id, user_id: user.id)
+        user_project.save
+        expect(UserProject.find(user_project)).to eq(user_project)
+      end
+    end
   end
 end

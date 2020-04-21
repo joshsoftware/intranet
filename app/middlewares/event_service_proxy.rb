@@ -15,7 +15,6 @@ class EventServiceProxy < Rack::Proxy
 
   def rewrite_env(env)
     request = Rack::Request.new(env)
-    p  env['warden'].authenticated?
     if request.path.match('/events')
       if env['warden'].authenticated?
         @backend = URI("http://localhost:8000")

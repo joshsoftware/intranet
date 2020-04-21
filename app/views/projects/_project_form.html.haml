@@ -39,10 +39,6 @@
           .controls
             = select_tag :manager_ids, options_from_collection_for_select(Project.approved_manager_and_admin.to_a, :id, :name, @project.managers.collect{|user| user.id}), class: 'members', multiple: true, style: "width: 340px;", "data-placeholder"=> "You can add multiple managers", name: "project[manager_ids][]"
         .control-group
-          = label_tag "Team Members", nil, class: 'control-label'
-          .controls
-            = select_tag :user_ids, options_from_collection_for_select(User.where(:role.nin => ['HR','Finance'], :status => STATUS[2]).to_a, :id, :name, @project.users.collect{|k| k.id}), class: 'members', multiple: true, style: "width: 340px;", "data-placeholder"=> "You can add multiple team memebers", name: "project[user_ids][]"
-        .control-group
           = label_tag 'Client Logo', nil, class: 'control-label'
           = f.file_field :logo, required: true, id: 'logo-upload', class: 'case_study_upload'
           = image_tag f.object.logo, size: "50x50", id: 'project-logo'

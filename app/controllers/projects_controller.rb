@@ -35,7 +35,6 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new(safe_params)
     if @project.save
-      @project.add_or_remove_team_members(params[:project][:user_ids] || [])
       flash[:success] = "Project created Succesfully"
       redirect_to projects_path
     else
@@ -45,7 +44,7 @@ class ProjectsController < ApplicationController
 
   def update
     if update_obj(@project, safe_params, projects_path)
-      @project.add_or_remove_team_members(params[:project][:user_ids] || [])
+      @project.add_manager_as_team_member(params[:project][:manager_ids] || [])
     else
       flash[:error] = "Error unable to add or remove team member"
       render 'edit'
@@ -53,8 +52,8 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    @users = @project.users
     @managers = @project.managers
+    @team_members = @project.users - @managers
   end
 
   def destroy

@@ -130,6 +130,10 @@ class User
     end
   end
 
+  def is_approved?
+    self.status == 'approved'
+  end
+
   def is_intern?(role)
     [ROLE[:intern]].include?(role)
   end
