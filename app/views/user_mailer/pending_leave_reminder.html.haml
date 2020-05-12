@@ -82,12 +82,14 @@
                                                           %th Reason
                                                           %th Start Date
                                                           %th End Date
+                                                          %th Managers
                                                           %tr
                                                             %td #{@leave.user.name} 
                                                             %td{ class: "center panel", style: "margin-left:10px;"} #{@leave.number_of_days}
                                                             %td #{@leave.reason}
                                                             %td #{@leave.start_at}
                                                             %td #{@leave.end_at}
+                                                            %td #{@user.get_managers_names.join(', ')}
                                                       = link_to "Approve", process_leave_url(id: @leave.id, leave_action: 'approve'), class: 'btn btn-success'
                                                       |
                                                       = link_to "Reject", process_leave_url(id: @leave.id, leave_action: 'reject'), class: 'btn btn-danger'
