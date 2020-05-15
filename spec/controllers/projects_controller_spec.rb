@@ -58,17 +58,14 @@ describe ProjectsController do
       should render_template(:new)
     end
 
-    it 'create new project with manager and team members' do
+    it 'create new project with manager' do
       project_attributes = attributes_for(:project)
       manager = create(:manager)
-      employees = create_list(:employee, 2).collect(&:id)
-      project_attributes.merge!(manager_ids: [manager.id.to_s], company_id: create(:company).id,
-        user_ids: [employees.collect(&:to_s)].flatten)
-
+      project_attributes.merge!(manager_ids: [manager.id.to_s], company_id: create(:company).id)
       post :create, { project: project_attributes }
       expect(Project.count).to eq(1)
       expect(assigns[:project].manager_ids).to eq([manager.id])
-      expect(assigns[:project].user_projects.count).to eq(2)
+      # user_projects will be added using team details page now
     end
   end
 
@@ -102,16 +99,7 @@ describe ProjectsController do
     end
 
     it 'Should remove team members' do
-      employees.each do |employee|
-        project.user_projects.create(start_date: Date.today, user_id: employee.id)
-      end
-      removed_member = employees.first
-      updated_params = params.merge!(user_ids: [removed_member.id], billing_frequency: 'Monthly')
-      patch :update, project: params, id: project.slug
-      project.reload
-      expect(project.billing_frequency).to eq('Monthly')
-      expect(project.user_projects.count).to eq(2)
-      expect(project.user_projects.where(user_id: removed_member.id).first).not_to be_nil
+      # Now we do not remove team members but just mark them inactive
     end
   end
 

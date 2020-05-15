@@ -12,17 +12,15 @@ describe HolidayList do
   context 'Weekends' do
 
     it 'Do not create on saturday' do
-      holiday = FactoryGirl.build(:holiday,
-        holiday_date: '07/09/2019',
-        reason: 'Test')
+      holiday = FactoryGirl.build(:holiday)
+        holiday.holiday_date = '07/09/2019'
       holiday.valid?
       expect(holiday.errors[:holiday_date]).to eq(["cant create holiday on Saturday or Sunday"])
     end
 
     it 'Do not create on sunday' do
-      holiday = FactoryGirl.build(:holiday,
-        holiday_date: '08/09/2019',
-        reason: 'Test')
+      holiday = FactoryGirl.build(:holiday)
+      holiday.holiday_date = '08/09/2019'
       holiday.valid?
       expect(holiday.errors[:holiday_date]).to eq(["cant create holiday on Saturday or Sunday"])
     end

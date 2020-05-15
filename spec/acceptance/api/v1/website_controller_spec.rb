@@ -36,8 +36,8 @@ resource "Website Apis" do
       expect(res["members"].last.keys).to eq ["email", "public_profile", "employee_detail"]
       expect(res["members"].flatten).not_to include user.name
       expect(res["members"].last["employee_detail"]["designation"].keys).to eq ["name"]
-      expect(res["members"].last["employee_detail"]["designation"]["name"]).
-        to eq members.last.employee_detail.designation.name
+      expect(res["members"].map{|member| member["employee_detail"]["designation"]["name"]}).
+        to include members.last.employee_detail.designation.name
     end
 
     example "Must be Unauthorized for referer other than #{ORGANIZATION_DOMAIN}" do
