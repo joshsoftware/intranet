@@ -44,7 +44,7 @@ RSpec.describe UserProject, type: :model do
       user_project.allocation = nil
       user_project.save
       expect(user_project.errors.full_messages).
-        to eq(["Allocation can't be blank"])
+        to eq(["Allocation can't be blank", "Allocation should be between range of 1-100"])
     end
 
     context 'end_date compulsory if user is inactive' do

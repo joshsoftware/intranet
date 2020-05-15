@@ -25,7 +25,7 @@ describe LeaveApplication do
       leave_application2 = FactoryGirl.build(:leave_application, user: @user)
       expect(leave_application2.valid?).to eq(false)
       expect(leave_application2.errors[:base]).
-        to eq(["Already applied for leave on same date"])
+        to eq(["Already applied for LEAVE/WFH on same date"])
     end
 
     it 'start date should not exists in the range of applied leaves'
