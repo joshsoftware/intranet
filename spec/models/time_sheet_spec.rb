@@ -718,7 +718,7 @@ RSpec.describe TimeSheet, type: :model do
           project: project,
           start_date: '01/08/2018'
         )
-        FactoryGirl.create(:holiday, holiday_date: '13/09/2018'.to_date)
+        FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '13/09/2018'.to_date)
         from_date = '01/09/2018'.to_date
         to_date = '20/09/2018'.to_date
         allocated_hours = TimeSheet.get_allocated_hours(
@@ -751,7 +751,7 @@ RSpec.describe TimeSheet, type: :model do
           start_date: '05/09/2018',
           end_date: '15/09/2018'
         )
-        FactoryGirl.create(:holiday, holiday_date: '13/09/2018'.to_date)
+        FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '13/09/2018'.to_date)
         from_date = '01/09/2018'.to_date
         to_date = '20/09/2018'.to_date
         allocated_hours = TimeSheet.get_allocated_hours(
@@ -782,7 +782,7 @@ RSpec.describe TimeSheet, type: :model do
           project: project,
           start_date: '06/09/2018'
         )
-        FactoryGirl.create(:holiday, holiday_date: '13/09/2018'.to_date)
+        FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '13/09/2018'.to_date)
         from_date = '01/09/2018'.to_date
         to_date = '20/09/2018'.to_date
         allocated_hours = TimeSheet.get_allocated_hours(
@@ -815,7 +815,7 @@ RSpec.describe TimeSheet, type: :model do
           start_date: '01/08/2018',
           end_date: '06/09/2018'
         )
-        FactoryGirl.create(:holiday, holiday_date: '05/09/2018'.to_date)
+        FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '05/09/2018'.to_date)
         from_date = '01/09/2018'.to_date
         to_date = '20/09/2018'.to_date
         allocated_hours = TimeSheet.get_allocated_hours(
@@ -854,7 +854,7 @@ RSpec.describe TimeSheet, type: :model do
           start_date: '01/08/2018',
           end_date: '06/09/2018'
         )
-        FactoryGirl.create(:holiday, holiday_date: '05/09/2018'.to_date)
+        FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '05/09/2018'.to_date)
         from_date = '01/09/2018'.to_date
         to_date = '20/09/2018'.to_date
         allocated_hours = TimeSheet.get_allocated_hours(
@@ -986,7 +986,7 @@ RSpec.describe TimeSheet, type: :model do
         from_time: "#{Date.today - 1} 19:00",
         to_time: "#{Date.today - 1} 20:00"
       )
-      FactoryGirl.create(:holiday, holiday_date: Date.today - 4)
+      FactoryGirl.create(:holiday_for_time_sheet, holiday_date: Date.today - 4)
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: Date.today - 2,
@@ -1212,8 +1212,8 @@ RSpec.describe TimeSheet, type: :model do
 
   context 'Get holiday count' do
     it 'Should give holiday count' do
-      FactoryGirl.create(:holiday, holiday_date: '09/10/2018'.to_date)
-      FactoryGirl.create(:holiday, holiday_date: '11/10/2018'.to_date)
+      FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '09/10/2018'.to_date)
+      FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '11/10/2018'.to_date)
       from_date = '05/10/2018'.to_date
       to_date = '15/10/2018'.to_date
       count = TimeSheet.get_holiday_count(from_date, to_date)
@@ -1221,8 +1221,8 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it 'Should give holiday count 0' do
-      FactoryGirl.create(:holiday, holiday_date: '09/10/2018'.to_date)
-      FactoryGirl.create(:holiday, holiday_date: '11/10/2018'.to_date)
+      FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '09/10/2018'.to_date)
+      FactoryGirl.create(:holiday_for_time_sheet, holiday_date: '11/10/2018'.to_date)
       from_date = '01/10/2018'.to_date
       to_date = '05/10/2018'.to_date
       count = TimeSheet.get_holiday_count(from_date, to_date)
@@ -1937,7 +1937,7 @@ RSpec.describe TimeSheet, type: :model do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
     let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 5) }
     it 'should send mail if user is not assinged on project and filled timesheet' do
-      time_sheet = FactoryGirl.create(:time_sheet, user: user, project: project, date: Date.today - 1)
+      time_sheet = FactoryGirl.create(:time_sheet, user: user, project: project, date: Date.yesterday)
       TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_diffrent_project
       expect(ActionMailer::Base.deliveries.count).to eq(1)
     end
