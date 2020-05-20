@@ -839,7 +839,7 @@ class TimeSheet
       message2 = "Go ahead and fill it now. You can fill timesheet for past 7 days. If it exceeds 7 days then contact your manager."
       text_for_slack = "*#{message1} #{unfilled_timesheet_date}. #{message2}*"
       text_for_email = "#{message1} #{unfilled_timesheet_date}. #{message2}"
-      TimesheetRemainderMailer.send_timesheet_reminder_mail(user, slack_handle, text_for_email).deliver!
+      TimesheetRemainderMailer.send_timesheet_reminder_mail(user, slack_handle, text_for_email).deliver_now!
       send_reminder(slack_handle, text_for_slack) unless slack_handle.blank? rescue "Error in sending reminder to slack"
       return true
     end
@@ -1140,7 +1140,7 @@ class TimeSheet
     csv     = generate_csv_for_employees_not_filled_timesheet(employee_list)
     text    = "PFA Employee List- Who have not filled timesheet from #{from_date} to #{to_date}"
     options = { csv: csv, text: text, emails: emails, from_date: from_date, to_date: to_date }
-    WeeklyTimesheetReportMailer.send_report_who_havent_filled_timesheet(options).deliver!
+    WeeklyTimesheetReportMailer.send_report_who_havent_filled_timesheet(options).deliver_now!
   end
 
   def self.generate_summary_report(from_date, to_date, params, current_user)

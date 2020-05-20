@@ -972,30 +972,30 @@ RSpec.describe TimeSheet, type: :model do
   context 'Project report' do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
     let!(:project) { FactoryGirl.create(:project) }
-
+    let!(:safe_date) { Date.parse('15/05/2020') }
     it 'Should give expected project report' do
       FactoryGirl.create(:user_project,
         user: user,
         project: project,
-        start_date: Date.today - 20
+        start_date: safe_date - 20
       )
-      FactoryGirl.create(:time_sheet,
+      ts = FactoryGirl.create(:time_sheet,
         user: user,
         project: project,
-        date: Date.today - 1,
-        from_time: "#{Date.today - 1} 19:00",
-        to_time: "#{Date.today - 1} 20:00"
+        date: safe_date - 1,
+        from_time: "#{safe_date - 1} 19:00",
+        to_time: "#{safe_date - 1} 20:00"
       )
-      FactoryGirl.create(:holiday_for_time_sheet, holiday_date: Date.today - 4)
+      FactoryGirl.create(:holiday_for_time_sheet, holiday_date: safe_date - 4 )
       FactoryGirl.create(:leave_application,
         user: user,
-        start_at: Date.today - 2,
-        end_at: Date.today - 2,
+        start_at: safe_date - 2,
+        end_at: safe_date - 2,
         number_of_days: 1,
         leave_status: LEAVE_STATUS[1]
       )
-      from_date = Date.today - 20
-      to_date = Date.today
+      from_date = safe_date - 20
+      to_date = safe_date
       load_projects_report = TimeSheet.load_projects_report(from_date, to_date)
       projects_report, project_without_timesheet =
         TimeSheet.create_projects_report_in_json_format(
@@ -1021,22 +1021,22 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:user_project,
         user: user,
         project: project,
-        start_date: Date.today - 20
+        start_date: safe_date - 20
       )
       FactoryGirl.create(:user_project,
         user: user,
         project: test_project_one,
-        start_date: Date.today - 20
+        start_date: safe_date - 20
       )
       FactoryGirl.create(:time_sheet,
         user: user,
         project: project,
-        date: Date.today - 1,
-        from_time: "#{Date.today - 1} 9:00",
-        to_time: "#{Date.today - 1} 10:00"
+        date: safe_date - 1,
+        from_time: "#{safe_date - 1} 9:00",
+        to_time: "#{safe_date - 1} 10:00"
       )
-      from_date = Date.today - 30
-      to_date = Date.today - 1
+      from_date = safe_date - 30
+      to_date = safe_date - 1
       load_projects_report = TimeSheet.load_projects_report(from_date, to_date)
       projects_report, project_without_timesheet, users_without_timesheet =
         TimeSheet.create_projects_report_in_json_format(
@@ -1937,7 +1937,7 @@ RSpec.describe TimeSheet, type: :model do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
     let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 5) }
     it 'should send mail if user is not assinged on project and filled timesheet' do
-      time_sheet = FactoryGirl.create(:time_sheet, user: user, project: project, date: Date.yesterday)
+      FactoryGirl.create(:time_sheet, user: user, project: project, date: Date.yesterday, created_at:  Time.parse('10:00')- 24.hours)
       TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_diffrent_project
       expect(ActionMailer::Base.deliveries.count).to eq(1)
     end
