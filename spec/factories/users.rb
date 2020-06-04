@@ -29,6 +29,7 @@ FactoryGirl.define do
 
   factory :employee, class: User do
     role { 'Employee' }
+    status { 'approved' }
     sequence(:email) { |i | Faker::Name.first_name + i.to_s + "@#{ORGANIZATION_DOMAIN}" }
     password { Faker::Internet.password }
   end

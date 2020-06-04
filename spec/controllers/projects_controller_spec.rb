@@ -63,8 +63,9 @@ describe ProjectsController do
       manager = create(:manager)
       employees = create_list(:employee, 2).collect(&:id)
       project_attributes.merge!(manager_ids: [manager.id.to_s], company_id: create(:company).id,
-        user_ids: [employees.collect(&:to_s)].flatten)
-
+      user_projects_attributes: [{user_id: employees.first.to_s, start_date: Date.current},
+                                 {user_id: employees.last.to_s, start_date: Date.current}])
+      
       post :create, { project: project_attributes }
       expect(Project.count).to eq(1)
       expect(assigns[:project].manager_ids).to eq([manager.id])
@@ -80,8 +81,10 @@ describe ProjectsController do
     let!(:manager2) { create(:manager) }
     let!(:employees) { create_list(:employee, 2) }
     let!(:params) do
-      { billing_frequency: "Adhoc", type_of_project: "Fixbid",  manager_ids: [manager, manager2],
-        user_ids: employees.collect(&:id).collect(&:to_s) }
+      { billing_frequency: "Adhoc", type_of_project: "Fixbid",  manager_ids: [manager.id, manager2.id],
+        user_projects_attributes: [{ user_id: employees.first.id.to_s, start_date: Date.current },
+                                   { user_id: employees.last.id.to_s, start_date: Date.current }]
+      }
     end
 
     it 'Should update manager ids and managed_project_ids' do
@@ -95,23 +98,36 @@ describe ProjectsController do
     it 'Should add team members' do
       patch :update, project: params, id: project.slug
       project.reload
+      user_projects = project.user_projects
       expect(project.billing_frequency).to eq('Adhoc')
       expect(project.type_of_project).to eq('Fixbid')
-      expect(project.user_projects.count).to eq(2)
+      expect(user_projects.count).to eq(2)
       expect(project.manager_ids).to match_array([manager.id, manager2.id])
+      expect(user_projects.approved_users.collect(&:user_id)).to include(employees.first.id)
+      expect(user_projects.approved_users.collect(&:user_id)).to include(employees.last.id)
     end
 
     it 'Should remove team members' do
       employees.each do |employee|
-        project.user_projects.create(start_date: Date.today, user_id: employee.id)
+        project.user_projects.create(start_date: Date.today,
+                                     end_date: Date.today + 7,
+                                     user_id: employee.id)
       end
-      removed_member = employees.first
-      updated_params = params.merge!(user_ids: [removed_member.id], billing_frequency: 'Monthly')
-      patch :update, project: params, id: project.slug
+      removed_member = project.user_projects.where(user_id: employees.first.id).first
+      updated_params = params.merge!(
+        billing_frequency: 'Monthly',
+        user_projects_attributes: [{ id: removed_member.id.to_s,
+                                     user_id: removed_member.user_id.to_s,
+                                     end_date: DateTime.now,
+                                     active: false }])
+
+      patch :update, project: updated_params, id: project.slug
       project.reload
+      inactive_users = project.user_projects.inactive_users
       expect(project.billing_frequency).to eq('Monthly')
       expect(project.user_projects.count).to eq(2)
-      expect(project.user_projects.where(user_id: removed_member.id).first).not_to be_nil
+      expect(inactive_users.count).to eq(1)
+      expect(inactive_users.collect(&:user_id)).to include(employees.first.id)
     end
   end
 

@@ -374,7 +374,8 @@ describe User do
             user: user,
             project: project,
             start_date: '01/08/2018'.to_date,
-            end_date: '10/10/2018'.to_date
+            end_date: '10/10/2018'.to_date,
+            active: false
           )
           FactoryGirl.create(:user_project,
             user: user,

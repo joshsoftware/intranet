@@ -583,7 +583,8 @@ RSpec.describe TimeSheetsController, type: :controller do
           project: project,
           date: Date.today - 1,
           from_time: "#{Date.today - 1} 10",
-          to_time: "#{Date.today - 1} 11:30"
+          to_time: "#{Date.today - 1} 11:30",
+          created_by: user.id
         )
         params = {
           time_sheets_attributes: {
@@ -596,11 +597,11 @@ RSpec.describe TimeSheetsController, type: :controller do
               id: time_sheet.id
             }
           },
-          id:user.id
+          id: user.id
         }
         post :update_timesheet, user_id: user.id,
-          user: params,
-          time_sheet_date: Date.today - 1
+                                user: params,
+                                time_sheet_date: Date.today - 1
         expect(time_sheet.reload.date).to eq(Date.today - 12)
         expect(flash[:notice]).to eq('Timesheet Updated Succesfully')
       end
@@ -742,11 +743,11 @@ RSpec.describe TimeSheetsController, type: :controller do
               id: time_sheet.id
             }
           },
-          id:user.id
+          id: user.id
         }
         post :update_timesheet, user_id: employee.id,
-          user: params,
-          time_sheet_date: Date.today - 9
+                                user: params,
+                                time_sheet_date: Date.today - 9
         expect(time_sheet.reload.from_time).
           to eq(Time.parse("#{Date.today - 9} 10"))
         expect(time_sheet.reload.to_time).

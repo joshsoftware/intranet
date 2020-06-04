@@ -9,7 +9,7 @@
 
 #ignore seed file
 /db/seeds.rb
-/config/mongoid.yml
+
 #ignore smtp credentials
 
 /config/initializers/smtp_gmail.rb

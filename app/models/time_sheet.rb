@@ -107,8 +107,7 @@ class TimeSheet
   end
 
   def valid_date_for_update?
-    # date > Date.today - DAYS_FOR_UPDATE
-    date >= "01/05/2020".to_date
+    date > Date.today - DAYS_FOR_UPDATE
   end
 
   def is_management?
@@ -121,8 +120,7 @@ class TimeSheet
       errors.add(:date, 'Invalid time')
       return false
     end
-    # if date < Date.today - DAYS_FOR_CREATE
-    if date < "01/05/2020".to_date
+    if date < Date.today - DAYS_FOR_CREATE
       text = "Not allowed to fill timesheet for this date. If you want to fill the timesheet, meet your manager."
       errors.add(:date, text)
       return false
@@ -844,7 +842,7 @@ class TimeSheet
       message2 = "Go ahead and fill it now. You can fill timesheet for past 7 days. If it exceeds 7 days then contact your manager."
       text_for_slack = "*#{message1} #{unfilled_timesheet_date}. #{message2}*"
       text_for_email = "#{message1} #{unfilled_timesheet_date}. #{message2}"
-      TimesheetRemainderMailer.send_timesheet_reminder_mail(user, slack_handle, text_for_email).deliver!
+      TimesheetRemainderMailer.send_timesheet_reminder_mail(user, slack_handle, text_for_email).deliver_now!
       send_reminder(slack_handle, text_for_slack) unless slack_handle.blank? rescue "Error in sending reminder to slack"
       return true
     end

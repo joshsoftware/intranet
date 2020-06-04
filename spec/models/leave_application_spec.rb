@@ -42,7 +42,7 @@ describe LeaveApplication do
       expect(leave_application.errors[:base]).to eq(["Already applied for LEAVE/WFH on same date"])
     end
 
-    it 'no start date of any existing leave should come in the range of leave appling' do
+    it 'start date of future leave should not clash with that of existing leave' do
       FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
       FactoryGirl.create(:leave_application, start_at: Date.today - 3, end_at: Date.today - 1, user: @user)
       leave_application = FactoryGirl.build(:leave_application, start_at: Date.today + 1, end_at: Date.today + 3, user: @user)
@@ -50,7 +50,7 @@ describe LeaveApplication do
       expect(leave_application.errors[:base]).to eq(["Already applied for LEAVE/WFH on same date"])
     end
 
-    it 'no end date of any existing leave should come in' do
+    it 'end date of future leave should not clash with that of existing leave' do
       FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
       FactoryGirl.create(:leave_application, start_at: Date.today - 3, end_at: Date.today - 1, user: @user)
       leave_application = FactoryGirl.build(:leave_application, start_at: Date.today - 6, end_at: Date.today - 1, user: @user)

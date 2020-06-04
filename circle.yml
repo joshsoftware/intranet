@@ -1,3 +1,0 @@
-checkout:
-  post:
-    - cp config/environment.yml.ci config/environment.yml

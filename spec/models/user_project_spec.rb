@@ -43,8 +43,16 @@ RSpec.describe UserProject, type: :model do
       user_project = FactoryGirl.build(:user_project)
       user_project.allocation = nil
       user_project.save
+      expect(user_project.errors.full_messages.first).
+        to eq("Allocation can't be blank")
+    end
+
+    it 'Should fail because allocation is greater than 100' do
+      user_project = FactoryGirl.build(:user_project)
+      user_project.allocation = 101
+      user_project.save
       expect(user_project.errors.full_messages).
-        to eq(["Allocation can't be blank"])
+        to eq(["Allocation should be between range of 1-100"])
     end
 
     context 'end_date compulsory if user is inactive' do

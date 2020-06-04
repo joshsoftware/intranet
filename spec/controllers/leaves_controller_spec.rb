@@ -487,26 +487,23 @@ describe LeaveApplicationsController do
     it "should query only active user_projects when NO filter/default" do
       @user_ids = UserProject.where(project: @project).pluck(:user_id)
       @user_ids_active = (@user_ids - [@employee_two.id]) # Removing one team member
-      @project.add_or_remove_team_members(@user_ids_active)
-      @project.save
+      @user_project_two.update_attributes(end_date: DateTime.now, active: false)
       controller.params = ActionController::Parameters.new({project_id: @project.id}) # No filter param
-      expect(controller.send(:user_ids).map {|id| id.to_s}).to eq(@user_ids_active)
+      expect(controller.send(:user_ids)).to eq(@user_ids_active)
     end
     
     it "should query only active user_projects when active filter selected in params" do
       @user_ids = UserProject.where(project: @project).pluck(:user_id)
       @user_ids_active = (@user_ids - [@employee_two.id]) # Removing one team member
-      @project.add_or_remove_team_members(@user_ids_active)
-      @project.save
+      @user_project_two.update_attributes(end_date: DateTime.now, active: false)
       controller.params = ActionController::Parameters.new({active_or_all_flag: "active", project_id: @project.id})
-      expect(controller.send(:user_ids).map {|id| id.to_s}).to eq(@user_ids_active)
+      expect(controller.send(:user_ids)).to eq(@user_ids_active)
     end
 
     it "should query all user_projects when all filter selected in params" do
       @user_ids = UserProject.where(project: @project).pluck(:user_id)
       @user_ids_active = (@user_ids - [@employee_two.id]) # Removing one team member
-      @project.add_or_remove_team_members(@user_ids_active)
-      @project.save
+      @user_project_two.update_attributes(end_date: DateTime.now, active: false)
       controller.params = ActionController::Parameters.new({active_or_all_flag: "all", project_id: @project.id})
       expect(controller.send(:user_ids)).to eq(@user_ids)
     end

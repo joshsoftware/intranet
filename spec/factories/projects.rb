@@ -7,7 +7,7 @@ FactoryGirl.define do
     rails_version { Faker::App.semantic_version }
     ruby_version { Faker::App.semantic_version }
     database { "MongoDB" }
-    other_details { Faker::App.author }
+    other_details { Faker::App.name }
     start_date { Date.today }
     billing_frequency "Monthly"
     type_of_project "T&M"
