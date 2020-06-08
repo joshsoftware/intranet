@@ -1,0 +1,16 @@
+= f.hidden_field :requested_date
+= f.hidden_field :requested_by
+= f.input :request_for, collection: @users, input_html: {class: "select_dropdowns", style: "width: 210px"}
+= f.input :from_project, collection: @projects, input_html: {class: "select_dropdowns", style: "width: 210px"}
+= f.input :to_project, collection: @projects, input_html: {class: "select_dropdowns", style: "width: 210px"}
+= f.input :allocation, {min: 0, max: 100, step: 1, style: "height: 32px;", class: 'allotment'}
+= f.input :start_date, label: 'Start Date', input_html: {class: 'datepicker', data: {'behaviour' => 'datepicker', 'validation-required-message' => 'You must select start date'}, required: true, value: f.object.start_date.try(:strftime, '%d-%m-%Y')}
+= f.input :end_date, label: 'End Date', input_html: {class: 'datepicker', data: {'behaviour' => 'datepicker'}, value: f.object.end_date.try(:strftime, '%d-%m-%Y')}
+= f.input :request_reason, as: :text, label: 'Reason', input_html: {required: true, :'data-validation-required-message' => 'Please specify a reason for request'}
+%center
+  = f.submit (params[:action] == "new" ? 'Add' : 'Save Changes'), class: 'btn'
+
+:javascript
+  $(document).ready(function(){
+    $(".select_dropdowns").select2()
+  })

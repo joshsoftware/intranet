@@ -88,6 +88,9 @@ Rails.application.routes.draw do
     patch :feedback
   end
 
+  resources :employee_project_transfers
+  get 'process_employee_project_transfer' => 'employee_project_transfers#process_request', as: :process_request
+
   namespace :api, :defaults => {:format => 'json'} do
     namespace :v1 do
       get 'users/info', to: 'users#info'

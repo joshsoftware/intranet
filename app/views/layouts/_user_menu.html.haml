@@ -19,6 +19,9 @@
       = link_to "Company", main_app.companies_path
     %li
       = link_to "Invite Employee", main_app.invite_user_path
+  - if can? :read, EmployeeProjectTransfer
+    %li
+      = link_to "Employee Project Transfer", main_app.employee_project_transfers_path
   %li
     = link_to "Profile", main_app.public_profile_user_path(current_user), data: {'no-turbolink' =>  true}
   %li

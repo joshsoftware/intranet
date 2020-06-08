@@ -1,0 +1,33 @@
+if("#{@message[:type]}" != 'error'){
+// FIRST IF
+tr_id = "#" + employee_project_transfer_request_id;
+pending_request = ($(tr_id).attr('pending') == 'true')
+
+row = pending_request ? $(tr_id).detach() : $(tr_id)
+//edit_element_string = "<div class='btn btn-mini btn_style'><a data-no-turbolink='true' href='/employee_project_transfers/"+employee_project_transfer_request_id+"/edit'>Edit</a></div>"
+edit_element_string = ""
+if("#{@status}" == "#{REJECTED}"){
+// REQUEST REJECTED
+row.children('.status').text("#{@status}")
+row.children('.action').html(edit_element_string + "<div class='process_btn btn btn-mini btn_style btn-success' data-action='approve'>Approve</div>")
+}
+if("#{@status}" == "#{APPROVED}"){
+// REQUEST APPROVED
+row.children('.status').text("#{@status}")
+row.children('.action').html(edit_element_string + "<div class='btn btn-danger btn-mini btn_style process_btn' data-action='reject'>Reject</div>")
+}
+
+if(pending_request){
+$('#processed_transfers table tbody').append(row);
+}
+
+$('.alert-message').alert({txt: "#{@message[:text]}", type: 'success'});
+
+$('.process_btn').click(update_request);
+
+// FIRST IF ENDS
+}else{
+
+$('.alert-message').alert({txt: "#{@message[:text]}", type: 'error'});
+
+}

@@ -20,6 +20,8 @@ class Ability
       can :manage, TimeSheet
       can :manage, LeaveApplication
       can :resource_list, User
+      can :manage, EmployeeProjectTransfer
+      cannot :process_request, EmployeeProjectTransfer
 
       # TODO remove later after snowflake changes
       can :manage, Designation
@@ -69,6 +71,8 @@ class Ability
     can :edit, User
     can [:public_profile, :private_profile], User
     can :manage, :admin
+    can :manage, EmployeeProjectTransfer
+    cannot :process_request, EmployeeProjectTransfer
   end
 
   def hr_abilities

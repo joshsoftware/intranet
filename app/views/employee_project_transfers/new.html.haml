@@ -1,0 +1,6 @@
+.form-heading
+  %h2
+    Add Employee Project Transfer Request
+
+= simple_form_for @employee_project_transfer, url: employee_project_transfers_path , html:{class: 'form-horizontal', 'autocomplete': 'off'}  do|f|
+  = render 'form', f: f

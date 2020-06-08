@@ -1,0 +1,26 @@
+:css
+  .nav-tabs>.active>a, .nav-tabs>.active>a:hover, .nav-tabs>.active>a:focus{
+    background: -webkit-gradient( linear, left top, left bottom, from(#fff3db), to(rgba(0, 0, 0, 0.39)));
+  }
+  .leave_link{float: right;}
+.alert-message
+.form-heading.row
+  %h4
+    .span4
+      Employee Project Transfer Requests
+    .offset6{style: "float: right;"}
+      = link_to "", "/employee_project_transfers/new", data: { "no-turbolink": true }, class: 'icon-plus', "data-toggle" => "tooltip", title: "New Employee Project Transfer Request"
+
+%ul.leave_applicationTab.nav.nav-tabs
+  %li.active
+    %a#pending_link{data:{toggle: 'tab'}, href: '#pending_transfers'}
+      Pending
+  %li
+    %a#leave_history_link{data:{toggle: "tab"}, href: '#processed_transfers'}
+      Transfer Requests History
+
+.tab-content
+  #processed_transfers.tab-pane.fade
+    = render 'employee_project_transfers/requests_view', requests_data: @processed_transfers
+  #pending_transfers.tab-pane.fade.in.active
+    = render 'employee_project_transfers/requests_view', requests_data: @pending_transfers

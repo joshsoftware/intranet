@@ -1,0 +1,60 @@
+.form-horizontal
+  %table.table.table-hover
+    %thead
+      %tr
+        %th Requested Date
+        %th Requested by
+        %th Candidate
+        %th From project
+        %th To project
+        %th Allocation
+        %th Reason for request
+        %th Start date
+        %th End date
+        %th Status
+        %th Actions
+    %tbody
+      - requests_data.each do |employee_project_transfer_request|
+        - is_pending = employee_project_transfer_request.pending?
+        %tr{id: employee_project_transfer_request.id.to_s, pending: "#{is_pending}"}
+          %td= employee_project_transfer_request.requested_date
+          %td= User.find(employee_project_transfer_request.requested_by).name
+          %td= User.find(employee_project_transfer_request.request_for).name
+          %td= Project.find(employee_project_transfer_request.from_project).name
+          %td= Project.find(employee_project_transfer_request.to_project).name
+          %td= employee_project_transfer_request.allocation
+          %td= employee_project_transfer_request.request_reason
+          %td= employee_project_transfer_request.start_date
+          %td= employee_project_transfer_request.end_date
+          %td.status= employee_project_transfer_request.status
+          %td.action{width: "150"}
+            - if is_pending
+              .btn.btn-mini.btn_style= link_to 'Edit', edit_employee_project_transfer_path(employee_project_transfer_request)
+            - if current_user.role == "Super Admin"
+              - if is_pending
+                %div.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
+                %div.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject
+              - else
+                - if employee_project_transfer_request.status == REJECTED
+                  %div.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
+                - else
+                  %div.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject
+
+:javascript
+  $('.process_btn').click(update_request);
+
+  function update_request(e){
+    action = $(this).attr('data-action')
+    employee_project_transfer_request_id = $(this).parent().parent().attr('id')
+    $.ajax({
+      url: '/process_employee_project_transfer',
+      type: 'GET',
+      data: {id: employee_project_transfer_request_id, perform_action: action},
+      error: function(e){
+        console.log(e)
+        $('.alert-message').alert({txt: 'Internal Server Error! Please contact web sysadmin', type: 'error'});
+      }
+    });
+    e.stopImmediatePropagation();
+    return false
+  }
