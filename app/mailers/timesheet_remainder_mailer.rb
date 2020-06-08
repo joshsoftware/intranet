@@ -1,13 +1,15 @@
 class TimesheetRemainderMailer < ActionMailer::Base
   default :from => 'intranet@joshsoftware.com',
           :reply_to => 'hr@joshsoftware.com'
-  
-  def send_timesheet_reminder_mail(user, slack_id, text)
+
+  def send_timesheet_reminder_mail(user, slack_id, text, pending_more_than_threshold = false)
     managers_emails = []
     @user = user
     @text = text
     managers_emails = @user.get_managers_emails_for_timesheet
-    mail(subject: 'Timesheet Reminder', to: user.email, cc: managers_emails + DEFAULT_TIMESHEET_MANAGERS + ['hr@joshsoftware.com'])
+    all_receivers = managers_emails + DEFAULT_TIMESHEET_MANAGERS + ['hr@joshsoftware.com']
+    receivers = pending_more_than_threshold ? all_receivers : [managers_emails.first, 'hr@joshsoftware.com']
+    mail(subject: 'Timesheet Reminder', to: user.email, cc: receivers)
   end
 
   def user_timesheet_for_diffrent_project(user, timesheets)
@@ -16,11 +18,11 @@ class TimesheetRemainderMailer < ActionMailer::Base
     managers_emails = @user.get_managers_emails_for_timesheet
     hr_emails       = User.get_hr_emails
     @timesheets     = timesheets
-    mail( 
+    mail(
       subject: 'Timesheet for project(s) which are not yet assigned',
       to: user.email,
       cc: managers_emails + hr_emails
     )
-    
+
   end
 end

@@ -31,6 +31,7 @@ class TimeSheet
   ALLOCATED_HOURS = 8
   DAYS_FOR_UPDATE = 7
   DAYS_FOR_CREATE = 7
+  PENDING_THRESHOLD = 3                     #threshold pending days after which mail will be sent to all receivers
 
   def parse_timesheet_data(params)
     split_text = params['text'].split
@@ -842,7 +843,8 @@ class TimeSheet
       message2 = "Go ahead and fill it now. You can fill timesheet for past 7 days. If it exceeds 7 days then contact your manager."
       text_for_slack = "*#{message1} #{unfilled_timesheet_date}. #{message2}*"
       text_for_email = "#{message1} #{unfilled_timesheet_date}. #{message2}"
-      TimesheetRemainderMailer.send_timesheet_reminder_mail(user, slack_handle, text_for_email).deliver_now!
+      pending_more_than_threshold = (Date.today - unfilled_timesheet_date) > PENDING_THRESHOLD
+      TimesheetRemainderMailer.send_timesheet_reminder_mail(user, slack_handle, text_for_email, pending_more_than_threshold).deliver_now!
       send_reminder(slack_handle, text_for_slack) unless slack_handle.blank? rescue "Error in sending reminder to slack"
       return true
     end
