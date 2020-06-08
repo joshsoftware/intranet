@@ -13,12 +13,8 @@
       - if project_user_form.object.user.blank? || (project_user_form.object.user && project_user_form.object.user.is_approved? && (project_user_form.object.active || project_user_form.object.end_date.nil?))
         .row.span12
           .span2.width12
-            - if project_user_form.object.user.blank?
-              .new-switch{"data-on" => "success", "data-off" => "danger", "data-on-label" => "Yes", "data-off-label" => "No"}
-                = project_user_form.check_box :active, {class: "active-check-box"}, 'true', 'false'
-            - else
-              .make-switch{"data-on" => "success", "data-off" => "danger", "data-on-label" => "Yes", "data-off-label" => "No"}
-                = project_user_form.check_box :active, {class: "active-check-box"}, 'true', 'false'
+            .make-switch{"data-on" => "success", "data-off" => "danger", "data-on-label" => "Yes", "data-off-label" => "No"}
+              = project_user_form.check_box :active, {class: "active-check-box"}, 'true', 'false'
           .span2.width18
             = project_user_form.input :user_id, collection: users, input_html: {class: "user_select"}, label: false
           .span2.width15
@@ -26,12 +22,8 @@
           .span2.width15
             = project_user_form.input :end_date, input_html: {class: :datepicker, style: "height: 32px", id: "end-date"},  label: false
           .span2.width10
-            - if project_user_form.object.user.blank?
-              .new-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "REQ", "data-off-label" => "NREQ"}
-                = project_user_form.check_box :time_sheet
-            - else
-              .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "REQ", "data-off-label" => "NREQ"}
-                = project_user_form.check_box :time_sheet
+            .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "REQ", "data-off-label" => "NREQ"}
+              = project_user_form.check_box :time_sheet
           .span2.width10
             = project_user_form.input :allocation, {min: 0, max: 100, step: 1, style: "height: 32px;", label: false, class: 'allotment'}
           - if project_user_form.object.user.blank?
@@ -81,20 +73,19 @@
   })
 
   $(document).ready(function(){
-    makeSwitches()
     $(".user_select").select2()
   })
 
   $(document).on('nested:fieldAdded', function(event){
-    makeSwitches()
+    var checkBox = $(event.target).find(".make-switch")
+    makeSwitches(checkBox)
     var selectField = event.field.find(".user_select")
     selectField.select2()
   })
 
-  function makeSwitches(){
-    var checkBoxes = $(".new-switch")
-    checkBoxes.bootstrapSwitch()
+  function makeSwitches(checkBox){
+    checkBox.bootstrapSwitch()
     referenceCheckBox = $(".make-switch")
-    checkBoxes.height(referenceCheckBox.height())
-    checkBoxes.css('margin-left','4px')
+    checkBox.height(referenceCheckBox.height())
+    checkBox.css('margin-left','4px')
   }
