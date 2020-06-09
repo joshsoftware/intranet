@@ -34,7 +34,7 @@ describe PrivateProfile do
     after do
       expect(user.save).to eq(false)
       expect(user.generate_errors_message).to eq(
-        "Private profile is invalid  Date of joining can't be blank"
+        "Private profile is invalid  Date of joining can't be blank "
       )
     end
 
@@ -80,7 +80,7 @@ describe PrivateProfile do
 
     after do
       expect(user.save).to eq(true)
-      expect(user.generate_errors_message).to eq('  ')
+      expect(user.generate_errors_message).to eq('   ')
     end
 
     it 'because joining date is present, role is employee' do

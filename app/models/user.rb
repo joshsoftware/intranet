@@ -161,7 +161,7 @@ class User
     error_msg.push(errors.full_messages,
                    public_profile.errors.full_messages,
                    private_profile.errors.full_messages,
-                  employee_detail.try(:errors).try(:full_messages))
+                   employee_detail.try(:errors).try(:full_messages))
     error_msg.join(' ')
   end
 
