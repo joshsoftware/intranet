@@ -1,17 +1,17 @@
 GIT
   remote: git://github.com/PerfectMemory/mongoid_rateable.git
-  revision: 56962d77eb03faf5764b7251fea078ebfd3e6f28
+  revision: e440a5509a145f838a97c0e97f18b9088aa80a8d
   specs:
-    mongoid_rateable (0.4.0)
-      mongoid (~> 4.0.alpha)
+    mongoid_rateable (0.5.0)
+      mongoid (>= 4.0)
 
 GIT
   remote: git://github.com/ahoward/mongoid-grid_fs.git
-  revision: e80532461d4f88a51b59d3cd394e10f87707b5d4
+  revision: 2f0e12e85a24c5b8ed5e308a127aaa64891ed043
   specs:
-    mongoid-grid_fs (2.2.1)
-      mime-types (>= 1.0, < 3.0)
-      mongoid (>= 3.0, < 6.0)
+    mongoid-grid_fs (2.4.1)
+      mime-types (>= 1.0, < 4.0)
+      mongoid (>= 3.0, < 8.0)
 
 GIT
   remote: git://github.com/aq1018/mongoid-history.git
@@ -21,6 +21,14 @@ GIT
       activesupport
       easy_diff
       mongoid (>= 3.0)
+
+GIT
+  remote: git://github.com/garethcokell/mongoid_taggable.git
+  revision: b21719450723e0a1c64f9b6bd9a3731e99ae2c22
+  specs:
+    mongoid_taggable (1.1.1)
+      mongoid (>= 3)
+      rake
 
 GIT
   remote: git://github.com/marcosbeirigo/mina_extensions.git
@@ -65,8 +73,8 @@ GIT
 
 GIT
   remote: git@github.com:joshsoftware/lightair.git
-  revision: a061cf99e0102c398ccde3ac0cc4c9232e17639d
-  branch: engine
+  revision: 4a7a7306d8689a11e7c744bab259e947dc8454ac
+  branch: updated_engine
   specs:
     light (0.0.1)
       bootstrap-datepicker-rails (= 1.3.0.2)
@@ -102,8 +110,8 @@ GIT
 
 GIT
   remote: git@github.com:joshsoftware/screamout.git
-  revision: d14af4ee35d5d6f4fb7ec8c132b67adaa7adf450
-  branch: engine
+  revision: c28b5dd9fe238f9f397e20940aae351fd23fac19
+  branch: update_engine
   specs:
     screamout (0.0.1)
       bson
@@ -174,7 +182,7 @@ GEM
       addressable (>= 2.3.1)
       extlib (>= 0.9.15)
       multi_json (>= 1.0.0)
-    autoprefixer-rails (9.1.3)
+    autoprefixer-rails (9.7.6)
       execjs
     aws-eventstream (1.0.1)
     aws-partitions (1.95.0)
@@ -777,9 +785,9 @@ GEM
       debug_inspector (>= 0.0.1)
     bootstrap-datepicker-rails (1.3.0.2)
       railties (>= 3.0)
-    bootstrap-sass (3.3.5)
-      autoprefixer-rails (>= 5.0.0.1)
-      sass (>= 3.2.19)
+    bootstrap-sass (3.4.1)
+      autoprefixer-rails (>= 5.2.1)
+      sassc (>= 2.0.0)
     brakeman (2.6.2)
       erubis (~> 2.6)
       fastercsv (~> 1.5)
@@ -791,9 +799,9 @@ GEM
       sass (~> 3.0)
       slim (>= 1.3.6, < 3.0)
       terminal-table (~> 1.4)
-    bson (3.2.6)
+    bson (4.5.0)
     bson_ext (1.5.1)
-    builder (3.2.3)
+    builder (3.2.4)
     business_time (0.9.3)
       activesupport (>= 3.2.0)
       tzinfo
@@ -810,8 +818,6 @@ GEM
       mongoid-grid_fs (>= 1.3, < 3.0)
     chronic (0.10.2)
     climate_control (0.2.0)
-    cocaine (0.5.8)
-      climate_control (>= 0.0.3, < 1.0)
     codeclimate-test-reporter (0.4.0)
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
@@ -825,8 +831,8 @@ GEM
     colorbox-rails (0.1.2)
       jquery-rails
       rails (>= 3.1.1)
-    concurrent-ruby (1.0.5)
-    connection_pool (2.2.0)
+    concurrent-ruby (1.1.6)
+    connection_pool (2.2.2)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.3)
@@ -844,7 +850,7 @@ GEM
     devise_invitable (1.6.1)
       actionmailer (>= 3.2.6)
       devise (>= 3.2.0)
-    diff-lcs (1.2.5)
+    diff-lcs (1.3)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (2.7.5)
@@ -872,6 +878,7 @@ GEM
       curb (~> 0.8)
       loofah (~> 2.0)
       sax-machine (~> 1.0)
+    ffi (1.12.2)
     gli (2.17.1)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
@@ -911,14 +918,14 @@ GEM
     htmlentities (4.3.4)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    httparty (0.16.2)
+    httparty (0.18.0)
+      mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
-    imgkit (1.6.1)
-    jbuilder (2.7.0)
+    imgkit (1.6.2)
+    jbuilder (2.9.1)
       activesupport (>= 4.2.0)
-      multi_json (>= 1.2)
     jmespath (1.4.0)
     jquery-rails (4.1.0)
       rails-dom-testing (~> 1.0)
@@ -947,24 +954,36 @@ GEM
       nokogiri (>= 1.5.9)
     mail (2.7.0)
       mini_mime (>= 0.1.1)
-    mime-types (2.99.3)
-    mimemagic (0.3.2)
+    mime-types (3.3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2019.1009)
+    mimemagic (0.3.4)
     mini_magick (4.3.6)
     mini_mime (1.0.0)
     mini_portile2 (2.1.0)
-    minitest (5.10.3)
-    mongoid (4.0.2)
+    minitest (5.14.0)
+    mongo (2.10.4)
+      bson (>= 4.4.2, < 5.0.0)
+    mongoid (5.4.1)
       activemodel (~> 4.0)
-      moped (~> 2.0.0)
-      origin (~> 2.1)
+      mongo (>= 2.5.1, < 3.0.0)
+      origin (~> 2.3)
       tzinfo (>= 0.3.37)
+    mongoid-compatibility (0.5.1)
+      activesupport
+      mongoid (>= 2.0)
     mongoid-paperclip (0.0.11)
       mongoid
       paperclip (>= 2.3.6, != 4.3.0)
-    mongoid-rspec (2.2.0)
-      mongoid (~> 4.0.0)
-      rake
-      rspec (~> 3.1)
+    mongoid-rspec (4.0.1)
+      activesupport (>= 3.0.0)
+      mongoid (>= 3.1)
+      mongoid-compatibility (>= 0.5.1)
+      rspec (~> 3.3)
+    mongoid-slug (5.3.3)
+      mongoid (>= 3.0)
+      mongoid-compatibility
+      stringex (~> 2.0)
     mongoid_adjust (0.1.2)
       bson (>= 1.2)
       mongoid (>= 2.0.1)
@@ -972,16 +991,6 @@ GEM
       bson (>= 1.2)
       mongoid (>= 2.0.1)
       mongoid_adjust (>= 0.1.1)
-    mongoid_slug (3.2.1)
-      mongoid (> 3.0)
-      stringex (~> 2.0)
-    mongoid_taggable (1.1.1)
-      mongoid (>= 3)
-      rake
-    moped (2.0.7)
-      bson (~> 3.0)
-      connection_pool (~> 2.0)
-      optionable (~> 0.2.0)
     multi_json (1.12.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -1009,15 +1018,14 @@ GEM
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
     open4 (1.3.4)
-    optionable (0.2.0)
-    origin (2.2.0)
+    origin (2.3.1)
     orm_adapter (0.5.0)
-    paperclip (5.1.0)
+    paperclip (6.1.0)
       activemodel (>= 4.2.0)
       activesupport (>= 4.2.0)
-      cocaine (~> 0.5.5)
       mime-types
       mimemagic (~> 0.3.0)
+      terrapin (~> 0.6.0)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.11)
@@ -1053,7 +1061,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     raindrops (0.13.0)
-    rake (12.3.0)
+    rake (13.0.1)
     rdoc (4.1.1)
       json (~> 1.4)
     recaptcha (3.3.0)
@@ -1133,6 +1141,8 @@ GEM
       sass (~> 3.2.2)
       sprockets (~> 2.8, < 3.0)
       sprockets-rails (~> 2.0)
+    sassc (2.3.0)
+      ffi (~> 1.9)
     sax-machine (1.0.2)
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
@@ -1187,9 +1197,11 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
-    stringex (2.5.2)
+    stringex (2.8.5)
     temple (0.6.8)
     terminal-table (1.4.5)
+    terrapin (0.6.0)
+      climate_control (>= 0.0.3, < 1.0)
     therubyracer (0.12.1)
       libv8 (~> 3.16.14.0)
       ref
@@ -1209,7 +1221,7 @@ GEM
       execjs
       rails (>= 3.1)
       railties (>= 3.1)
-    tzinfo (1.2.4)
+    tzinfo (1.2.7)
       thread_safe (~> 0.1)
     uglifier (2.7.2)
       execjs (>= 0.3.0)
@@ -1281,8 +1293,9 @@ DEPENDENCIES
   mongoid-grid_fs!
   mongoid-history!
   mongoid-rspec
+  mongoid-slug (~> 5.0)
   mongoid_rateable!
-  mongoid_slug
+  mongoid_taggable!
   nested_form
   nokogiri
   omniauth-google-oauth2

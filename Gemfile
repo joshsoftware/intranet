@@ -5,7 +5,7 @@ ruby "2.2.4"
 gem 'rails', '4.2.5.2'
 gem 'devise'
 gem 'mongoid'
-gem 'mongoid_slug'
+gem 'mongoid-slug', '~>5.0'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem 'rmagick'
 gem 'mongoid-grid_fs', github: 'ahoward/mongoid-grid_fs'
@@ -35,6 +35,7 @@ gem 'twitter-typeahead-rails', :git => "git://github.com/yourabi/twitter-typeahe
 #mongoid-history
 gem 'mongoid-history', github: 'aq1018/mongoid-history'
 gem 'jquery-timepicker-rails'
+gem 'mongoid_taggable', git: 'git://github.com/garethcokell/mongoid_taggable.git'
 
 #sinatra
 gem 'sinatra'
@@ -118,9 +119,9 @@ gem 'authority'
 # gem 'debugger', group: [:development, :test]
 gem 'execjs'
 gem 'therubyracer', :platforms => :ruby
-gem 'light', git: 'git@github.com:joshsoftware/lightair.git', branch: 'engine'
+gem 'light', git: 'git@github.com:joshsoftware/lightair.git', branch: 'updated_engine'
 #gem 'light', path: '/Users/shweta/josh/intranet/lightair'#, branch: 'engine'
-gem 'screamout', git: 'git@github.com:joshsoftware/screamout.git', branch: 'engine'
+gem 'screamout', git: 'git@github.com:joshsoftware/screamout.git', branch: 'update_engine'
 gem 'mongoid_rateable', :git => 'git://github.com/PerfectMemory/mongoid_rateable.git'
 gem 'feedjira'
 gem 'rollbar'
