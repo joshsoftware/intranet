@@ -226,9 +226,10 @@ describe User do
       expect(managers_emails[1]).to eq(manager_two.email)
     end
 
-    it 'Should give the managers emails of all projects for particular Employee' do
+    it 'Should give the managers email ids of all projects whose timesheet' +
+       ' is mandatory for particular Employee' do
       project_1 = FactoryGirl.create(:project)
-      project_2 = FactoryGirl.create(:project)
+      project_2 = FactoryGirl.create(:project, timesheet_mandatory: false)
       manager_1 = FactoryGirl.create(:user, role: 'Manager')
       manager_2 = FactoryGirl.create(:user, role: 'Manager')
       user_project_1 = FactoryGirl.create(:user_project,
@@ -244,9 +245,8 @@ describe User do
       project_1.managers << manager_1
       project_2.managers << manager_2
       managers_emails = user.get_managers_emails_for_timesheet
-      expect(managers_emails.count).to eq(2)
+      expect(managers_emails.count).to eq(1)
       expect(managers_emails[0]).to eq(manager_1.email)
-      expect(managers_emails[1]).to eq(manager_2.email)
     end
 
     it 'Should skip the email if already added' do
