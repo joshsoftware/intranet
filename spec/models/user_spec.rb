@@ -222,8 +222,31 @@ describe User do
       project.managers << manager_two
       managers_emails = user.get_managers_emails
       expect(managers_emails.count).to eq(2)
-      expect(managers_emails[0]).to eq(managers_emails[0])
-      expect(managers_emails[1]).to eq(managers_emails[1])
+      expect(managers_emails[0]).to eq(manager_one.email)
+      expect(managers_emails[1]).to eq(manager_two.email)
+    end
+
+    it 'Should give the managers emails of all projects for particular Employee' do
+      project_1 = FactoryGirl.create(:project)
+      project_2 = FactoryGirl.create(:project)
+      manager_1 = FactoryGirl.create(:user, role: 'Manager')
+      manager_2 = FactoryGirl.create(:user, role: 'Manager')
+      user_project_1 = FactoryGirl.create(:user_project,
+        user: user,
+        project: project_1,
+        start_date: Date.today - 2
+      )
+      user_project_2 = FactoryGirl.create(:user_project,
+        user: user,
+        project: project_2,
+        start_date: Date.today - 4
+      )
+      project_1.managers << manager_1
+      project_2.managers << manager_2
+      managers_emails = user.get_managers_emails_for_timesheet
+      expect(managers_emails.count).to eq(2)
+      expect(managers_emails[0]).to eq(manager_1.email)
+      expect(managers_emails[1]).to eq(manager_2.email)
     end
 
     it 'Should skip the email if already added' do
@@ -244,7 +267,7 @@ describe User do
       project_two.managers << manager
       managers_emails = user.get_managers_emails
       expect(managers_emails.count).to eq(1)
-      expect(managers_emails[0]).to eq(managers_emails[0])
+      expect(managers_emails[0]).to eq(manager.email)
     end
 
     it 'Should not give the emails if manager is not assigned to project' do
