@@ -436,7 +436,7 @@ describe User do
   context 'Employee Auto Id generation' do
     before do
       @user = FactoryGirl.create(:user)
-      @internuser = FactoryGirl.create(:user,
+      @intern = FactoryGirl.create(:user,
         role: 'Intern',
         employee_detail: FactoryGirl.build(:employee_detail)
       )
@@ -458,12 +458,14 @@ describe User do
       user1.employee_detail.location = "Plano"
       user1.save
       expect(user1.reload.employee_detail.try(:employee_id).to_i).to eq(9001)
+      expect(user1.reload.employee_detail.try(:location)).to eq('Plano')
     end
 
     it "should generate ID < 9000 if location is Pune" do
       user1 = FactoryGirl.build(:user)
       user1.save!
       expect(user1.reload.employee_detail.try(:employee_id).to_i).to eq(2)
+      expect(user1.reload.employee_detail.try(:location)).to eq('Pune')
     end
 
     it "should not generate ID if user role is Intern" do
@@ -471,24 +473,32 @@ describe User do
       expect(intern.employee_detail.employee_id).to eq(nil)
     end
 
-    it "should generate id when user role is changed Intern to Employee" do
-      @internuser.update_attributes(role: "Employee")
-      expect(@internuser.employee_detail.employee_id.to_i).to eq(2)
+    it "should generate ID < 9000 when user role is changed Intern to Employee" +
+       " for location Pune" do
+      @intern.update_attributes(role: "Employee")
+      expect(@intern.employee_detail.employee_id.to_i).to eq(2)
+    end
+
+    it "should generate ID > 9000 when user role is changed Intern to Employee" +
+       " for location Plano" do
+      @intern.employee_detail.update_attributes(location: 'Plano')
+      @intern.update_attributes(role: "Employee")
+      expect(@intern.employee_detail.employee_id.to_i).to eq(9001)
     end
 
     it "should not override other details when user role is changed intern to employee" do
-      @internuser.update_attributes(role: "Employee")
-      expect(@internuser.dob_day).to eq(@internuser.dob_day)
-      expect(@internuser.dob_month).to eq(@internuser.dob_month)
-      expect(@internuser.doj_day).to eq(@internuser.doj_day)
-      expect(@internuser.doj_month).to eq(@internuser.doj_month)
-      expect(@internuser.email).to eq(@internuser.email)
-      expect(@internuser.status).to eq(@internuser.status)
-      expect(@internuser.employee_detail.employee_id.to_i).to eq(2)
-      expect(@internuser.employee_detail.date_of_relieving).
-        to eq(@internuser.employee_detail.date_of_relieving)
-      expect(@internuser.employee_detail.available_leaves).
-        to eq(@internuser.employee_detail.available_leaves)
+      @intern.update_attributes(role: "Employee")
+      expect(@intern.dob_day).to eq(@intern.dob_day)
+      expect(@intern.dob_month).to eq(@intern.dob_month)
+      expect(@intern.doj_day).to eq(@intern.doj_day)
+      expect(@intern.doj_month).to eq(@intern.doj_month)
+      expect(@intern.email).to eq(@intern.email)
+      expect(@intern.status).to eq(@intern.status)
+      expect(@intern.employee_detail.employee_id.to_i).to eq(2)
+      expect(@intern.employee_detail.date_of_relieving).
+        to eq(@intern.employee_detail.date_of_relieving)
+      expect(@intern.employee_detail.available_leaves).
+        to eq(@intern.employee_detail.available_leaves)
     end
   end
 
