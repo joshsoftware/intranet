@@ -46,7 +46,7 @@ RSpec.describe EntryPassesController, type: :controller do
         expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(0)
       end
 
-      it 'should send mail if for new dates in entry passes' do
+      it 'should send mail if new dates present in entry passes' do
         user = FactoryGirl.create(:user)
         sign_out @admin
         sign_in user
@@ -71,7 +71,7 @@ RSpec.describe EntryPassesController, type: :controller do
 
   describe '#destroy' do
     context 'delete entry passes' do
-      it 'should send not mail if user deletes own entry pass' do
+      it 'should not send mail if user deletes own entry pass' do
         user = FactoryGirl.create(:user)
         sign_out @admin
         sign_in user

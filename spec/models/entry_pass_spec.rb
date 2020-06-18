@@ -19,4 +19,12 @@ RSpec.describe EntryPass, type: :model do
         to eq(["Maximum number of employees allowed to work from office is reached"])
     end
   end
+
+  it 'should validate uniqueness of date for specific user' do
+    user = FactoryGirl.create(:user)
+    FactoryGirl.create(:entry_pass, user: user, date: Date.today)
+    entry_pass = FactoryGirl.build(:entry_pass, user: user, date: Date.today)
+    entry_pass.valid?
+    expect(entry_pass.errors.full_messages).to eq(["Date already selected"])
+  end
 end
