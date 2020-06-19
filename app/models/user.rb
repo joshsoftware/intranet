@@ -209,8 +209,8 @@ class User
 
   def get_managers_emails_for_timesheet
     managers_emails = []
-    projects.where(timesheet_mandatory: true).each do |project|
-      project.managers.each do |manager|
+    user_projects.where(time_sheet: true).each do |user_project|
+      user_project.project.managers.each do |manager|
         next if managers_emails.include?(manager.email)
         managers_emails << manager.email
       end
