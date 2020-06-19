@@ -20,5 +20,6 @@
  *= require redactor-rails
  *= require octicons/octicons.css
  *= require dataTables/jquery.dataTables
+ *= require light/home.css
  *= require_tree .
  */
