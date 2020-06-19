@@ -1,11 +1,13 @@
-= content_tag :a, "", :href => "#office_entry_modal", :class => 'icon-plus pull-right', :data => {:toggle => 'modal'}, "data-toggle" => "tooltip", title: "Create Entry Pass"
 = render 'modal'
+= render 'rules'
 =# link_to "", office_pass_path, :class => 'icon-th-list pull-right', :data => {:toggle => 'modal'}, "data-toggle" => "tooltip", title: "Your Entry Passes"
 
 - if ["HR", "Admin"].include?(current_user.role)
   =# render 'download_report'
 
-%h3 List of Employees registered for Office Entry
+= content_tag :a, "", :href => "#office_entry_modal", :class => 'icon-plus pull-right', :data => {:toggle => 'modal'}, "data-toggle" => "tooltip", title: "Add new request for Office Entry"
+%h3
+  %center List of Employees registered for Office Entry
 .form-horizontal
   - (Date.today..Date.today + 7).each do |date|
     %h4
