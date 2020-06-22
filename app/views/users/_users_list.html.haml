@@ -14,7 +14,10 @@
     - users.each_with_index do |user, i|
       %tr
         %td= user.employee_detail.try(:employee_id) if user.employee_detail
-        %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid') if user.public_profile
+        - if user.public_profile.present? && Rails.env.production?
+          %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid')
+        - else
+          %td= image_tag('dummy_image.png', class: 'img-polaroid')
         %td= link_to user.name, user_path(user) if user.public_profile
         %td= user.email
         %td= user.public_profile.try(:mobile_number)

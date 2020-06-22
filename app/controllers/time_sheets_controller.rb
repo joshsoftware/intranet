@@ -1,4 +1,5 @@
 class TimeSheetsController < ApplicationController
+  before_action :authenticate_user!
   skip_before_filter :verify_authenticity_token
   load_and_authorize_resource only: [:index, :users_timesheet, :edit_timesheet, :update_timesheet, :new, :projects_report, :add_time_sheet]
   load_and_authorize_resource only: :individual_project_report, class: Project

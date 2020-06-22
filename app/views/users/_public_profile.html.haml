@@ -7,7 +7,10 @@
         = pub.input :gender, collection: GENDER, prompt: 'Select'
         = pub.input :mobile_number
       %td.photo
-        = image_tag(pub.object.image.medium.url, class: 'controls profile-image', size: '100x100')
+        - if Rails.env.production?
+          = image_tag(pub.object.image.medium.url, class: 'controls profile-image', size: '100x100')
+        - else
+          = image_tag('dummy_image.png', class: 'controls profile-image', size: '100x100')
         %br
         %br
         - if current_user.is_admin_or_hr?

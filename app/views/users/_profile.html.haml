@@ -1,5 +1,8 @@
 .profile
-  = image_tag(@user.public_profile.image.thumb.url)
+  - if Rails.env.production?
+    = image_tag(@user.public_profile.image.thumb.url)
+  - else
+    = image_tag('dummy_image.png', size: '100x100')
   %h6.employee_id 
     = "Id: #{@user.employee_detail.try(:employee_id)}" if @user.employee_detail.try(:employee_id)
   .profile-title
