@@ -328,6 +328,14 @@ describe Project do
     end
   end
 
+  context 'validate end_date' do
+    it 'should validate end_date greater than start_date' do
+      project = FactoryGirl.build(:project, start_date: Date.today, end_date: Date.yesterday)
+      project.save
+      expect(project.errors[:end_date]).to eq(["should not be less than start date."])
+    end
+  end
+
   describe '#update_user_projects' do
     context 'when project set to inactive' do
       let!(:project) { create(:project) }

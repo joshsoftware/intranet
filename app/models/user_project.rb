@@ -21,11 +21,18 @@ class UserProject
 
 
   validates :end_date, presence: {unless: "!!active || active.nil?", message: "is mandatory to mark inactive"}
+  validate :start_date_less_than_end_date, if: 'end_date.present?'
 
   scope :approved_users, ->{where(:user_id.in => User.approved.pluck(:id))}
   scope :active_users, ->{where(:user_id.in => User.approved.pluck(:id), :active => true)}
   scope :inactive_users, ->{where(:user_id.in => User.approved.pluck(:id), :active => false)}
   scope :ex_users, ->{where(:user_id.nin => User.approved.pluck(:id))}
+
+  def start_date_less_than_end_date
+    if end_date < start_date
+      errors.add(:end_date, 'should not be less than start date.')
+    end
+  end
 end
 
 def active_user?

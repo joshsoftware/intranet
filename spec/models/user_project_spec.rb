@@ -68,10 +68,18 @@ RSpec.describe UserProject, type: :model do
       it 'Should pass if end_date is present' do
         user_project = FactoryGirl.build(:user_project)
         user_project.active = false
-        user_project.end_date = '12/03/2020'.to_date
+        user_project.end_date = Date.today
         user_project.save
         expect(UserProject.find(user_project)).to eq(user_project)
       end
+    end
+
+    it 'should validate end_date greater than start_date' do
+      user = FactoryGirl.create(:user)
+      project = FactoryGirl.create(:project)
+      user_project = FactoryGirl.build(:user_project, user: user, project: project, start_date: Date.today, end_date: Date.yesterday)
+      user_project.save
+      expect(user_project.errors[:end_date]).to eq(['should not be less than start date.'])
     end
 
     context 'user_id should be unique for active users' do

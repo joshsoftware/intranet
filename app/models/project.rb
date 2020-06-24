@@ -77,6 +77,14 @@ class Project
   validates_presence_of :end_date, unless: -> { is_active? }
   validates :billing_frequency, inclusion: { in: BILLING_FREQUENCY_TYPES, allow_nil: true }
   validates :type_of_project, inclusion: { in: TYPE_OF_PROJECTS, allow_nil: true }
+  validate :start_date_less_than_end_date, if: 'end_date.present?'
+
+  def start_date_less_than_end_date
+    if end_date < start_date
+      errors.add(:end_date, 'should not be less than start date.')
+    end
+  end
+
   before_save do
     if name_changed? && display_name.blank?
       self.display_name = name.split.join('_')
