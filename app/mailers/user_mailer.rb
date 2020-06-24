@@ -110,7 +110,7 @@ class UserMailer < ActionMailer::Base
     @user = @entry_passes.first.user
     mail(
       subject: "Office Entry Pass created by #{@user.name}",
-      to: OFFICE_ENTRY_PASS_MAIL_RECEPIENT
+      to: [OFFICE_ENTRY_PASS_MAIL_RECEPIENT, @user.email].flatten
     )
   end
 

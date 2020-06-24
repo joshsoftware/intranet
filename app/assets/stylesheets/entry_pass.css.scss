@@ -71,13 +71,19 @@
     text-align: initial;
     padding-left: 10px;
     margin-left: 20px;
-    .error {
+    textarea .error {
       width: max-content;
     }
   }
+
+  .controls textarea {
+    width: 310px;
+  }
+
   .remove_nested_fields {
     float: right;
   }
+
   #dates{
     .span1{
       margin-left: 13%;

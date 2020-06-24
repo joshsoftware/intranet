@@ -17,6 +17,8 @@
           .span2.width6
             = f.input :date, label: false, placeholder: 'Select Date', input_html: {class: 'office-pass-datepicker', autocomplete: "off",required: true, readonly: true}
             = f.input :user_id, :as => :hidden, :input_html => { :value => current_user.id }
+            = f.input :reason,  as: :text, label: false, placeholder: 'Please provide reason why you want to be in the office?'
+            = f.input :timing_details, as: :text, label: false, placeholder: 'Please provide time details when you are planning to reach the office and when you will leave the office?'
           .span2.width2
             %span.available_text= "(  Available)"
             = f.link_to_remove "X", class: "btn btn-danger"
