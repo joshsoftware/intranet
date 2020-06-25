@@ -969,6 +969,7 @@ class TimeSheet
   end
 
   def self.from_date_less_than_to_date?(from_date, to_date)
+    return false if from_date.blank? or to_date.blank?
     from_date.to_date <= to_date.to_date
   end
 

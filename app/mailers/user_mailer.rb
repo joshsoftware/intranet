@@ -57,7 +57,7 @@ class UserMailer < ActionMailer::Base
     admin_emails = User.approved.where(role: 'Admin').all.map(&:email)
     @receiver_emails = [admin_emails, hr_emails].flatten.join(',')
     leaves.map do |leave|
-      leave.sanctioning_manager = User.find(leave.processed_by).name
+      leave.sanctioning_manager = User.where(id: leave.processed_by).first.try(:name)
     end
     @leaves = leaves
     mail(to: @receiver_emails, subject: "Employees on leave tomorrow.") if leaves.present?
