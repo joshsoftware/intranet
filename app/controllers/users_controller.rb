@@ -29,7 +29,7 @@ class UsersController < ApplicationController
     return_value_of_add_project, return_value_of_remove_project = @user.add_or_remove_projects(params) if params[:user][:project_ids].present?
     if return_value_of_add_project && return_value_of_remove_project
       if @user.save
-        flash.notice = 'Profile updated Succesfully'
+        flash.notice = 'Profile updated Successfully'
       else
         flash[:error] = "Error #{@user.generate_errors_message}"
       end
@@ -62,7 +62,7 @@ class UsersController < ApplicationController
       #update_attribute was getting called on embedded_document so slug which is defined in parent was not getting updated so
       #update_attributes is caaled on user insted of public_profile/private_profile
       if @user.update_attributes(profile => params.require(profile).permit!)
-        flash.notice = 'Profile Updated Succesfully'
+        flash.notice = 'Profile Updated Successfully'
         #UserMailer.delay.verification(@user.id)
         redirect_to public_profile_user_path(@user)
       else
@@ -79,7 +79,7 @@ class UsersController < ApplicationController
       @user = User.new(params[:user].permit(:email, :role, employee_detail_attributes: [:location] ))
       @user.password = Devise.friendly_token[0,20]
       if @user.save
-        flash.notice = 'Invitation sent Succesfully'
+        flash.notice = 'Invitation sent Successfully'
         UserMailer.delay.invitation(current_user.id, @user.id)
         redirect_to invite_user_path
       else

@@ -26,7 +26,8 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
       locals: { project_employee: options[:project_employee],
                 projects_summary: options[:projects_summary],
                 employee_summary: options[:employee_summary],
-                report: options[:report], params: options[:params],
+                report: options[:report],
+                params: options[:params],
                 project_name: options[:project_name]
               }
     )

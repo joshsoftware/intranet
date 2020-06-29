@@ -14,7 +14,7 @@ class HolidayListsController < ApplicationController
     @holiday = HolidayList.new(holiday_params)
     if @holiday.valid?
       @holiday.save
-      flash[:success] = "Holiday Created Succesfully"
+      flash[:success] = "Holiday Created Successfully"
       redirect_to new_holiday_list_path
     else
       render 'new'
@@ -30,14 +30,14 @@ class HolidayListsController < ApplicationController
 
   def update
     if @holiday.update(holiday_params)
-      flash[:success] = 'Holiday Updated Succesfully'
+      flash[:success] = 'Holiday Updated Successfully'
       redirect_to holiday_lists_path
     end
   end
 
   def destroy
     if @holiday.destroy
-      flash[:success] = 'Holiday Deleted Succesfully'
+      flash[:success] = 'Holiday Deleted Successfully'
       redirect_to holiday_lists_path
     end
   end

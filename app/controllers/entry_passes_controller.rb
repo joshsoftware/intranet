@@ -17,7 +17,7 @@ class EntryPassesController < ApplicationController
     old_passes_ids = current_user.entry_passes.pluck(:id)
     current_user.attributes = {'entry_passes_attributes' => entry_pass_params}
     if current_user.valid? && current_user.save!
-      flash[:success] = "Entry Pass Created Succesfully"
+      flash[:success] = "Entry Pass Created Successfully"
       entry_passes_ids = current_user.entry_passes.pluck(:id)
       if (entry_passes_ids - old_passes_ids).count > 0
         UserMailer.delay.new_entry_passes(entry_passes_ids)
@@ -44,7 +44,7 @@ class EntryPassesController < ApplicationController
     user_id = @entry_pass.user_id
     date = @entry_pass.date
     @entry_pass.destroy
-    flash[:success] = "Entry Pass deleted succesfully"
+    flash[:success] = "Entry Pass deleted successfully"
     if user_id != current_user.id
       deleted_by = current_user.id
       UserMailer.delay.delete_office_pass(date, user_id, deleted_by)

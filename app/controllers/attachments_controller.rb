@@ -26,7 +26,7 @@ class AttachmentsController < ApplicationController
   end
 
   def destroy
-    flash[:notice] = @attachment.destroy ? "Document deleted Succesfully" : "Error in deleting document"
+    flash[:notice] = @attachment.destroy ? "Document deleted Successfully" : "Error in deleting document"
     redirect_to attachments_path
   end
   

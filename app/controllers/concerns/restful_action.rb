@@ -3,7 +3,7 @@ module RestfulAction
 
   def update_obj(model_obj, params, redirect_path)
     if model_obj.update_attributes(params)
-      flash[:success] = "#{model_obj.class.to_s} updated Succesfully"
+      flash[:success] = "#{model_obj.class.to_s} updated Successfully"
       redirect_to redirect_path
     else
       flash[:error] = "#{model_obj.class.to_s}: #{get_detail_message(model_obj)}"

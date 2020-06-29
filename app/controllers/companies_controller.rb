@@ -23,7 +23,7 @@ class CompaniesController < ApplicationController
   def create
     @company = Company.new(company_params)
     if @company.save
-      flash[:success] = "Company created Succesfully"
+      flash[:success] = "Company created Successfully"
       redirect_to companies_path
     else
       render 'new'
@@ -44,7 +44,7 @@ class CompaniesController < ApplicationController
 
   def update
     if @company.update(company_params)
-      flash[:success] = "Company updated Succesfully"
+      flash[:success] = "Company updated Successfully"
       redirect_to companies_path
     else
       flash[:error] = "Company: #{@company.errors.full_messages.join(',')}"
@@ -54,7 +54,7 @@ class CompaniesController < ApplicationController
 
   def destroy
     if @company.destroy
-      flash[:notice] = "Company deleted Succesfully"
+      flash[:notice] = "Company deleted Successfully"
     else
       flash[:notice] = "Error in deleting Company"
     end

@@ -36,7 +36,7 @@ class VendorsController < ApplicationController
 
   def destroy
     if @vendor.destroy
-     flash[:notice] = "Vendor deleted Succesfully" 
+     flash[:notice] = "Vendor deleted Successfully"
     else
      flash[:notice] = "Error in deleting vendor"
     end
@@ -44,7 +44,7 @@ class VendorsController < ApplicationController
   end
 
   def import_vendors
-    @message = { type: :notice, message: "Vendors added succesfully form CSV" }
+    @message = { type: :notice, message: "Vendors added successfully from CSV" }
     parse_csv_file(params[:csv_file])
     flash[@message[:type]] = @message[:message]
     redirect_to vendors_path 

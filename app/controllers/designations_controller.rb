@@ -15,7 +15,7 @@ class DesignationsController < ApplicationController
   def create
     @designation = Designation.new(designation_params)
     if @designation.save
-      flash[:success] = "Designation created Succesfully"
+      flash[:success] = "Designation created Successfully"
       redirect_to designations_path
     else
       render action: 'new'
@@ -33,7 +33,7 @@ class DesignationsController < ApplicationController
   def update
     @designation = Designation.find(params[:id])
     if @designation.update_attributes(designation_params)
-      flash[:success] = "Designation updated Succesfully"
+      flash[:success] = "Designation updated Successfully"
       redirect_to designations_path
     else
       render action: 'edit'
@@ -42,7 +42,7 @@ class DesignationsController < ApplicationController
 
   def destroy
     @designation = Designation.find(params[:id])
-    flash[:notice] = @designation.destroy ? "Designation deleted Succesfully" : "Error in deleting Designation"
+    flash[:notice] = @designation.destroy ? "Designation deleted Successfully" : "Error in deleting Designation"
     redirect_to designations_path
   end
 

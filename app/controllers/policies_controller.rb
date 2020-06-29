@@ -11,7 +11,7 @@ class PoliciesController < ApplicationController
   def create
     @policy = Policy.new(policies_params)
     if @policy.save
-      flash[:notice] = "Policy created Succesfully" 
+      flash[:notice] = "Policy created Successfully" 
       redirect_to attachments_path
     else
       render action: 'new'
@@ -29,7 +29,7 @@ class PoliciesController < ApplicationController
   def update
     @policy = Policy.find(params[:id])
     if @policy.update_attributes(policies_params)
-      flash[:notice] = "Policy updated Succesfully" 
+      flash[:notice] = "Policy updated Successfully" 
       redirect_to attachments_path
     else
       render action: 'edit'
@@ -38,7 +38,7 @@ class PoliciesController < ApplicationController
 
   def destroy
     @policy = Policy.find(params[:id])
-    flash[:notice] = @policy.destroy ? "Policy deleted Succesfully" : "Error in deleting policy"
+    flash[:notice] = @policy.destroy ? "Policy deleted Successfully" : "Error in deleting policy"
     redirect_to attachments_path
   end
 

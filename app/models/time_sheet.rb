@@ -429,8 +429,8 @@ class TimeSheet
     return individual_project_report, project_report
   end
 
-  def self.get_project_and_generate_weekly_report(mananers, from_date, to_date)
-    mananers.each do |manager|
+  def self.get_project_and_generate_weekly_report(managers, from_date, to_date)
+    managers.each do |manager|
       unfilled_time_sheet_report = []
       weekly_report = []
       manager.managed_projects.each do |project|
@@ -1159,7 +1159,8 @@ class TimeSheet
       params:           params,
       user_email:       current_user.email,
       user_name:        current_user.name,
-      from_date:        from_date, to_date: to_date,
+      from_date:        from_date,
+      to_date:          to_date,
       subject:          subject
     }
   end

@@ -64,7 +64,7 @@ class TimeSheetsController < ApplicationController
       current_user.is_admin_or_hr? || current_user.is_manager?
       return_value, @time_sheets = TimeSheet.update_time_sheet(@time_sheets, current_user, timesheet_params)
       unless return_value.include?(false)
-        flash[:notice] = 'Timesheet Updated Succesfully'
+        flash[:notice] = 'Timesheet Updated Successfully'
         redirect_to users_time_sheets_path(@user.id, from_date: @from_date, to_date: @to_date)
       else
         render 'edit_timesheet'
@@ -85,11 +85,11 @@ class TimeSheetsController < ApplicationController
     data_params = {"time_sheets_attributes"=>data_params}
     return_values, @time_sheets = TimeSheet.create_time_sheet(@user.id, current_user, data_params)
     unless return_values.include?(false)
-      flash[:notice] = 'Timesheet created succesfully'
+      flash[:notice] = 'Timesheet created successfully'
       redirect_to users_time_sheets_path(user_id: @user.id, from_date: @from_date, to_date: @to_date)
     else
       if return_values.include?(true)
-        flash[:notice] = "#{return_values.count(true)} #{'timesheet'.pluralize(return_values.count(true))} created succesfully"
+        flash[:notice] = "#{return_values.count(true)} #{'timesheet'.pluralize(return_values.count(true))} created successfully"
       end
       render 'new'
     end
