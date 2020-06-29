@@ -71,44 +71,39 @@ describe VendorsController do
   end
 
   describe "POST 'import_vendor'" do
+    let(:params) {{ "csv_file" => Rack::Test::UploadedFile.new(@file.path, 'application/csv', true) }}
+
+    before do
+      @vendor = FactoryGirl.create(:vendor)
+      FactoryGirl.create(:contact_person, vendor: @vendor)
+    end
+
     it 'should import data from csv if csv is valid' do
-      vendor = FactoryGirl.build(:vendor)
-      file = generate_valid_csv(vendor)
-      path = file.path
-      params = { "csv_file" => Rack::Test::UploadedFile.new(path, 'application/csv', true) }
+      @file = generate_valid_csv(@vendor)
       post :import_vendors, params
       expect(response).to have_http_status(302)
       expect(Vendor.count).to eq(1)
-      expect(Vendor.last.contact_persons.count).to eq(1)
+      expect(Vendor.last.contact_persons.count).to eq(2)
       expect(flash[:notice]).to eq("Vendors added successfully from CSV")
     end
 
     it "should update contact_person's data if contact_person already exist" do
-      vendor = FactoryGirl.create(:vendor)
-      contact_person = FactoryGirl.create(:contact_person, vendor: vendor)
-      file = generate_valid_csv(vendor, email = 'changed@testmail.com', is_change = true)
-      path = file.path
-      params = { "csv_file" => Rack::Test::UploadedFile.new(path, 'application/csv', true) }
+      @file = generate_valid_csv(@vendor, email = 'changed@testmail.com', is_change = true)
       post :import_vendors, params
       expect(response).to have_http_status(302)
       expect(Vendor.count).to eq(1)
-      expect(vendor.contact_persons.count).to eq(1)
-      expect(vendor.contact_persons.last.email).to eq('changed@testmail.com')
+      expect(@vendor.contact_persons.count).to eq(1)
+      expect(@vendor.contact_persons.last.email).to eq('changed@testmail.com')
       expect(flash[:notice]).to eq("Vendors added successfully from CSV")
     end
 
     it "should not update contact_person's data if csv is invalid" do
-      vendor = FactoryGirl.create(:vendor)
-      contact_person = FactoryGirl.create(:contact_person, vendor: vendor)
-      file = generate_invalid_csv(vendor)
-      path = file.path
-      params = { "csv_file" => Rack::Test::UploadedFile.new(path, 'application/csv', true) }
+      @file = generate_invalid_csv(@vendor)
       post :import_vendors, params
       expect(response).to have_http_status(302)
       expect(Vendor.count).to eq(1)
       expect(Vendor.last.contact_persons.count).to eq(1)
       expect(flash[:error]).to eq("Error in csv file")
-      expect(Vendor.last.contact_persons.last.email).not_to eq('test12@testmail.com')
     end
   end
 end

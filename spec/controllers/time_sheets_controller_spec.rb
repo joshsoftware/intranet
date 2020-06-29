@@ -313,37 +313,32 @@ RSpec.describe TimeSheetsController, type: :controller do
   end
 
   context 'GET edit_timesheet' do
+    before do
+      @admin = FactoryGirl.create(:admin)
+      @user1 = FactoryGirl.create(:employee)
+      @user2 = FactoryGirl.create(:employee)
+      @project = FactoryGirl.create(:project)
+      @user_project = FactoryGirl.create(:user_project, user: @user1, project: @project)
+      @timesheet = FactoryGirl.create(:time_sheet, user: @user1, project: @project)
+    end
+
     it "should render edit_timesheet for own timesheets" do
-      user = FactoryGirl.create(:employee)
-      sign_in user
-      project = FactoryGirl.create(:project)
-      user_project = FactoryGirl.create(:user_project, user: user, project: project)
-      timesheet = FactoryGirl.create(:time_sheet, user: user, project: project)
-      get :edit_timesheet, { user_id: user.id, time_sheet_id: timesheet.id, time_sheet_date: timesheet.date }
+      sign_in @user1
+      get :edit_timesheet, { user_id: @user1.id, time_sheet_id: @timesheet.id, time_sheet_date: @timesheet.date }
       expect(response).to have_http_status(:success)
       should render_template(:edit_timesheet)
     end
 
     it "should render edit_timesheet for timesheets of any user if role is admin" do
-      admin = FactoryGirl.create(:admin)
-      sign_in admin
-      user = FactoryGirl.create(:employee)
-      project = FactoryGirl.create(:project)
-      user_project = FactoryGirl.create(:user_project, user: user, project: project)
-      timesheet = FactoryGirl.create(:time_sheet, user: user, project: project)
-      get :edit_timesheet, { user_id: user.id, time_sheet_id: timesheet.id, time_sheet_date: timesheet.date }
+      sign_in @admin
+      get :edit_timesheet, { user_id: @user1.id, time_sheet_id: @timesheet.id, time_sheet_date: @timesheet.date }
       expect(response).to have_http_status(:success)
       should render_template(:edit_timesheet)
     end
 
     it 'should not render edit_timesheet for timesheets of other users if role is employee' do
-      user1 = FactoryGirl.create(:employee)
-      user2 = FactoryGirl.create(:employee)
-      sign_in user2
-      project = FactoryGirl.create(:project)
-      user_project = FactoryGirl.create(:user_project, user: user1, project: project)
-      timesheet = FactoryGirl.create(:time_sheet, user: user1, project: project)
-      get :edit_timesheet, { user_id: user1.id, time_sheet_id: timesheet.id, time_sheet_date: timesheet.date }
+      sign_in @user2
+      get :edit_timesheet, { user_id: @user1.id, time_sheet_id: @timesheet.id, time_sheet_date: @timesheet.date }
       expect(response).to have_http_status(302)
       expect(flash[:error]).to eq("Invalid access")
       should redirect_to(users_time_sheets_path)
@@ -394,25 +389,28 @@ RSpec.describe TimeSheetsController, type: :controller do
     end
 
     context 'users_timesheet' do
-      it "should render users_timesheet of other users' if role admin or hr or super-admin" do
-        employee = FactoryGirl.create(:employee)
+      before do
+        @employee = FactoryGirl.create(:employee)
         FactoryGirl.create(:time_sheet,
           project: project1,
-          user: employee,
+          user: @employee,
           date: DateTime.yesterday,
           from_time: "#{Date.yesterday} 11:00",
           to_time: "#{Date.yesterday} 12:00"
         )
         FactoryGirl.create(:time_sheet,
           project: project1,
-          user: employee,
+          user: @employee,
           date: DateTime.yesterday,
           from_time: "#{Date.yesterday} 14:00",
           to_time: "#{Date.yesterday} 16:00"
         )
+      end
+
+      it "should render users_timesheet of other users' if role admin or hr or super-admin" do
         sign_in user
         params = {
-          user_id: employee.id,
+          user_id: @employee.id,
           from_date: Date.yesterday - 1,
           to_time: Date.today
         }
@@ -422,25 +420,10 @@ RSpec.describe TimeSheetsController, type: :controller do
       end
 
       it "should not render users_timesheet of other users' if role employee" do
-        employee = FactoryGirl.create(:employee)
         employee2 = FactoryGirl.create(:employee)
-        FactoryGirl.create(:time_sheet,
-          project: project1,
-          user: employee,
-          date: DateTime.yesterday,
-          from_time: "#{Date.yesterday} 11:00",
-          to_time: "#{Date.yesterday} 12:00"
-        )
-        FactoryGirl.create(:time_sheet,
-          project: project1,
-          user: employee,
-          date: DateTime.yesterday,
-          from_time: "#{Date.yesterday} 14:00",
-          to_time: "#{Date.yesterday} 16:00"
-        )
         sign_in employee2
         params = {
-          user_id: employee.id,
+          user_id: @employee.id,
           from_date: Date.yesterday - 1,
           to_time: Date.today
         }
