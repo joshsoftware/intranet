@@ -35,7 +35,7 @@ RSpec.describe CompaniesController, type: :controller do
   describe "#create" do
     it "should create new project" do
       post :create, { company: FactoryGirl.attributes_for(:company) }
-      expect(flash[:success]).to eq "Company created Succesfully"
+      expect(flash[:success]).to eq "Company created Successfully"
     end
 
     it "should render new on invalid record" do

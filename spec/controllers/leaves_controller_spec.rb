@@ -457,17 +457,27 @@ describe LeaveApplicationsController do
     it 'should update available leaves if number of days changed' do
       sign_in employee
       end_at, days = leave_app.end_at.to_date + 1.day,
-        leave_app.number_of_days - 1
+        leave_app.number_of_days + 1
       employee.employee_detail.available_leaves = 10
       employee.save
       post :update, id: leave_app.id, leave_application: {
         end_at: end_at,
         number_of_days: days
       }
-      l_app = assigns(:leave_application)
+      expect(employee.reload.employee_detail.available_leaves).to eq(9)
+    end
 
-      #TODO
-      #expect(employee.reload.employee_detail.available_leaves).to eq(10 - days)
+    it 'should not update if leave application is invalid' do
+      sign_in employee
+      leave_id = leave_app.id
+      available_leaves = employee.employee_detail.available_leaves
+      post :update, id: leave_id, leave_application: {
+        end_at: leave_app.start_at - 1,
+        number_of_days: 0
+      }
+      expect(flash[:error]).to eq("End at should not be less than start date.")
+      should render_template(:edit)
+      expect(employee.reload.employee_detail.available_leaves).to eq(available_leaves)
     end
   end
 

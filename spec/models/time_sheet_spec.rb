@@ -164,6 +164,12 @@ RSpec.describe TimeSheet, type: :model do
         expect(time_sheet.errors.full_messages).to eq([])
         expect(time_sheet.reload.description).to eq('call')
       end
+
+      it 'fail because date is not present' do
+        time_sheet = FactoryGirl.build(:time_sheet, date: nil)
+        expect(time_sheet.save).to eq(false)
+        expect(time_sheet.errors[:date]).to eq(['Invalid time'])
+      end
     end
 
     context 'Time should' do

@@ -27,4 +27,10 @@ describe HolidayList do
       expect(holiday.errors[:holiday_date]).to eq(["cant create holiday on Saturday or Sunday"])
     end
   end
+
+  it 'should return next working day' do
+    date = '26/06/2020'.to_date
+    next_date = HolidayList.next_working_day(date)
+    expect(next_date).to eq('29/06/2020'.to_date)
+  end
 end

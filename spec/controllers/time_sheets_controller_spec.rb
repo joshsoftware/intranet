@@ -302,6 +302,54 @@ RSpec.describe TimeSheetsController, type: :controller do
     end
   end
 
+  context 'GET new' do
+    it 'should respond with success' do
+      user = FactoryGirl.create(:user)
+      sign_in user
+      get :new, { user_id: user.id }
+      should respond_with(:success)
+      should render_template(:new)
+    end
+  end
+
+  context 'GET edit_timesheet' do
+    it "should render edit_timesheet for own timesheets" do
+      user = FactoryGirl.create(:employee)
+      sign_in user
+      project = FactoryGirl.create(:project)
+      user_project = FactoryGirl.create(:user_project, user: user, project: project)
+      timesheet = FactoryGirl.create(:time_sheet, user: user, project: project)
+      get :edit_timesheet, { user_id: user.id, time_sheet_id: timesheet.id, time_sheet_date: timesheet.date }
+      expect(response).to have_http_status(:success)
+      should render_template(:edit_timesheet)
+    end
+
+    it "should render edit_timesheet for timesheets of any user if role is admin" do
+      admin = FactoryGirl.create(:admin)
+      sign_in admin
+      user = FactoryGirl.create(:employee)
+      project = FactoryGirl.create(:project)
+      user_project = FactoryGirl.create(:user_project, user: user, project: project)
+      timesheet = FactoryGirl.create(:time_sheet, user: user, project: project)
+      get :edit_timesheet, { user_id: user.id, time_sheet_id: timesheet.id, time_sheet_date: timesheet.date }
+      expect(response).to have_http_status(:success)
+      should render_template(:edit_timesheet)
+    end
+
+    it 'should not render edit_timesheet for timesheets of other users if role is employee' do
+      user1 = FactoryGirl.create(:employee)
+      user2 = FactoryGirl.create(:employee)
+      sign_in user2
+      project = FactoryGirl.create(:project)
+      user_project = FactoryGirl.create(:user_project, user: user1, project: project)
+      timesheet = FactoryGirl.create(:time_sheet, user: user1, project: project)
+      get :edit_timesheet, { user_id: user1.id, time_sheet_id: timesheet.id, time_sheet_date: timesheet.date }
+      expect(response).to have_http_status(302)
+      expect(flash[:error]).to eq("Invalid access")
+      should redirect_to(users_time_sheets_path)
+    end
+  end
+
   context 'Show' do
     let!(:user) { FactoryGirl.create(:admin) }
     let!(:project1) { FactoryGirl.create(:project) }
@@ -343,6 +391,64 @@ RSpec.describe TimeSheetsController, type: :controller do
         to_date: Date.today
       expect(response).to have_http_status(200)
       should render_template(:users_timesheet)
+    end
+
+    context 'users_timesheet' do
+      it "should render users_timesheet of other users' if role admin or hr or super-admin" do
+        employee = FactoryGirl.create(:employee)
+        FactoryGirl.create(:time_sheet,
+          project: project1,
+          user: employee,
+          date: DateTime.yesterday,
+          from_time: "#{Date.yesterday} 11:00",
+          to_time: "#{Date.yesterday} 12:00"
+        )
+        FactoryGirl.create(:time_sheet,
+          project: project1,
+          user: employee,
+          date: DateTime.yesterday,
+          from_time: "#{Date.yesterday} 14:00",
+          to_time: "#{Date.yesterday} 16:00"
+        )
+        sign_in user
+        params = {
+          user_id: employee.id,
+          from_date: Date.yesterday - 1,
+          to_time: Date.today
+        }
+        get :users_timesheet, params
+        expect(response).to have_http_status(:success)
+        should render_template(:users_timesheet)
+      end
+
+      it "should not render users_timesheet of other users' if role employee" do
+        employee = FactoryGirl.create(:employee)
+        employee2 = FactoryGirl.create(:employee)
+        FactoryGirl.create(:time_sheet,
+          project: project1,
+          user: employee,
+          date: DateTime.yesterday,
+          from_time: "#{Date.yesterday} 11:00",
+          to_time: "#{Date.yesterday} 12:00"
+        )
+        FactoryGirl.create(:time_sheet,
+          project: project1,
+          user: employee,
+          date: DateTime.yesterday,
+          from_time: "#{Date.yesterday} 14:00",
+          to_time: "#{Date.yesterday} 16:00"
+        )
+        sign_in employee2
+        params = {
+          user_id: employee.id,
+          from_date: Date.yesterday - 1,
+          to_time: Date.today
+        }
+        get :users_timesheet, params
+        expect(response).to have_http_status(302)
+        expect(flash[:error]).to eq("Invalid access")
+        should redirect_to(time_sheets_path)
+      end
     end
   end
 
@@ -603,7 +709,7 @@ RSpec.describe TimeSheetsController, type: :controller do
                                 user: params,
                                 time_sheet_date: Date.today - 1
         expect(time_sheet.reload.date).to eq(Date.today - 12)
-        expect(flash[:notice]).to eq('Timesheet Updated Succesfully')
+        expect(flash[:notice]).to eq('Timesheet Updated Successfully')
       end
     end
 
@@ -757,6 +863,30 @@ RSpec.describe TimeSheetsController, type: :controller do
         )
         should render_template(:edit_timesheet)
       end
+
+      it "if one user trying to update other user's timesheet" do
+        user1 = FactoryGirl.create(:employee)
+        timesheet = FactoryGirl.create(:time_sheet, project: project, user: employee)
+        sign_in user1
+        params = {
+          time_sheets_attributes: {
+            "0" => {
+              project_id: project.id,
+              date: Date.today - 9,
+              from_time: "#{Date.today - 9} 10:00",
+              to_time: "#{Date.today - 9} 11:00",
+              description: 'testing API and call with client',
+              id: timesheet.id
+            }
+          }
+        }
+        post :update_timesheet, user_id: user1.id,
+                                user: params,
+                                time_sheet_date: timesheet.date
+        expect(response).to have_http_status(302)
+        expect(flash[:error]).to eq("Invalid access")
+        should redirect_to(edit_time_sheets_path)
+      end
     end
   end
 
@@ -867,6 +997,45 @@ RSpec.describe TimeSheetsController, type: :controller do
       assigns(:time_sheets)[0].errors.full_messages ==
         ["From time From time must be less than to time"]
       expect(TimeSheet.count).to eq(0)
+      should render_template(:new)
+    end
+
+    it 'should add only valid timesheets' do
+      sign_in user
+      params = {
+        user: {
+          time_sheets_attributes: {
+            '0' => {
+              project_id: project.id,
+              date: Date.today - 1,
+              from_time: "#{Date.today - 1} 10:00",
+              to_time: "#{Date.today - 1} 11:00",
+              description: "testing API and call with client"
+            },
+            '1' => {
+              project_id: project.id,
+              date: Date.today - 1,
+              from_time: "#{Date.today - 1} 11:30",
+              to_time: "#{Date.today - 1} 12:00",
+              description: "testing API and call with client"
+            },
+            '2' => {
+              project_id: project.id,
+              date: Date.today - 1,
+              from_time: "#{Date.today - 1} 12:30",
+              to_time: "#{Date.today - 1} 12:00",
+              description: "testing API and call with client"
+            }
+          },
+          user_id: user.id,
+          from_date: Date.today - 20,
+          to_date: Date.today
+        },
+        user_id: user.id
+      }
+      post :add_time_sheet, params
+      expect(response).to have_http_status(200)
+      expect(flash[:notice]).to eq("2 timesheets created successfully")
       should render_template(:new)
     end
   end

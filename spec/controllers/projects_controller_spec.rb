@@ -28,6 +28,11 @@ describe ProjectsController do
       xhr :get, :index
       expect(assigns(:projects).pluck(:id)).to match_array [@active_project.id]
     end
+
+    it 'should return project csv' do
+      get :index, { format: :csv }
+      expect(response).to have_http_status(200)
+    end
   end
 
   describe "GET new" do
@@ -46,7 +51,7 @@ describe ProjectsController do
   describe "GET create" do
     it "should create new project" do
       post :create, { project: FactoryGirl.attributes_for(:project) }
-      expect(flash[:success]).to eq("Project created Succesfully")
+      expect(flash[:success]).to eq("Project created Successfully")
       should redirect_to projects_path
     end
 
