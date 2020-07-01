@@ -3,23 +3,24 @@
   #dates
     - if @entry_passes.present?
       %fieldset
-        %legend Already Requested Office Entries On
-        .row.span4
-          = entry_pass.fields_for :entry_passes, @entry_passes do |f|
-            .span2.width6
-              .registered_entry_pass
-                = f.input :date, label: false, disabled: true, input_html: {class: 'office-pass-datepicker', autocomplete: "off",required: true}
+        %legend.span7 Already Requested Office Entries On
+        = entry_pass.fields_for :entry_passes, @entry_passes do |f|
+          .row.span8.width8
+            .registered_entry_pass
+              = f.input :date, label: false, placeholder: 'Select Date', input_html: {class: 'office-pass-datepicker', autocomplete: "off",required: true, readonly: true}, wrapper_class: 'span2', disabled: true
+              = f.input :user_id, :as => :hidden, :input_html => { :value => current_user.id }
+              = f.input :details,  as: :text, label: false, placeholder: 'Please provide reason why you want to be in the office? When you are planning to reach & leave from office.', wrapper_class: 'span4', disabled: true
+              .span2
+                %span.available_text= "(  Available)"
 
     %fieldset
-      %legend Add New Entries
+      %legend.span7 Add New Entries
       = entry_pass.fields_for :entry_passes, @new_entry_pass do |f|
-        .row.span4
-          .span2.width6
-            = f.input :date, label: false, placeholder: 'Select Date', input_html: {class: 'office-pass-datepicker', autocomplete: "off",required: true, readonly: true}
-            = f.input :user_id, :as => :hidden, :input_html => { :value => current_user.id }
-            = f.input :reason,  as: :text, label: false, placeholder: 'Please provide reason why you want to be in the office?'
-            = f.input :timing_details, as: :text, label: false, placeholder: 'Please provide time details when you are planning to reach the office and when you will leave the office?'
-          .span2.width2
+        .row.span8.width8
+          = f.input :date, label: false, placeholder: 'Select Date', input_html: {class: 'office-pass-datepicker', autocomplete: "off",required: true, readonly: true}, wrapper_class: 'span2'
+          = f.input :user_id, :as => :hidden, :input_html => { :value => current_user.id }
+          = f.input :details,  as: :text, label: false, placeholder: 'Please provide reason why you want to be in the office? When you are planning to reach & leave from office.', wrapper_class: 'span4'
+          .span2
             %span.available_text= "(  Available)"
             = f.link_to_remove "X", class: "btn btn-danger"
   .offset0

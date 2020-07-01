@@ -77,14 +77,13 @@
                                                       %br/
                                                       %div{:style => "margin-left: 20px"}
                                                         -@entry_passes.each do |entry_pass|
-                                                          #{entry_pass.date}
-                                                          %br/
-                                                          #{ 'Reason : ' + entry_pass.reason}
-                                                          %br/
-                                                          #{ 'Timing Details : ' + entry_pass.timing_details}
-                                                          %br/
-                                                          %br/
+                                                          %div{style: 'border-bottom: 1px solid #e5e5e5;'}
+                                                            #{entry_pass.date}
+                                                            %br/
+                                                            #{ 'Details : ' + entry_pass.details}
+                                                            %br/
                                                       %br/
+
                                                       = link_to "View Details", entry_passes_url
                                                     %p{:style => "margin:0;padding-bottom:0"}
                                                       Regards,
