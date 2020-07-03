@@ -36,7 +36,12 @@ class TimeSheetsController < ApplicationController
     @from_date = params[:from_date] || Date.today.beginning_of_month.to_s
     @to_date = params[:to_date] || Date.today.to_s
     @user = User.find(params[:user_id])
-    @individual_timesheet_report, @total_work_and_leaves = TimeSheet.generate_individual_timesheet_report(@user, params) if TimeSheet.from_date_less_than_to_date?(@from_date, @to_date)
+    @individual_timesheet_report, @total_work_and_leaves = {}, {}
+    if TimeSheet.from_date_less_than_to_date?(@from_date, @to_date)
+      @individual_timesheet_report, @total_work_and_leaves = TimeSheet.generate_individual_timesheet_report(@user, params) 
+    else
+      flash[:error] = 'Please select appropriate date'
+    end
   end
 
   def edit_timesheet

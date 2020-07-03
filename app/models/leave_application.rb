@@ -36,7 +36,7 @@ class LeaveApplication
   validate :end_date_less_than_start_date, if: 'start_at.present?'
   validate :validate_date, on: [:create, :update]
 
-  before_save :deduct_available_leave_send_mail
+  after_save :deduct_available_leave_send_mail
   after_update :update_available_leave_send_mail, if: "pending?"
 
   scope :pending, ->{where(leave_status: PENDING)}
