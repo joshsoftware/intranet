@@ -8,6 +8,7 @@
     %th Date
     %th From Time(HH:MM 24hrs)
     %th To Time(HH:MM 24hrs)
+    %th No. of hours
     %th Description
     %tbody
       = f.fields_for :time_sheets, @time_sheets do |time_sheet|
@@ -22,5 +23,6 @@
           %td= time_sheet.input :to_time,
             input_html: {value: time_sheet.object.to_time.try(:strftime, "%H:%M"),
             type: 'time', class: 'timesheet-input'}, label: false
+          %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, prompt: 'Select', label: false
           %td= time_sheet.input :description, as: :text, label: false
   = f.submit :Update, class: "btn edit-timesheet-update"

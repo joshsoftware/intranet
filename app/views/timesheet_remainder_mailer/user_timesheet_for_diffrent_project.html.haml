@@ -78,16 +78,22 @@
                                                       %br
                                                       %table.table-bordered
                                                         %tr
-                                                          %th{style: "padding: 0 10px;"} Project
-                                                          %th{style: "padding: 0 10px;"} Date
-                                                          %th{style: "padding: 0 10px;"} Time
-                                                          %th{style: "padding: 0 10px;"} Description
+                                                          %th{style: "padding: 0 5px;"} Project
+                                                          %th{style: "padding: 0 5px;"} Date
+                                                          %th{style: "padding: 0 5px;"} Time
+                                                          %th{style: "padding: 0 5px;"} Duration
+                                                          %th{style: "padding: 0 5px;"} Description
                                                         - @timesheets.each do|timesheet|
                                                           %tr
-                                                            %td{style: "padding: 0 10px;"} #{timesheet[:project_name]}
-                                                            %td{style: "padding: 0 10px;"} #{timesheet[:date].strftime("%d %B %Y")}
-                                                            %td{style: "padding: 0 10px;"} #{timesheet[:from_time].strftime("%I:%M %p")} to #{timesheet[:to_time].strftime("%I:%M %p")}
-                                                            %td{style: "padding: 0 10px;"} #{timesheet[:description]}
+                                                            %td{style: "padding: 0 5px;"} #{timesheet[:project_name]}
+                                                            %td{style: "padding: 0 5px;"} #{timesheet[:date].strftime("%d %B %Y")}
+                                                            %td{style: "padding: 0 5px;"}
+                                                              - unless timesheet[:from_time].blank? and timesheet[:to_time].blank?
+                                                                #{timesheet[:from_time].strftime("%I:%M %p")} to #{timesheet[:to_time].strftime("%I:%M %p")}
+                                                              - else
+                                                                N.A.
+                                                            %td{style: "padding: 0 5px;"} #{timesheet[:duration]}
+                                                            %td{style: "padding: 0 5px;"} #{timesheet[:description]}
 
                                                     %p{:style => "border-bottom: ridge; padding-bottom: 15px;"}
                                                       If it’s a wrong entry then kindly update it as soon as possible.

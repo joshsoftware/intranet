@@ -179,6 +179,6 @@ class TimeSheetsController < ApplicationController
   end
 
   def timesheet_params
-    params.require(:user).permit(:time_sheets_attributes => [:project_id, :date, :from_time, :to_time, :description, :id, :_destroy, :user_id, :from_date, :to_date ])
+    params.require(:user).permit(:time_sheets_attributes => [:project_id, :date, :from_time, :to_time, :description, :id, :_destroy, :user_id, :from_date, :to_date, :duration ])
   end
 end
