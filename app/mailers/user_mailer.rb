@@ -67,6 +67,13 @@ class UserMailer < ActionMailer::Base
     mail(to: @receiver_emails, subject: "Employees on leave tomorrow.") if leaves.present?
   end
 
+  def invalid_blog_url(user_id)
+    @user = User.where(id: user_id).first
+    hr_emails = User.approved.where(role: 'HR').collect(&:email)
+    @receiver_emails = [hr_emails, @user.email].flatten.join(',')
+    mail(to: @receiver_emails, subject: 'Invalid Blog URL')
+  end
+
   def new_blog_notification(params)
     body = <<-body
       #{params[:post_url]}

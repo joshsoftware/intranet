@@ -225,15 +225,20 @@ class UsersController < ApplicationController
 
     return if blog_url.blank?
 
-    xml_feed = Feedjira::Feed.fetch_raw "#{blog_url}/feed"
+    xml_feed = Feedjira::Feed.fetch_raw get_blog_url(blog_url)
     if xml_feed.eql?(0)
       @blog_message = "The server has not found anything matching the URI given!!"
       return nil
     end
 
-    blog_feed = Feedjira::Feed.parse xml_feed
+    begin
+      blog_feed = Feedjira::Feed.parse xml_feed
+    rescue
+      @blog_message = "Invalid Blog URL!!"
+      UserMailer.delay.invalid_blog_url(@user.id) if @user.is_approved?
+      return nil 
+    end
 
-    return nil if blog_feed.try(:entries).try(:blank?)
     if blog_feed != 0
       blog_feed.entries[0..9]
     else
@@ -242,4 +247,20 @@ class UsersController < ApplicationController
     end
   end
 
+  def get_blog_url(url)
+    if url.include?('medium')
+      medium_url(url)
+    elsif url.include?('blogspot')
+      "#{url}/feeds/posts/default?q=KEYWORD"
+    else
+      "#{url}/feed"
+    end
+  end
+
+  def medium_url(url)
+    domain_name = 'https://medium.com/'
+    parse_url = url.split(/\'medium.com\''|\//)
+    medium_id = parse_url.select { |i| i.start_with?('@') }.first
+    domain_name + 'feed/' + medium_id
+  end
 end
