@@ -19,10 +19,10 @@
             'readonly' => true}, label: false
           %td= time_sheet.input :from_time,
             input_html: {value: time_sheet.object.from_time.try(:strftime, "%H:%M"),
-            type: 'time', class: 'timesheet-input'}, label: false
+            type: 'time', class: 'timesheet-input time-range'}, label: false
           %td= time_sheet.input :to_time,
             input_html: {value: time_sheet.object.to_time.try(:strftime, "%H:%M"),
-            type: 'time', class: 'timesheet-input'}, label: false
-          %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, prompt: 'Select', label: false
+            type: 'time', class: 'timesheet-input time-range'}, label: false
+          %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, placeholder: 'Select', label: false
           %td= time_sheet.input :description, as: :text, label: false
   = f.submit :Update, class: "btn edit-timesheet-update"

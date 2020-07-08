@@ -755,6 +755,7 @@ RSpec.describe TimeSheetsController, type: :controller do
               date: Date.today - 1,
               from_time: '',
               to_time: "#{Date.today - 1} 11:15",
+              duration: nil,
               id: time_sheet.id
             }
           },
@@ -791,6 +792,7 @@ RSpec.describe TimeSheetsController, type: :controller do
               date: Date.today - 1,
               from_time: "#{Date.today - 1} 09:00",
               to_time: '',
+              duration: nil,
               id: time_sheet.id
             }
           },

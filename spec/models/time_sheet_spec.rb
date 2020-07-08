@@ -285,6 +285,64 @@ RSpec.describe TimeSheet, type: :model do
         )
       end
     end
+
+    context 'Duration' do
+      it 'should fail if from_time, to_time and duration is absent' do
+        time_sheet = FactoryGirl.build(:time_sheet,
+          user: user,
+          project: project,
+          date: DateTime.now - 1,
+          from_time: nil,
+          to_time: nil,
+          duration: nil
+        )
+        expect(time_sheet.save).to eq(false)
+        expect(time_sheet.errors[:duration]).
+          to eq(["can't be blank"])
+      end
+
+      it 'should fail if duration is nil and one of from_time and to_time is present and other absent' do
+        time_sheet = FactoryGirl.build(:time_sheet,
+          user: user,
+          project: project,
+          date: DateTime.now - 1,
+          from_time: "#{Date.today} 10:00",
+          to_time: nil,
+          duration: nil
+        )
+        expect(time_sheet.save).to eq(false)
+        expect(time_sheet.errors[:duration]).to eq(["can't be blank"])
+      end
+
+      it 'should pass if duration is present' do
+        time_sheet = FactoryGirl.build(:time_sheet,
+          user: user,
+          project: project,
+          date: DateTime.now - 1,
+          duration: 90,
+          from_time: nil,
+          to_time: nil
+        )
+        expect(time_sheet.save).to eq(true)
+        expect(time_sheet.duration).to eq(90)
+        expect(time_sheet.from_time).to eq(nil)
+        expect(time_sheet.to_time).to eq(nil)
+      end
+
+      it 'should always calculate duration and succeed if valid from_time and to_time present' do
+        time_sheet = FactoryGirl.build(:time_sheet,
+          user: user,
+          project: project,
+          date: Date.today - 1,
+          from_time: "#{Date.today - 1} 10:00",
+          to_time: "#{Date.today - 1} 11:30",
+          duration: 30
+        )
+        time_sheet.save
+        expect(time_sheet.save).to eq(true)
+        expect(time_sheet.duration).to eq(90)
+      end
+    end
   end
 
   context 'Timesheet parse_timesheet_data' do
@@ -354,10 +412,13 @@ RSpec.describe TimeSheet, type: :model do
           project: project,
           start_date: Date.today - 5
         )
-        if Date.today.day == 6
+        # date dependant testcase, on weekends this was causing failures an
+        if Date.today.sunday?
+          date = Date.today - 3
+        elsif Date.today.saturday?
           date = Date.today - 2
         else
-          date = Date.today - 1 
+          date = Date.today - 1
         end
         FactoryGirl.create(:time_sheet,
           user: user,
@@ -655,7 +716,7 @@ RSpec.describe TimeSheet, type: :model do
         Date.yesterday - 1,
         Date.today
       )
-      timesheet_data = TimeSheet.generete_employee_timesheet_report(
+      timesheet_data = TimeSheet.generate_employee_timesheet_report(
         timesheet_record,
         Date.yesterday - 1,
         Date.today,

@@ -16,11 +16,11 @@
             'readonly' => true, value: time_sheet.object.date || Date.today}, label: false
           %td= time_sheet.input :from_time,
             input_html: {value: time_sheet.object.from_time.try(:strftime, "%H:%M"),
-            type: 'time', class: 'timesheet-input', required: true}, label: false, id: 'from-time'
+            type: 'time', class: 'timesheet-input time-range', required: true}, label: false, id: 'from-time'
           %td= time_sheet.input :to_time,
             input_html: {value: time_sheet.object.to_time.try(:strftime, "%H:%M"),
-            type: 'time', class: 'timesheet-input'}, label: false
-          %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, prompt: 'Select', label: false
+            type: 'time', class: 'timesheet-input time-range'}, label: false
+          %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, placeholder: 'Select', label: false
           %td= time_sheet.input :description, as: :text, label: false
           %td= time_sheet.link_to_remove '', class: 'icon-remove'
   = f.hidden_field :user_id, value: @user.id

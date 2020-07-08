@@ -327,7 +327,7 @@ class TimeSheet
     return time_sheet_log, time_sheet_message
   end
 
-  def self.generete_employee_timesheet_report(timesheets, from_date, to_date, current_user)
+  def self.generate_employee_timesheet_report(timesheets, from_date, to_date, current_user)
     timesheet_reports = []
     timesheets.each do |timesheet|
       user = load_user_with_id(timesheet['_id'])
@@ -605,7 +605,7 @@ class TimeSheet
 
   def self.format_time(time_sheet)
     from_time, to_time = "N.A.", "N.A."
-    unless time_sheet.from_time.blank? and time_sheet.to_time.blank?
+    unless time_sheet.from_time.blank? or time_sheet.to_time.blank?
       from_time = time_sheet.from_time.strftime("%I:%M%p")
       to_time = time_sheet.to_time.strftime("%I:%M%p")
     end
@@ -641,7 +641,7 @@ class TimeSheet
   end
 
   def self.calculate_working_minutes(time_sheet)
-    unless time_sheet.from_time.blank? and time_sheet.to_time.blank?
+    unless time_sheet.from_time.blank? or time_sheet.to_time.blank?
       return TimeDifference.between(time_sheet.to_time, time_sheet.from_time).in_minutes
     end
     return time_sheet.duration
@@ -909,7 +909,7 @@ class TimeSheet
     params['time_sheets_attributes'].each do |key, value|
       time_sheet = time_sheets.find(value[:id])
       value['updated_by'] = current_user.id
-      unless value[:from_time].blank? and value[:to_time].blank?
+      unless value[:from_time].blank? or value[:to_time].blank?
         value['from_time']  = value['date'] + ' ' + value['from_time']
         value['to_time']    = value['date'] + ' ' + value['to_time']
         unless time_sheet.time_validation(value['date'], value['from_time'], value['to_time'], 'from_ui')
@@ -918,10 +918,10 @@ class TimeSheet
           next
         end
       end
+      updated_time_sheets << time_sheet
       if time_sheet.update_attributes(value)
         return_value << true
       else
-        updated_time_sheets << time_sheet
         return_value << false
       end
     end
@@ -936,7 +936,7 @@ class TimeSheet
       value['created_by'] = current_user.id
       time_sheet = TimeSheet.new
       value.delete("_destroy")
-      unless value[:from_time].blank? and value[:to_time].blank?
+      unless value[:from_time].blank? or value[:to_time].blank?
         value['from_time']  = value['date'] + ' ' + value['from_time']
         value['to_time']    = value['date'] + ' ' + value['to_time']
         unless time_sheet.time_validation(value['date'], value['from_time'], value['to_time'], 'from_ui')
@@ -946,10 +946,10 @@ class TimeSheet
         end
       end
       time_sheet.attributes = value
+      time_sheets << time_sheet
       if time_sheet.save
         return_value << true
       else
-        time_sheets << time_sheet
         return_value << false
       end
     end
@@ -1091,12 +1091,7 @@ class TimeSheet
               "project_id" => "$project_id"
             },
             "totalSum" => {
-              "$sum" => {
-                "$subtract" => [
-                  "$to_time",
-                  "$from_time"
-                ]
-              }
+              "$sum" => "$duration"
             }
           }
         },
@@ -1106,7 +1101,13 @@ class TimeSheet
             "working_status" => {
               "$push" => {
                 "project_id" => "$_id.project_id",
-                "total_time" => "$totalSum"
+                "total_time" => {
+                  "$multiply" => [
+                    "$totalSum",
+                    60,
+                    1000
+                  ]                       #conversion of minutes into milliseconds
+                }
               }
             }
           }
