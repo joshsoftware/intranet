@@ -16,30 +16,55 @@ class TimeSheet
   belongs_to :user
   belongs_to :project
 
-  validates :from_time, :to_time, uniqueness: { scope: [:user_id, :date], message: "Record already present" }, if: :is_from_time_and_to_time_present?
   validates :project_id, :date, :description, presence: true
-
-  validates :date, presence: true, if: :is_future_date?
-  validates :duration, presence: true, unless: :is_from_time_and_to_time_present?
-  validate :from_time_is_future_time?, :to_time_is_future_time?, :time_sheet_overlapping?, if: :is_from_time_and_to_time_present?
+  validate :is_future_date?
   before_validation :valid_date_for_create?, unless: :is_management?
+
+  validates :from_time, :to_time, uniqueness: { scope: [:user_id, :date], message: "Record already present" }, if: :is_from_time_and_to_time_present?
+  # when both of them are absent thats when we have to check for the duration
+  validates :duration, presence: true, unless: :is_from_time_or_to_time_present?
+  # when atleast one of those is present thats when check for others presence
+  validate :presence_of_from_time_and_to_time?, if: :is_from_time_or_to_time_present?
+  validate :from_time_is_future_time?, :to_time_is_future_time?, :time_sheet_overlapping?, if: :is_from_time_and_to_time_present?
 
   before_save do
     self.duration = TimeSheet.calculate_working_minutes(self)
   end
   # validate :timesheet_date_greater_than_project_start_date, if: :is_project_assigned_to_user?
 
-  DURATION_HASH = {30 => "30 mins", 60 => "1 hour", 90 => "1 hour 30 mins", 120 => "2 hours", 150 => "2 hours 30 mins", 180 => "3 hours", 210 => "3 hours 30 mins", 240 => "4 hours", 270 => "4 hours 30 mins", 300 => "5 hours", 330 => "5 hours 30 mins", 360 => "6 hours", 390 => "6 hours 30 mins", 420 => "7 hours", 450 => "7 hours 30 mins", 480 => "8 hours"}
+  DURATION_HASH = {
+    30 => "30 mins", 60 => "1 hour", 90 => "1 hour 30 mins",
+    120 => "2 hours", 150 => "2 hours 30 mins", 180 => "3 hours",
+    210 => "3 hours 30 mins", 240 => "4 hours", 270 => "4 hours 30 mins",
+    300 => "5 hours", 330 => "5 hours 30 mins", 360 => "6 hours",
+    390 => "6 hours 30 mins", 420 => "7 hours",
+    450 => "7 hours 30 mins", 480 => "8 hours"
+  }
   MAX_TIMESHEET_COMMAND_LENGTH = 5
   DATE_FORMAT_LENGTH = 3
   MAX_DAILY_STATUS_COMMAND_LENGTH = 2
   ALLOCATED_HOURS = 8
   DAYS_FOR_UPDATE = 7
   DAYS_FOR_CREATE = 7
-  PENDING_THRESHOLD = 3                     #threshold pending days after which mail will be sent to all receivers
+  #threshold pending days after which mail will be sent to all receivers
+  PENDING_THRESHOLD = 3
 
   def is_from_time_and_to_time_present?
     from_time.present? and to_time.present?
+  end
+
+  def is_from_time_or_to_time_present?
+    from_time.present? or to_time.present?
+  end
+
+  def presence_of_from_time_and_to_time?
+    text = "can't be blank"
+    unless to_time.present?
+      errors.add(:to_time, text)
+    end
+    unless from_time.present?
+      errors.add(:from_time, text)
+    end
   end
 
   def parse_timesheet_data(params)
@@ -946,10 +971,10 @@ class TimeSheet
         end
       end
       time_sheet.attributes = value
-      time_sheets << time_sheet
       if time_sheet.save
         return_value << true
       else
+        time_sheets << time_sheet
         return_value << false
       end
     end
@@ -1070,6 +1095,7 @@ class TimeSheet
     end
   end
 
+  # conversion of minutes into milliseconds
   def self.load_timesheet(timesheet_ids, from_date, to_date)
     TimeSheet.collection.aggregate(
       [
@@ -1106,7 +1132,7 @@ class TimeSheet
                     "$totalSum",
                     60,
                     1000
-                  ]                       #conversion of minutes into milliseconds
+                  ]
                 }
               }
             }
@@ -1116,6 +1142,7 @@ class TimeSheet
     )
   end
 
+  # duration is in minutes and we are calculating worked hours by milliseconds
   def self.load_projects_report(from_date, to_date)
     TimeSheet.collection.aggregate([
       {
@@ -1132,10 +1159,11 @@ class TimeSheet
             "project_id"=>"$project_id"
           },
           "totalSum"=>{
-            "$sum"=>{
-              "$subtract"=>[
-                "$to_time",
-                "$from_time"
+            "$sum"=> {
+              "$multiply" => [
+                "$duration",
+                60,
+                1000
               ]
             }
           }
@@ -1163,9 +1191,10 @@ class TimeSheet
           },
           "totalSum" => {
             "$sum" => {
-              "$subtract" => [
-                "$to_time",
-                "$from_time"
+              "$multiply" => [
+                "$duration",
+                60,
+                1000
               ]
             }
           }

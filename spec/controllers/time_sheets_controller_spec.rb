@@ -590,6 +590,48 @@ RSpec.describe TimeSheetsController, type: :controller do
         expect(time_sheet.reload.updated_by).to eq(user.id.to_s)
       end
 
+      it 'if duration is present' do
+        sign_in user
+        FactoryGirl.create(:user_project,
+          user: user,
+          project: project,
+          start_date: Date.today - 10
+        )
+        time_sheet = FactoryGirl.create(:time_sheet,
+          user: user,
+          project: project,
+          date: Date.today - 1,
+          from_time: "#{Date.today - 1} 10:00",
+          to_time: "#{Date.today - 1} 11:30"
+        )
+        params = {
+          time_sheets_attributes: {
+            "0" => {
+              project_id: project.id,
+              date: Date.today - 1,
+              from_time: nil,
+              to_time: nil,
+              duration: 120,
+              description: 'testing API and call with client',
+              id: time_sheet.id
+            }
+          },
+          id:user.id
+        }
+        put :update_timesheet, user_id: user.id,
+          user: params,
+          time_sheet_date: Date.today - 1
+        expect(time_sheet.reload.from_time).
+          to eq(nil)
+        expect(time_sheet.reload.to_time).
+          to eq(nil)
+        expect(time_sheet.reload.description).
+          to eq('testing API and call with client')
+        expect(time_sheet.reload.duration).
+          to eq(120)
+        expect(time_sheet.reload.updated_by).to eq(user.id.to_s)
+      end
+
       it 'if timesheet date is not less than 2 days in case of Employee' do
         sign_in employee
         FactoryGirl.create(:user_project,
@@ -808,6 +850,96 @@ RSpec.describe TimeSheetsController, type: :controller do
         should render_template(:edit_timesheet)
       end
 
+      it 'if duration, from_time and to_time is absent' do
+        sign_in user
+        FactoryGirl.create(:user_project,
+          user: user,
+          project: project,
+          start_date: Date.today - 10
+        )
+        time_sheet = FactoryGirl.create(:time_sheet,
+          user: user,
+          project: project,
+          date: Date.today - 1,
+          from_time: "#{Date.today - 1} 10:00",
+          to_time: "#{Date.today - 1} 11:30",
+          description: 'testing test-suite'
+        )
+        from_time = time_sheet.from_time
+        to_time = time_sheet.to_time
+        params = {
+          time_sheets_attributes: {
+            "0" => {
+              project_id: project.id,
+              date: Date.today - 1,
+              from_time: nil,
+              to_time: nil,
+              duration: nil,
+              description: 'testing API and call with client',
+              id: time_sheet.id
+            }
+          },
+          id:user.id
+        }
+        put :update_timesheet, user_id: user.id,
+          user: params,
+          time_sheet_date: Date.today - 1
+        expect(time_sheet.reload.from_time).
+          to eq(from_time)
+        expect(time_sheet.reload.to_time).
+          to eq(to_time)
+        expect(time_sheet.reload.description).
+          to eq('testing test-suite')
+        expect(time_sheet.reload.duration).
+          to eq(90)
+        should render_template(:edit_timesheet)
+      end
+
+      it 'if duration and one of from_time and to_time is absent' do
+        sign_in user
+        FactoryGirl.create(:user_project,
+          user: user,
+          project: project,
+          start_date: Date.today - 10
+        )
+        time_sheet = FactoryGirl.create(:time_sheet,
+          user: user,
+          project: project,
+          date: Date.today - 1,
+          from_time: "#{Date.today - 1} 10:00",
+          to_time: "#{Date.today - 1} 11:30",
+          description: 'testing test-suite'
+        )
+        from_time = time_sheet.from_time
+        to_time = time_sheet.to_time
+        params = {
+          time_sheets_attributes: {
+            "0" => {
+              project_id: project.id,
+              date: Date.today - 1,
+              from_time: "#{Date.today - 1} 11:00",
+              to_time: nil,
+              duration: nil,
+              description: 'testing API and call with client',
+              id: time_sheet.id
+            }
+          },
+          id:user.id
+        }
+        put :update_timesheet, user_id: user.id,
+          user: params,
+          time_sheet_date: Date.today - 1
+        expect(time_sheet.reload.from_time).
+          to eq(from_time)
+        expect(time_sheet.reload.to_time).
+          to eq(to_time)
+        expect(time_sheet.reload.description).
+          to eq('testing test-suite')
+        expect(time_sheet.reload.duration).
+          to eq(90)
+        should render_template(:edit_timesheet)
+      end
+
       it "if timesheet date is less than #{ TimeSheet::DAYS_FOR_UPDATE } days in case of Employee" do
         sign_in employee
         FactoryGirl.create(:user_project,
@@ -939,14 +1071,15 @@ RSpec.describe TimeSheetsController, type: :controller do
       )
     }
 
-    it 'Should add timesheet' do
-      params = { 
+    it 'Should add timesheet if from_time and to_time is present' do
+      params = {
         time_sheets_attributes: {
           "0" => {
             project_id: "#{project.id}", 
             date: "#{Date.today - 1}",
             from_time: "#{Date.today - 1} 10:00", 
             to_time: "#{Date.today - 1} 11:00",
+            duration: nil,
             description: "testing API and call with client"
           }
         },
@@ -960,6 +1093,54 @@ RSpec.describe TimeSheetsController, type: :controller do
       expect(user.reload.time_sheets[0].user_id).to eq(user.id)
       expect(user.time_sheets[0].project_id).to eq(project.id)
       expect(user.time_sheets[0].created_by).to eq(user.id.to_s)
+    end
+
+    it 'Should add timesheet if duration is present' do
+      params = {
+        time_sheets_attributes: {
+          "0" => {
+            project_id: "#{project.id}",
+            date: "#{Date.today - 1}",
+            from_time: nil,
+            to_time: nil,
+            duration: 60,
+            description: "testing API and call with client"
+          }
+        },
+        user_id: user.id,
+        from_date: Date.today - 20,
+        to_date: Date.today
+      }
+      sign_in user
+      post :add_time_sheet, user_id: user.id, user: params
+      expect(flash[:notice]).to be_present
+      expect(user.reload.time_sheets[0].user_id).to eq(user.id)
+      expect(user.time_sheets[0].project_id).to eq(project.id)
+      expect(user.time_sheets[0].created_by).to eq(user.id.to_s)
+    end
+
+    it 'Should not add timesheet if only from_time or to_time is present' do
+      params = {
+        time_sheets_attributes: {
+          "0" => {
+            project_id: "#{project.id}",
+            date: "#{Date.today - 1}",
+            from_time: "#{Date.today - 1} 10:00",
+            to_time: nil,
+            duration: nil,
+            description: "testing API and call with client"
+          }
+        },
+        user_id: user.id,
+        from_date: Date.today - 20,
+        to_date: Date.today
+      }
+      sign_in user
+      post :add_time_sheet, user_id: user.id, user: params
+      assigns(:time_sheets)[0].errors.full_messages ==
+        ["To time can't be blank"]
+      expect(TimeSheet.count).to eq(0)
+      should render_template(:new)
     end
 
     it 'Should not add timesheet because validation failure' do

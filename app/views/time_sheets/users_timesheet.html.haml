@@ -12,13 +12,9 @@
   -@individual_timesheet_report.each do |key, value|
     %h2 #{key}
     %table.table
-      %col{:width => '130'}
-      %col{:width => '130'}
-      %col{:width => '130'}
-      %col{:width => '180'}
+      %col{:width => '200'}
+      %col{:width => '200'}
       %th Date
-      %th From time
-      %th To time
       %th Total Work(in hours)
       %th Description
       %descripton
@@ -27,8 +23,6 @@
           %tr
             -ds.each do |record|
               %td= link_to record['date'], edit_time_sheets_path(@user.id, time_sheet_date: record['date'], time_sheet_id: record['id'], from_date: @from_date, to_date: @to_date)
-              %td= record['from_time']
-              %td= record['to_time']
               %td= record['total_worked']
               %td= record['description']
         -total_worked_hours = value["total_worked_hours"]

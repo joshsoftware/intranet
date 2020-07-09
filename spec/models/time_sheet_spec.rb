@@ -311,7 +311,7 @@ RSpec.describe TimeSheet, type: :model do
           duration: nil
         )
         expect(time_sheet.save).to eq(false)
-        expect(time_sheet.errors[:duration]).to eq(["can't be blank"])
+        expect(time_sheet.errors[:to_time]).to eq(["can't be blank"])
       end
 
       it 'should pass if duration is present' do
