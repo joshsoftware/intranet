@@ -1391,6 +1391,7 @@
 						newViewDate = this.moveAvailableDate(focusDate, dir, 'moveWeek');
 					}
 					if (newViewDate){
+						this._toggle_multidate(newViewDate);
 						this.focusDate = this.viewDate = newViewDate;
 						this.setValue();
 						this.fill();
