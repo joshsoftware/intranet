@@ -456,6 +456,31 @@ class TimeSheet
     end
   end
 
+  def self.generate_and_send_weekend_report(holiday_list, start_date)
+    weekend_report = []
+    holiday_list.each do |date|
+      project_ids = TimeSheet.where(date: date).map(&:project_id).uniq
+      project_ids.each do |project|
+        users = TimeSheet.where(date: date, project_id: project)
+                         .order(:start_time.asc)
+                         .map(&:user_id).uniq
+        users.each do |user|
+          timesheets = TimeSheet.where(date: date, project_id: project, user_id: user)
+          weekend_report += timesheets.map { |i| [ i.project.name, 
+                                                   i.user.name, 
+                                                   i.date.to_s,  
+                                                   i.from_time.strftime("%I:%M%p"), 
+                                                   i.to_time.strftime("%I:%M%p"),
+                                                   i.description] }
+        end 
+      end
+    end
+    if weekend_report.present?
+      csv = generate_weekend_report_in_csv_format(weekend_report)
+      WeeklyTimesheetReportMailer.send_weekend_timesheet_report(csv, start_date).deliver_now!
+    end
+  end
+
   def self.get_time_sheet_and_calculate_total_minutes(user, project, from_date, to_date)
     users_without_timesheet = []
     total_minutes = 0
@@ -680,6 +705,18 @@ class TimeSheet
 
   def self.generate_weekly_report_in_csv_format(weekly_report)
     headers = ['Employee name', 'Project name', 'No of days worked', 'Leaves', 'Holidays']
+    weekly_report_in_csv =
+      CSV.generate(headers: true) do |csv|
+        csv << headers
+        weekly_report.each do |report|
+          csv << report
+        end
+      end
+    weekly_report_in_csv
+  end
+
+  def self.generate_weekend_report_in_csv_format(weekly_report)
+    headers = ['Project Name', 'Employee Name', 'Date', 'From Time', 'To Time', 'Description']
     weekly_report_in_csv =
       CSV.generate(headers: true) do |csv|
         csv << headers

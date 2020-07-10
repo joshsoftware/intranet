@@ -9,6 +9,19 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
     mail(subject: 'Weekly timesheet report', to: emails)
   end
 
+  def send_weekend_timesheet_report(csv, start_date)
+    attachments["weekend_timesheet_report_#{Date.today}.csv"] = csv
+    hr_emails = User.approved.where(role: 'HR').collect(&:email)
+    emails = [ 'sameert@joshsoftware.com', 
+               'shailesh.kalekar@joshsoftware.com',
+               hr_emails ].flatten
+    @start_date = start_date.strftime('%d %B')
+    mail(
+      subject: "Weekend Timesheet Report (#{start_date.strftime('%d %B')} - #{Date.today.strftime('%d %B')})",
+      to: emails
+    )
+  end
+
   def send_report_who_havent_filled_timesheet( options = {} )
     @text = options[:text]
     attachments["Employees- Not Filled Timesheet.csv"] = options[:csv]

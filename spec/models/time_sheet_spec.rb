@@ -2010,6 +2010,46 @@ RSpec.describe TimeSheet, type: :model do
       timesheet    = FactoryGirl.create(:time_sheet, user: user, project: project)
     end
   end
+
+  context "Employee's weekend work" do
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
+    let!(:user_hr) { FactoryGirl.create(:user, role: 'HR', status: STATUS[2]) }
+    let!(:project) { FactoryGirl.create(:project, timesheet_mandatory: true) }
+    
+    before do
+      ActionMailer::Base.deliveries = []
+      @start_date = Date.today - 14
+    end
+
+    it 'send mail- when employee have filled timesheet on weekend' do
+      FactoryGirl.create(:user_project, start_date: Date.today - 20,
+                                        user: user,
+                                        project: project)
+      date = Date.today - Date.today.wday
+      FactoryGirl.create(:time_sheet, date: date, user: user, project: project )
+      TimeSheet.generate_and_send_weekend_report([date], @start_date)
+
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect(ActionMailer::Base.deliveries.first.subject).to eq(
+        "Weekend Timesheet Report (#{@start_date.strftime('%d %B')} - #{Date.today.strftime('%d %B')})"
+      )
+    end
+
+    it 'send mail- when employee have filled timesheet on holiday' do
+      FactoryGirl.create(:user_project, start_date: Date.today - 20,
+                                        user: user,
+                                        project: project)
+      date = Date.today - 1
+      FactoryGirl.build(:holiday, holiday_date: date, reason: 'Test')
+      FactoryGirl.create(:time_sheet, date: date, user: user, project: project )
+      TimeSheet.generate_and_send_weekend_report([date], @start_date)
+
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect(ActionMailer::Base.deliveries.first.subject).to eq(
+        "Weekend Timesheet Report (#{@start_date.strftime('%d %B')} - #{Date.today.strftime('%d %B')})"
+      )
+    end
+  end
   
   context "User without time_sheet" do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
