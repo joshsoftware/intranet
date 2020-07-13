@@ -2,7 +2,7 @@
   = f.simple_fields_for :employee_detail do |e|
     = e.input :employee_id, label: "Employee Id", disabled: true
     = e.input :location, as: :select, collection: [["Pune","Pune"],["Plano", "Plano"]], label: "Employee Location", prompt: 'Select Location', selected: e.object.try(:location)
-    = e.input :designation, as: :select, collection: Designation.all, prompt: 'Select Designation', selected: e.object.try(:designation_id)
+    = e.input :designation, as: :select, collection: Designation.all.sort_by(&:name), input_html: {class: 'designations', style: "width: 206px"}, prompt: 'Select Designation', selected: e.object.try(:designation_id)
     = e.input :designation_track, as: :select, collection: EmployeeDetail::DESIGNATION_TRACKS, prompt: 'Select Designation Track', selected: e.object.try(:designation_track), hint: 'This track will be used to show designation hierarchy under assessments.'
     = e.input :description, as: :text, input_html: {class: 'text-description'}
     = e.input :date_of_relieving, input_html: {class: 'datepicker', 'data-behaviour' => 'datepicker', value: @user.employee_detail.date_of_relieving.try(:strftime, '%d-%m-%Y')}
@@ -10,7 +10,7 @@
     = e.label "Is Billable"
     .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "Yes", "data-off-label" => "No"}
       = e.check_box :is_billable, {}, 'Yes', 'No'
-  = f.input :project_ids, collection: @projects, input_html: {class: 'notification_emails', multiple: true, style: "width:300px;", "data-placeholder" => "Add projects"}, label: "Projects", disabled: true
+  = f.input :project_ids, collection: @projects, input_html: {class: 'project_ids', multiple: true, style: "width:300px;", "data-placeholder" => "Add projects"}, label: "Projects", disabled: true
   = f.submit :save, class: "btn controls"
 - if @notify_users
   %h4 Current Notification to
@@ -24,3 +24,5 @@
         %td= n.email
 :javascript
   $(".notification_emails").select2();
+  $(".project_ids").select2();
+  $(".designations").select2();

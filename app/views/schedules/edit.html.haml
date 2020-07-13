@@ -28,8 +28,8 @@
 
   = schedule.submit :save, class: "btn"
 
-  :javascript
-  loadFunction= function() {
+:javascript
+  loadFunction = function() {
     console.log('in load function');
     $.validator.addMethod("skype_tip", function(value) {     
       if($('#schedule_interview_type').val()=='Skype')

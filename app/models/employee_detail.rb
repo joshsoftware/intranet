@@ -1,7 +1,7 @@
 class EmployeeDetail
   include Mongoid::Document
   include Mongoid::Timestamps
-  include  UserDetail
+  include UserDetail
   DESIGNATION_TRACKS = ['Software Engineer', 'QA Engineer', 'UI/UX Designer']
   embedded_in :user
 
