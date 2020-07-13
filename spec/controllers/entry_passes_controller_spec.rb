@@ -19,11 +19,12 @@ RSpec.describe EntryPassesController, type: :controller do
         user = FactoryGirl.create(:user)
         sign_out @admin
         sign_in user
+        entry_pass = FactoryGirl.attributes_for(:entry_pass, user: user)
         Sidekiq::Extensions::DelayedMailer.jobs.clear
         post :create, { user: { entry_passes_attributes: {
-            '0' => { date: Date.today }
+            '0' => entry_pass
           }}, format: :js }
-        expect(flash[:success]).to eq("Entry Pass Created Succesfully")
+        expect(flash[:success]).to eq("Entry Pass Created Successfully")
         expect(user.entry_passes.count).to eq(1)
         expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
       end
@@ -41,7 +42,7 @@ RSpec.describe EntryPassesController, type: :controller do
                 '1' => entry_pass2.attributes
             }}, format: :js}
         user.reload
-        expect(flash[:success]).to eq("Entry Pass Created Succesfully")
+        expect(flash[:success]).to eq("Entry Pass Created Successfully")
         expect(user.entry_passes.count).to eq(1)
         expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(0)
       end
@@ -52,19 +53,64 @@ RSpec.describe EntryPassesController, type: :controller do
         sign_in user
         entry_pass1 = FactoryGirl.create(:entry_pass, user: user, date: Date.today)
         entry_pass2 = FactoryGirl.create(:entry_pass, user: user, date: Date.today + 1)
-        entry_pass2.attributes['_destroy'] = '1'
+        entry_pass3 = FactoryGirl.attributes_for(:entry_pass, user: user, date: Date.today + 2)
         Sidekiq::Extensions::DelayedMailer.jobs.clear
         params =  { user:
                     { "entry_passes_attributes" => {
                       '0' => entry_pass1.attributes,
                       '1' => entry_pass2.attributes,
-                      '2' => { date: Date.today + 2, user: user }
+                      '2' => entry_pass3
                     }
                   }, format: :js}
         post :create, params
-        expect(flash[:success]).to eq("Entry Pass Created Succesfully")
-        expect(user.entry_passes.count).to eq(2)
+        expect(flash[:success]).to eq("Entry Pass Created Successfully")
+        expect(user.entry_passes.count).to eq(3)
         expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
+      end
+    end
+
+    context 'fail creating pass' do
+      it 'should not create pass if details is absent' do
+        user = FactoryGirl.create(:user)
+        sign_out @admin
+        sign_in user
+        entry_pass = FactoryGirl.attributes_for(:entry_pass, user: user)
+        Sidekiq::Extensions::DelayedMailer.jobs.clear
+        post :create, { user: { entry_passes_attributes: {
+            '0' => { date: Date.today }
+          }}, format: :js }
+        expect(flash[:error]).to eq("Error while creating entry passes, please try again.")
+        expect(user.entry_passes.count).to eq(0)
+        expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(0)
+      end
+
+      it 'should not create pass if date is absent' do
+        user = FactoryGirl.create(:user)
+        sign_out @admin
+        sign_in user
+        entry_pass = FactoryGirl.attributes_for(:entry_pass, user: user)
+        Sidekiq::Extensions::DelayedMailer.jobs.clear
+        post :create, { user: { entry_passes_attributes: {
+            '0' => { details: "Deployment near. 10 - 5" }
+          }}, format: :js }
+        expect(flash[:error]).to eq("Error while creating entry passes, please try again.")
+        expect(user.entry_passes.count).to eq(0)
+        expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(0)
+      end
+
+      it 'should not create pass if date is already present' do
+        user = FactoryGirl.create(:user)
+        sign_out @admin
+        sign_in user
+        entry_pass = FactoryGirl.create(:entry_pass, user: user)
+        Sidekiq::Extensions::DelayedMailer.jobs.clear
+        post :create, { user: { entry_passes_attributes: {
+            '0' => entry_pass.attributes,
+            '1' => { date: Date.today, details: "Deployment near. 10 - 5" }
+          }}, format: :js }
+        expect(flash[:error]).to eq("Error while creating entry passes, please try again.")
+        expect(user.entry_passes.count).to eq(1)
+        expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(0)
       end
     end
   end
@@ -75,10 +121,10 @@ RSpec.describe EntryPassesController, type: :controller do
         user = FactoryGirl.create(:user)
         sign_out @admin
         sign_in user
-        entry_pass1 = FactoryGirl.create(:entry_pass, user: user, date: Date.today)
+        entry_pass1 = FactoryGirl.create(:entry_pass, user: user)
         Sidekiq::Extensions::DelayedMailer.jobs.clear
         delete :destroy, id: entry_pass1.id
-        expect(flash[:success]).to eq("Entry Pass deleted succesfully")
+        expect(flash[:success]).to eq("Entry Pass deleted successfully")
         expect(user.entry_passes.count).to eq(0)
         expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(0)
       end
@@ -88,7 +134,7 @@ RSpec.describe EntryPassesController, type: :controller do
         entry_pass1 = FactoryGirl.create(:entry_pass, user: user)
         Sidekiq::Extensions::DelayedMailer.jobs.clear
         delete :destroy, id: entry_pass1.id
-        expect(flash[:success]).to eq("Entry Pass deleted succesfully")
+        expect(flash[:success]).to eq("Entry Pass deleted successfully")
         expect(user.entry_passes.count).to eq(0)
         expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
       end
