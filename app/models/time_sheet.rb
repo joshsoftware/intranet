@@ -934,16 +934,15 @@ class TimeSheet
     params['time_sheets_attributes'].each do |key, value|
       time_sheet = time_sheets.find(value[:id])
       value['updated_by'] = current_user.id
+      updated_time_sheets << time_sheet
       unless value[:from_time].blank? or value[:to_time].blank?
         value['from_time']  = value['date'] + ' ' + value['from_time']
         value['to_time']    = value['date'] + ' ' + value['to_time']
         unless time_sheet.time_validation(value['date'], value['from_time'], value['to_time'], 'from_ui')
           return_value << false
-          updated_time_sheets << time_sheet
           next
         end
       end
-      updated_time_sheets << time_sheet
       if time_sheet.update_attributes(value)
         return_value << true
       else
