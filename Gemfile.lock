@@ -65,7 +65,7 @@ GIT
 
 GIT
   remote: git@github.com:joshsoftware/lightair.git
-  revision: 62f742f77d6385f1017254528131c2146e682212
+  revision: 4d3bea6a3ec1a47b5b4d0f110cc120772b7c3a79
   branch: engine
   specs:
     light (0.0.1)
@@ -102,7 +102,7 @@ GIT
 
 GIT
   remote: git@github.com:joshsoftware/screamout.git
-  revision: 128f88d6c72d5fb6fb88775e4b8223ed589a7016
+  revision: 8389d97c2962796d501e8aaea5dbd13386a75d58
   branch: engine
   specs:
     screamout (0.0.1)
