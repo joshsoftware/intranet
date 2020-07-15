@@ -26,10 +26,7 @@ class TimeSheet
   # when atleast one of those is present thats when check for others presence
   validate :presence_of_from_time_and_to_time?, if: :is_from_time_or_to_time_present?
   validate :from_time_is_future_time?, :to_time_is_future_time?, :time_sheet_overlapping?, if: :is_from_time_and_to_time_present?
-
-  before_save do
-    self.duration = TimeSheet.calculate_working_minutes(self)
-  end
+  validate :working_hours_less_than_max_threshold
   # validate :timesheet_date_greater_than_project_start_date, if: :is_project_assigned_to_user?
 
   DURATION_HASH = {
@@ -45,9 +42,12 @@ class TimeSheet
   MAX_DAILY_STATUS_COMMAND_LENGTH = 2
   ALLOCATED_HOURS = 8
   DAYS_FOR_UPDATE = 7
-  DAYS_FOR_CREATE = 7
-  #threshold pending days after which mail will be sent to all receivers
+  # change it back after running rake task to calculate duration
+  DAYS_FOR_CREATE = Date.today - TimeSheet.first.date
+  # threshold pending days after which mail will be sent to all receivers
   PENDING_THRESHOLD = 3
+  # Working hours threshold for a day
+  WORKING_HOURS_THRESHOLD = 24
 
   def is_from_time_and_to_time_present?
     from_time.present? and to_time.present?
@@ -64,6 +64,21 @@ class TimeSheet
     end
     unless from_time.present?
       errors.add(:from_time, text)
+    end
+  end
+
+  # this method is used to check if total worked hours for a day is within limit
+  def working_hours_less_than_max_threshold
+    total_duration = TimeSheet.where(user: user, date: date).sum(:duration)
+    # here to_i is used as calculate_working_minutes for time-range return float which causes issues
+    self.duration = TimeSheet.calculate_working_minutes(self).to_i
+    total_duration += duration
+    # for update purpose if record persists deduct previous duration
+    # duration_was in condition if previous duration is nil
+    total_duration -= duration_was if persisted? and duration_was
+    total_hours_worked = TimeSheet.total_worked_in_hours(total_duration)
+    if total_hours_worked > WORKING_HOURS_THRESHOLD
+      errors.add(:duration, "total working hours can't exceed #{WORKING_HOURS_THRESHOLD} hours")
     end
   end
 
