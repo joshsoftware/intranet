@@ -1166,6 +1166,35 @@ RSpec.describe TimeSheetsController, type: :controller do
       should render_template(:new)
     end
 
+    it 'should not add timesheet if total hours exceeds WORKING_HOURS_THRESHOLD hours' do
+      FactoryGirl.create(:time_sheet,
+        user: user,
+        project: project,
+        date: Date.today - 1,
+        from_time: "#{Date.today - 1} 01:00",
+        to_time: "#{Date.today - 1} 20:30"
+      )
+      params = {
+        time_sheets_attributes: {
+          "0" => {
+            project_id: "#{project.id}",
+            date: "#{Date.today - 1}",
+            duration: 300,
+            description: "testing API and call with client"
+          }
+        },
+        user_id: user.id,
+        from_date: Date.today - 20,
+        to_date: Date.today
+      }
+      sign_in user
+      post :add_time_sheet, user_id: user.id, user: params
+      expect(assigns(:time_sheets)[0].errors.full_messages)
+        .to eq(["Duration total working hours can't exceed 24 hours"])
+      expect(TimeSheet.count).to eq(1)
+      should render_template(:new)
+    end
+
     it 'should add only valid timesheets' do
       sign_in user
       params = {

@@ -342,6 +342,26 @@ RSpec.describe TimeSheet, type: :model do
         expect(time_sheet.save).to eq(true)
         expect(time_sheet.duration).to eq(90)
       end
+
+      it "should fail to save if total worked hours of a day exceed #{TimeSheet::WORKING_HOURS_THRESHOLD} hours" do
+        FactoryGirl.create(:time_sheet,
+          user: user,
+          project: project,
+          date: Date.today - 1,
+          from_time: "#{Date.today - 1} 01:00",
+          to_time: "#{Date.today - 1} 20:30"
+        )
+        time_sheet = FactoryGirl.build(:time_sheet,
+          user: user,
+          project: project,
+          from_time: nil,
+          to_time: nil,
+          date: Date.today - 1,
+          duration: 300
+        )
+        expect(time_sheet.save).to eq(false)
+        expect(time_sheet.errors[:duration]).to eq(["total working hours can't exceed #{TimeSheet::WORKING_HOURS_THRESHOLD} hours"])
+      end
     end
   end
 
