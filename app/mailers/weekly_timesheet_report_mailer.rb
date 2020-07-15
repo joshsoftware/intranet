@@ -44,8 +44,11 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
                 project_name: options[:project_name]
               }
     )
-    attachment = Base64.encode64(data_file)
-    attachments["Timesheet_report_from #{options[:from_date]} to #{options[:to_date]}.xlsx"] = {mime_type: Mime[:xlsx], content: attachment, encoding: 'base64'}
+
+    attachment = { mime_type: Mime[:xlsx],
+                   content: data_file }
+
+    attachments["Timesheet_report_from #{options[:from_date]} to #{options[:to_date]}.xlsx"] = attachment
     mail(
       subject: options[:subject],
       to: options[:user_email]
