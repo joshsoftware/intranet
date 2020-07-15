@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :project do
-    name { Faker::App.name }
+    name { Faker::App.name.gsub(/\W/, '') }
     code_climate_id { Faker::Bank.swift_bic }
     code_climate_snippet { Faker::Book.title }
     code { Faker::Lorem.characters(10) }
