@@ -516,11 +516,10 @@ class TimeSheet
                          .map(&:user_id).uniq
         users.each do |user|
           timesheets = TimeSheet.where(date: date, project_id: project, user_id: user)
-          weekend_report += timesheets.map { |i| [ i.project.name, 
-                                                   i.user.name, 
-                                                   i.date.to_s,  
-                                                   i.from_time.strftime("%I:%M%p"), 
-                                                   i.to_time.strftime("%I:%M%p"),
+          weekend_report += timesheets.map { |i| [ i.project.name,
+                                                   i.user.name,
+                                                   i.date.to_s,
+                                                   DURATION_HASH[i.duration],
                                                    i.description] }
         end 
       end
@@ -771,7 +770,7 @@ class TimeSheet
   end
 
   def self.generate_weekend_report_in_csv_format(weekly_report)
-    headers = ['Project Name', 'Employee Name', 'Date', 'From Time', 'To Time', 'Description']
+    headers = ['Project Name', 'Employee Name', 'Date', 'Duration', 'Description']
     weekly_report_in_csv =
       CSV.generate(headers: true) do |csv|
         csv << headers
