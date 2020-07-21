@@ -75,7 +75,7 @@ class TimeSheet
     total_duration += duration
     # for update purpose if record persists deduct previous duration
     # duration_was in condition if previous duration is nil
-    total_duration -= duration_was if persisted? and duration_was
+    total_duration -= duration_was if persisted? and duration_was and date_was == date
     total_hours_worked = TimeSheet.total_worked_in_hours(total_duration)
     if total_hours_worked > WORKING_HOURS_THRESHOLD
       errors.add(:duration, "total working hours can't exceed #{WORKING_HOURS_THRESHOLD} hours")
