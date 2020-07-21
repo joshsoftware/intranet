@@ -1,29 +1,36 @@
 .form-heading
-  %h3 
+  %h3
     Resource List
     = link_to '',"resource_list_download", controller:"users", action:"resource_list_download", class:"icon-download-alt"
+
 .form-horizontal
   %table.table.table-hover.resource.table-bordered
     %thead.font_style
       %tr
-        %th#engg_name Engineer Name
-        %th Joining Date
-        %th.heading_style Experience Prior to Josh (In Months)
-        %th.exp_style Experience as of Today (In Months)
-        %th Designation
+        %th#engg_name Name
+        %th{style: 'width:55'} Joining Date
+        %th.exp_style Exp Prior to Josh
+        %th.exp_style Exp in Josh
+        %th.exp_style Total Experience
+        %th{style: 'width:75;'} Designation
         %th Is Billable?
-        %th#center_style Technical Skills
-        %th#center_style Other Skills
-        %th#center_style Projects
+        %th Technical Skills
+        %th.heading_style Other Skills
+        %th Projects
     %tbody.font_style
       - @users.each do | user |
         %tr
           %td= link_to user.name, public_profile_user_path(user) if user.public_profile
           %td=user.private_profile.try(:date_of_joining)
-          %td=user.private_profile.try(:previous_work_experience)
-          %td=user.experience_as_of_today
+          %td=convert_months_to_years_and_months(user.private_profile.try(:previous_work_experience))
+          %td=convert_months_to_years_and_months(current_org_experience(user))
+          %td=convert_months_to_years_and_months(user.experience_as_of_today)
           %td=user.employee_detail.designation.try(:name)
           %td=user.employee_detail.is_billable? ? "Yes" : "No"
           %td= "#{user.public_profile.technical_skills.join(', ') if user.public_profile.technical_skills.present?}"
           %td= "#{user.public_profile.skills if user.public_profile.skills.present?}"
           %td="#{user.projects.collect(&:name).join(', ')}"
+
+:javascript
+  var technical_skills = #{@technical_skills}
+  var projects = #{@projects}

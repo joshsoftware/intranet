@@ -119,6 +119,8 @@ class UsersController < ApplicationController
   end
 
   def resource_list
+    @technical_skills = (LANGUAGE + FRAMEWORK + OTHER).sort
+    @projects = Project.pluck(:name).sort
     @users = User.employees.approved
   end
 
