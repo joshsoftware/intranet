@@ -23,6 +23,8 @@ class PublicProfile
   field :linkedin_url
   field :facebook_url
   field :slack_handle
+  field :gitlab_handle
+  field :bitbucket_handle
 
   #validates_attachment :photo, :content_type => { :content_type => "image/jpg" }
 

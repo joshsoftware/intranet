@@ -20,6 +20,7 @@ class UserProject
       message: 'should be between range of 1-100'
   }
 
+  after_save :call_monitor_service, if: 'active_changed?'
 
   validates :end_date, presence: {unless: "!!active || active.nil?", message: "is mandatory to mark inactive"}
   validate :start_date_less_than_end_date, if: 'end_date.present?'
@@ -32,6 +33,26 @@ class UserProject
   def start_date_less_than_end_date
     if end_date < start_date
       errors.add(:end_date, 'should not be less than start date.')
+    end
+  end
+
+  def call_monitor_service
+    CodeMonitoringService.call(monitor_service_params)
+  end
+
+  def monitor_service_params
+    if active
+      {
+        event_type: 'User Added',
+        user_id: user_id.to_s,
+        project_id: project_id.to_s
+      }
+    else
+      {
+        event_type: 'User Removed',
+        user_id: user_id.to_s,
+        project_id: project_id.to_s
+      }
     end
   end
 end

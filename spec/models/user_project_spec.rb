@@ -102,4 +102,64 @@ RSpec.describe UserProject, type: :model do
       end
     end
   end
+
+  context 'Trigger - should call code monitor service' do
+    before(:each) do 
+      @project = build(:project)
+      stub_request(:get, "http://localhost?event_type=Project%20Active&project_id=#{@project.id}").
+        with(
+          headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Host'=>'example.com',
+          'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+      @project.save
+      @user = FactoryGirl.create(:user)
+    end
+
+    it 'when user is added in the project' do
+      user_project = FactoryGirl.build(:user_project, project_id: @project.id, user_id: @user.id)
+      stub_request(:get, "http://localhost?event_type=User%20Added&project_id=#{@project.id}&user_id=#{@user.id}").
+        with(
+          headers: {
+        'Accept'=>'*/*',
+        'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Host'=>'example.com',
+        'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+
+      user_project.save
+      expect(@project.user_projects.count).to eq 1
+    end
+
+    it 'when user is removed from the project' do
+      user_project = FactoryGirl.build(:user_project, project_id: @project.id, user_id: @user.id)
+      stub_request(:get, "http://localhost?event_type=User%20Added&project_id=#{@project.id}&user_id=#{@user.id}").
+        with(
+          headers: {
+        'Accept'=>'*/*',
+        'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Host'=>'example.com',
+        'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+      user_project.save
+
+      stub_request(:get, "http://localhost?event_type=User%20Removed&project_id=#{@project.id}&user_id=#{@user.id}").
+        with(
+          headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Host'=>'example.com',
+          'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+      user_project.update_attributes(active: false, end_date: Date.today)
+      expect(@project.user_projects.count).to eq 1
+      expect(user_project.active).to eq false
+    end
+  end
 end

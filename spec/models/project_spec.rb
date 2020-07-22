@@ -351,6 +351,82 @@ describe Project do
     end
   end
 
+  context 'Trigger - should call code monitor service' do
+    before(:each) do 
+      @project = build(:project)
+      stub_request(:get, "http://localhost?event_type=Project%20Active&project_id=#{@project.id}").
+        with(
+          headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Host'=>'example.com',
+          'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+      @project.save
+    end
+
+    it 'when Project is created with Active status and changed disabled' do
+      stub_request(:get, "http://localhost?event_type=Project%20Inactive&project_id=#{@project.id}").
+         with(
+           headers: {
+       	  'Accept'=>'*/*',
+       	  'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+       	  'Host'=>'example.com',
+       	  'User-Agent'=>'Ruby'
+           }).
+         to_return(status: 200, body: "", headers: {})
+
+      @project.update_attributes(is_active: false)
+      expect(Project.count).to eq 1
+      expect(@project.is_active).to eq false
+    end
+
+    it 'when project is deleted ' do
+      stub_request(:get, "http://localhost?event_type=Project%20Deleted&project_id=#{@project.id}").
+        with(
+          headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Host'=>'example.com',
+          'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+      @project.destroy
+      expect(Project.count).to eq 0
+    end
+
+    it 'when manager is added and removed ' do
+      manager = FactoryGirl.create(:user, role: 'Manager')
+      # Manager Added
+      @project.manager_ids = [manager.id.to_s]
+      stub_request(:get, "http://localhost?event_type=Manager%20Added&project_id=#{@project.id}&user_id=#{manager.id}").
+        with(
+          headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Host'=>'example.com',
+          'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+      @project.save
+      expect(@project.manager_ids).to eq [manager.id]
+
+      # Manager Removed
+      @project.manager_ids = []
+      stub_request(:get, "http://localhost?event_type=Manager%20Removed&project_id=#{@project.id}&user_id=#{manager.id}").
+        with(
+          headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Host'=>'example.com',
+          'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+      @project.save
+      expect(@project.manager_ids).to eq []
+    end
+  end
   # context '#add_team_members' do
   #   it 'create new team members associated with project' do
   #     project = create(:project)
