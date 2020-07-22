@@ -9,6 +9,8 @@ FactoryGirl.define do
     technical_skills { ["Angular", "NodeJs", "Python", "React", "UI"] }
     date_of_birth { Date.today }
     github_handle { Faker::Internet.username }
+    gitlab_handle { Faker::Internet.username }
+    bitbucket_handle { Faker::Internet.username }
     blog_url { Faker::Internet.url }
   end
 end

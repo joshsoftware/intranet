@@ -47,7 +47,10 @@ class User
 
   after_update :delete_team_cache, if: :website_fields_changed?
   before_create :associate_employee_id
-  after_update :associate_employee_id_if_role_changed
+  after_update do
+    associate_employee_id_if_role_changed
+    call_monitor_service if status_changed? && status_was == 'approved' && status == 'pending'
+  end
 
   has_many :entry_passes
   accepts_nested_attributes_for :entry_passes, reject_if: :all_blank, :allow_destroy => true
@@ -116,6 +119,10 @@ class User
       User.approved.where(role: 'HR').pluck(:email), User.approved.where(role: 'Admin').first.try(:email),
       self.employee_detail.try(:get_notification_emails).try(:split, ','), self.get_managers_emails
     ].flatten.compact.uniq
+  end
+
+  def call_monitor_service
+    CodeMonitoringWorker.perform_async({ event_type: 'User Resigned', user_id: id.to_s })
   end
 
   def sent_mail_for_approval(leave_application_id)
@@ -293,7 +300,7 @@ class User
     pune_employee_ids = employee_id_array.select {|id| id <= 9000}
 
     if self.employee_detail.try(:location) == "Plano"
-      emp_id = usa_employee_ids.empty? ? 9000 : usa_employee_ids.max  
+      emp_id = usa_employee_ids.empty? ? 9000 : usa_employee_ids.max
     else
       emp_id = pune_employee_ids.empty? ? 0 : pune_employee_ids.max
     end

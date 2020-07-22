@@ -21,6 +21,79 @@ describe Repository do
     expect(repository.errors.full_messages).to eq(["Project can't be blank"])
   end
 
+  context 'Trigger - should call code monitor service' do
+    before do
+      # for creating project
+      project = FactoryGirl.build(:project)
+      stub_request(:get, "http://localhost/?event_type=Project%20Active&project_id=#{project.id}").
+         with(
+           headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Host'=>'localhost',
+          'User-Agent'=>'Ruby'
+           }).
+         to_return(status: 200, body: "", headers: {})
+      project.save
+
+      # for addition of repository
+      @repository = FactoryGirl.build(:repository, project: project)
+      params = {
+        event_type:         'Repository Added',
+        repository_id:      @repository.id,
+        repository_url:     @repository.url,
+        project_id:         @repository.project.id,
+        repository_details: @repository.as_json({
+          only: [
+            :name, :host, :code_climate_id, :maintainability_badge,
+            :test_coverage_badge, :visibility, :rollbar_access_token
+          ]
+        })
+      }
+      uri = URI('http://localhost')
+      uri.query = URI.encode_www_form(params)
+      stub_request(:get, uri).
+        with(
+          headers: {
+            'Accept'=>'*/*',
+            'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+            'Host'=>'localhost',
+            'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+
+      # for removal of repository
+      params = {
+        event_type:         'Repository Removed',
+        repository_id:      @repository.id,
+        repository_url:     @repository.url,
+        project_id:         @repository.project.id
+      }
+      uri.query = URI.encode_www_form(params)
+      stub_request(:get, uri).
+        with(
+          headers: {
+            'Accept'=>'*/*',
+            'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+            'Host'=>'localhost',
+            'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+    end
+
+    it 'when Repository is added' do
+      expect(@repository.new_record?).to eq(true)
+      @repository.save
+      expect(@repository).to be_valid
+    end
+
+    it 'when Repository is removed' do
+      @repository.save
+      @repository.destroy
+      expect(Repository.count).to eq 0
+    end
+  end
+
   it 'should not create a Repository with invalid host' do
     project = FactoryGirl.create(:project)
     repository = FactoryGirl.build(:repository, project: project)

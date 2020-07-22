@@ -37,6 +37,10 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with(:truncation)
   end
 
+  config.before(:all) do
+    ENV['CODE_MONITOR_URL'] = 'http://localhost'
+  end
+
   config.before(:each) do
     DatabaseCleaner.start
   end

@@ -95,10 +95,52 @@ class Project
     end
   end
 
-  after_save :update_user_projects, unless: -> { is_active? }
+  after_destroy :call_monitor_service
+
+  after_save do
+    update_user_projects unless is_active?
+    call_monitor_service if is_active_changed? || manager_ids_changed?
+  end
 
   after_update do
     Rails.cache.delete('views/website/portfolio.json') if updated_at_changed?
+  end
+
+  def call_monitor_service
+    CodeMonitoringWorker.perform_async(monitor_service_params)
+  end
+
+  def monitor_service_params
+    if is_active_changed?
+      {
+        event_type: is_active? ? 'Project Active' : 'Project Inactive',
+        project_id: id.to_s
+      }
+    elsif manager_ids_changed?
+      manager_ids, event_type = get_manager_id
+      {
+        event_type: event_type,
+        user_id: manager_ids,
+        project_id: id.to_s
+      }
+    elsif destroyed?
+      {
+        event_type: 'Project Deleted',
+        project_id: id.to_s
+      }
+    end
+  end
+
+  def get_manager_id
+    if manager_ids_was.nil?
+      return manager_ids_change.last, 'Manager Added'
+    elsif manager_ids_change.last.empty?
+      return manager_ids_was, 'Manager Removed'
+    elsif (manager_ids_change.last - manager_ids_was).empty?
+      return (manager_ids_was - manager_ids_change.last), 'Manger Removed'
+    else
+      return (manager_ids_change.last - manager_ids_was), 'Manager Added'
+    end
   end
 
   def self.get_all_sorted_by_name
@@ -149,6 +191,23 @@ class Project
         ).values_at(*column_names)
       end;nil
     end
+  end
+
+  def active_users
+    user_ids = []
+    users = []
+    user_ids = user_projects.includes(:user).where(
+      "$or" => [
+        { end_date: nil },
+        { end_date: { "$gte" => Date.today }}
+      ]
+    ).pluck(:user_id)
+    user_ids << manager_ids
+    user_ids.flatten!
+    User.where(:id.in => user_ids).map do |record|
+      users << {id: record.id.to_s, name: record.name}
+    end
+    users
   end
 
   def self.team_data_to_csv

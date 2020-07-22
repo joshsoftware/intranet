@@ -103,6 +103,8 @@ Rails.application.routes.draw do
   namespace :api, :defaults => {:format => 'json'} do
     namespace :v1 do
       get 'users/info', to: 'users#info'
+      get 'users', to: 'users#index'
+      get 'projects', to: 'project#index'
       get 'team', to: "website#team"
       get 'news', to: "website#news"
       get 'portfolio', to: "website#portfolio"
