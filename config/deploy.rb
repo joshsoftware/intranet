@@ -119,6 +119,7 @@ task :deploy => :environment do
       unless nocron
         queue "cd #{deploy_to}/current && bundle exec whenever -i intranet_whenever_tasks --update-crontab --set 'environment=#{env}'"
       end
+      queue "echo '#{settings.branch}' > #{deploy_to}/#{settings.current_path}/branch_deployed.txt"
       queue "touch #{deploy_to}/#{current_path}/tmp/restart.txt"
       if env == 'production'
         queue "sudo monit restart sidekiq"
