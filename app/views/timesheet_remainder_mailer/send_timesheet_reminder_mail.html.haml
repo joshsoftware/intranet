@@ -2,7 +2,13 @@
   Hello #{@user.name},
   %br
   %br
-  #{@text}
+  #{@text.html_safe}
+  %br
+  %br
+  Here is the list of your projects: 
+  - @projects.each_with_index do |project, index|
+    %br
+    #{index + 1}. #{project}
   %br
   %br
   Thanks

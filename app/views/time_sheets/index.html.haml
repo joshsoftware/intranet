@@ -6,7 +6,6 @@
     = text_field_tag :to_date, params[:to_date], class: "form-control datepicker", placeholder: "To Date", value: @to_date, style: "height: 2em;"
     = submit_tag "Search", class: "btn btn-primary"
     .pull-right
-      - if [ROLE[:intern], ROLE[:employee], "Manager"].include?(current_user.role)
-        = link_to '', new_time_sheet_path(user_id: current_user.id, from_date: @from_date, to_date: @to_date), "data-toggle" => "tooltip", title: 'Add Timesheet', class: "icon-plus add-timesheet-icon"
+      = link_to '', new_time_sheet_path(user_id: current_user.id, from_date: @from_date, to_date: @to_date), "data-toggle" => "tooltip", title: 'Add Timesheet', class: "icon-plus add-timesheet-icon"
 .timesheet_report
   = render 'time_sheets/timesheet_report_view', timesheet_reports: @timesheet_report

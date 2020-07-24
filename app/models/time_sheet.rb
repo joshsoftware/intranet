@@ -900,7 +900,7 @@ class TimeSheet
   def self.time_sheet_present_for_reminder?(user)
     unless user.time_sheets.present?
       slack_uuid = user.public_profile.slack_handle
-      message = "You haven't filled the timesheet for yesterday. Go ahead and fill it now. You can fill timesheet for past 7 days. If it exceeds 7 days then contact your manager."
+      message = "You haven't filled the timesheet for yesterday. Go ahead and fill it now. You can fill your timesheet <a href='#{'https://' + ENV['DOMAIN_NAME'] + '/time_sheets'}' target='_blank'> here </a> for past 7 days. If it exceeds 7 days then contact your manager."
       text_for_slack = "*#{message}*"
       text_for_email = "#{message}"
       TimesheetRemainderMailer.send_timesheet_reminder_mail(user, slack_uuid, text_for_email).deliver_now!
@@ -931,7 +931,7 @@ class TimeSheet
       slack_handle = user.public_profile.slack_handle
       message1 = "You haven't filled the timesheet from"
       unfilled_timesheet_date = [unfilled_timesheet.to_date, "2020-05-01".to_date].max
-      message2 = "Go ahead and fill it now. You can fill timesheet for past 7 days. If it exceeds 7 days then contact your manager."
+      message2 = "Go ahead and fill it now. You can fill your timesheet <a href='#{'https://' + ENV['DOMAIN_NAME'] + '/time_sheets'}' target='_blank'> here </a> for past 7 days. If it exceeds 7 days then contact your manager."
       text_for_slack = "*#{message1} #{unfilled_timesheet_date}. #{message2}*"
       text_for_email = "#{message1} #{unfilled_timesheet_date}. #{message2}"
       pending_more_than_threshold = (Date.today - unfilled_timesheet_date) > PENDING_THRESHOLD

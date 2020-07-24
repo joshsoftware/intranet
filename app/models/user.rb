@@ -237,7 +237,7 @@ class User
   end
 
   def projects
-    project_ids = user_projects.where(end_date: nil).pluck(:project_id)
+    project_ids = user_projects.where(active: true, end_date: nil).pluck(:project_id)
     Project.in(id: project_ids)
   end
 

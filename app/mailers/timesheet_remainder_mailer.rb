@@ -6,6 +6,7 @@ class TimesheetRemainderMailer < ActionMailer::Base
     managers_emails = []
     @user = user
     @text = text
+    @projects = user.projects.map(&:name)
     managers_emails = @user.get_managers_emails_for_timesheet
     all_receivers = managers_emails + DEFAULT_TIMESHEET_MANAGERS + ['hr@joshsoftware.com']
     receivers = pending_more_than_threshold ? all_receivers : ['hr@joshsoftware.com']
