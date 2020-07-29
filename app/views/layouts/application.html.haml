@@ -39,9 +39,6 @@
                         Cras sit amet nibh libero, in gravida nulla. Nulla metus scelerisque ante sollicitudin commodo
               %li
                 = link_to "Employees", main_app.users_path
-              - unless Rails.env.production?
-                %li
-                  = link_to "Repositories", main_app.overview_index_repositories_path, data: {'no-turbolink' =>  true}
               %li
                 = link_to "Screamout", screamout.contents_path, data: {'no-turbolink' =>  true}
               %li

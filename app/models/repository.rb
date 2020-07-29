@@ -3,9 +3,9 @@ class Repository
   include Mongoid::Timestamps
   HOSTS = ['GitHub', 'BitBucket', 'GitLab', 'SourceForge', 'Launchpad', 'Google Cloud', 'AWS CodeCommit'].freeze
   belongs_to :project
-  field :name
-  field :host
-  field :url
+  field :name, type: String, default: ''
+  field :host, type: String
+  field :url, type: String
   field :code_climate_id
   field :maintainability_badge
   field :test_coverage_badge

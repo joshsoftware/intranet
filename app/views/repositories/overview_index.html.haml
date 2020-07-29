@@ -16,7 +16,7 @@
           %td
             - hidden = repo.visibility.eql?("false") && !current_user.is_admin? && repo.project.users.pluck(:email).exclude?(current_user.email)
             %b= hidden ? repo.name : (link_to repo.name, repository_issues_repositories_path(repo_id: repo.code_climate_id))
-          %td= repo.url ? (link_to repo.url, repo.url, target: '_blank') : '-'
+          %td= repo.url ? (link_to truncate(repo.url, length: 30), repo.url, target: '_blank') : '-'
           %td
             = repo.maintainability_badge.present? ? (raw repo.maintainability_badge) : '-'
           %td
