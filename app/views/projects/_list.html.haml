@@ -17,8 +17,8 @@
       %tr.item{"data-item-id" => project.id}
         %td= i+1
         %td=link_to project.name, project_path(project)
-        - if project.managers.present?
-          %td= project.managers.collect(&:name).join(', ')
+        - if project.managers.approved.present?
+          %td= project.managers.approved.collect(&:name).join(', ')
         - else
           %td= "NA"
         %td

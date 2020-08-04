@@ -33,6 +33,11 @@ class EmployeeDetail
     self.update_attribute(:available_leaves, remaining_leaves)
   end
 
+  def get_notification_emails
+    unapproved_employees = User.where(:status.ne => 'approved').pluck(:email)
+    notification_emails - unapproved_employees
+  end
+
   def add_rejected_leave(number_of_days)
     remaining_leaves = available_leaves + number_of_days
     self.update_attribute(:available_leaves, remaining_leaves)

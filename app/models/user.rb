@@ -93,7 +93,7 @@ class User
   def notification_emails
     [
       User.approved.where(role: 'HR').pluck(:email), User.approved.where(role: 'Admin').first.try(:email),
-      self.employee_detail.try(:notification_emails).try(:split, ','), self.get_managers_emails
+      self.employee_detail.try(:get_notification_emails).try(:split, ','), self.get_managers_emails
     ].flatten.compact.uniq
   end
 
@@ -204,7 +204,7 @@ class User
 
   def get_managers_emails
     manager_ids = projects.pluck(:manager_ids).flatten.uniq
-    User.in(id: manager_ids).collect(&:email)
+    User.in(id: manager_ids, status: 'approved').collect(&:email)
   end
 
   def get_managers_emails_for_timesheet
@@ -220,7 +220,7 @@ class User
 
   def get_managers_names
     manager_ids = projects.pluck(:manager_ids).flatten.uniq
-    User.in(id: manager_ids).collect(&:name)
+    User.in(id: manager_ids, status: 'approved').collect(&:name)
   end
 
   def self.get_hr_emails
