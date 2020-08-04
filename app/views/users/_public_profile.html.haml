@@ -26,7 +26,11 @@
   = pub.input :skype_id, label: "Skype Id"
   = pub.input :pivotal_tracker_id, label: "Pivotal Tracker Id"
   = pub.input :github_handle
-  = pub.input :twitter_handle
+  = pub.hint '(Note: Mention only github-handle not url)', class: 'skill'
+  = pub.input :twitter_handle, :wrapper_html => {class: 'input-prepend'} do
+    %span.add-on @
+    = pub.input_field :twitter_handle, style: 'width: 178px;'
+  = pub.hint '(Note: Mention only twitter-handle not url)', class: 'skill'
   = pub.input :blog_url
   = pub.input :linkedin_url
   = pub.input :facebook_url
