@@ -2,14 +2,14 @@
   %thead
     %tr
       %th Id
-      %th
-      %th Employee Name
+      %th Image
+      %th Name
       %th Email
       %th Mobile No
       - if can? :edit, User
         %th Role
         %th Status
-        %th
+        %th Action
   %tbody
     - users.each_with_index do |user, i|
       %tr
@@ -18,7 +18,7 @@
           %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid')
         - else
           %td= image_tag('dummy_image.png', class: 'img-polaroid')
-        %td= link_to user.name, user_path(user) if user.public_profile
+        %td= link_to user.name, user_path(user), 'aria-describedby': 'new-window-1' if user.public_profile
         %td= user.email
         %td= user.public_profile.try(:mobile_number)
         - if can? :edit, User

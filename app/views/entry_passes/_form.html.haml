@@ -17,15 +17,15 @@
       %legend.span7 Add New Entries
       = entry_pass.fields_for :entry_passes, @new_entry_pass do |f|
         .row.span8.width8
-          = f.input :date, label: false, placeholder: 'Select Date', input_html: {class: 'office-pass-datepicker', autocomplete: "off",required: true, readonly: true}, wrapper_class: 'span2'
+          = f.input :date, label: false, placeholder: 'Select Date', input_html: { 'aria-label': 'Select a date from this week, starting today', class: 'office-pass-datepicker', autocomplete: "off",required: true, readonly: true}, wrapper_class: 'span2'
           = f.input :user_id, :as => :hidden, :input_html => { :value => current_user.id }
           = f.input :details,  as: :text, label: false, placeholder: 'Please provide reason why you want to be in the office? When you are planning to reach & leave from office.', wrapper_class: 'span4'
           .span2
             %span.available_text= "(  Available)"
-            = f.link_to_remove "X", class: "btn btn-danger"
+            = f.link_to_remove "X", 'aria-label': 'Remove Entry Pass', role: 'button', class: "btn btn-danger"
   .offset0
-    = entry_pass.link_to_add "Request for Another Date", :entry_passes, data: {target: '#dates'}, class: "btn btn-success", id: "add-pass-button"
-    = entry_pass.button :submit, "Create Office Pass", :class => "btn-success"
+    = entry_pass.link_to_add "Request for Another Date", :entry_passes, role: 'button', data: {target: '#dates'}, class: "btn btn-success", id: "add-pass-button"
+    = entry_pass.button :submit, "Create Office Pass", role: 'button', :class => "btn-success"
 
 :javascript
   total_availablity = #{DAILY_OFFICE_ENTRY_LIMIT}

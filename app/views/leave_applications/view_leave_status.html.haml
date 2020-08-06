@@ -33,6 +33,8 @@
     reason_div = $('.reason_'+app_id)
     $('.reason_'+app_id).editable('toggle')
     reason_div.attr('action', $(this).data('action'))
+    $('.editable-submit').attr('aria-label', 'Submit')
+    $('.editable-cancel').attr('aria-label', 'Cancel')
   }
 
   function make_editable(value){

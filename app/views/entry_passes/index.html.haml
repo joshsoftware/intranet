@@ -5,7 +5,7 @@
 - if ["HR", "Admin"].include?(current_user.role)
   =# render 'download_report'
 
-= content_tag :a, "", :href => "#office_entry_modal", :class => 'icon-plus pull-right', :data => {:toggle => 'modal'}, "data-toggle" => "tooltip", title: "Add new request for Office Entry"
+= content_tag :a, "", :href => "#office_entry_modal", :class => 'icon-plus pull-right', :data => {:toggle => 'modal'}, "data-toggle" => "tooltip", role: 'button', title: "Add new request for Office Entry"
 %h3
   %center List of Employees registered for Office Entry
 .form-horizontal
@@ -40,8 +40,8 @@
               - if name_and_id.is_a?(Boolean)
                 %td.no-bordered
               - else
-                %td{ :class => ("text-success" if name_and_id[0] == current_user.name) }
+                %td{ class: ("text-success" if name_and_id[0] == current_user.name) }
                   = name_and_id[0]
                   - if can? :manage, EntryPass.where(id: name_and_id[1]).first
-                    = link_to "X", entry_pass_path(:id => name_and_id[1]), data: {method: :delete, confirm: "Are you sure, you want to delete?"}, :class => "pull-right delete-entry"
+                    = link_to "X", entry_pass_path(:id => name_and_id[1]), role: 'button', 'aria-label': "Press enter to delete Entry Pass of employee #{name_and_id[0]} for Date #{date}", data: {method: :delete, confirm: "Are you sure, you want to delete?"}, :class => "pull-right delete-entry"
 

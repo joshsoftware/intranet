@@ -19,7 +19,7 @@
           .offset1.photoText Kindly contact HR to update your profile photo.
 
   = pub.input :blood_group, collection: BLOOD_GROUPS, prompt: 'Select'
-  = pub.input :date_of_birth, input_html: {class: 'datepicker', 'data-behaviour' => 'datepicker', value: @public_profile.date_of_birth.try(:strftime, "%d-%m-%Y")}
+  = pub.input :date_of_birth, input_html: { type: 'date', class: 'date-picker', value: @public_profile.date_of_birth.try(:strftime, "%Y-%m-%d")}
   = pub.input :technical_skills, collection: (LANGUAGE + FRAMEWORK + OTHER).sort, input_html: {class: 'technical_skills', multiple: true, style: "width:240px;", "data-placeholder" => "Add your technical skills"}, label: "Technical Skills",include_blank: false, include_hidden: false
   = pub.input :skills, as: :text
   = pub.hint '(Note: Mention your skills which are not covered in technical skills)', :class => 'skill'

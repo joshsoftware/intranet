@@ -1,4 +1,12 @@
-= modal_dialog :id => "office_entry_modal", :header => { :show_close => true, :dismiss => 'modal', :title => 'Office Entry Form'}
+#office_entry_modal.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "Office Entry Form", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h3.modal-title Office Entry Form
+      .modal-body
+      .modal-footer
 
 :javascript
   $(".modal-body").html('#{escape_javascript render("form")}');

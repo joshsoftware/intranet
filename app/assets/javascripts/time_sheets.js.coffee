@@ -32,13 +32,13 @@ validate_timesheet = ->
        $(element).is(':visible')
       
       project = $(this).find('.project_id').val()
-      date = $(this).find('.datepicker').datepicker('getDate').valueOf()
+      date = $(this).find('.date-picker').val()
       
       for x in [index...length]
         next_row = $(tr_elements[x + 1])
         if next_row.is(':visible') &&
            project == next_row.find('.project_id').val() &&
-           date == next_row.find('.datepicker').datepicker('getDate').valueOf()
+           date == next_row.find('.date-picker').val()
           
           value = false
           if next_row.find('.custom-error').length == 0 

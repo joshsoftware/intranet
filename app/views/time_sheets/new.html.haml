@@ -10,12 +10,10 @@
       = f.fields_for :time_sheets, @time_sheets, wrapper: false do |time_sheet|
         %tr.fields
           %td= time_sheet.input :project_id, collection: active_project_ids(@user), selected: time_sheet.object.project_id, input_html: { class: 'project_id', style: "margin-bottom: 16px"}, label: false
-          %td= time_sheet.input :date, input_html: {class: 'timesheet-input datepicker',
-            'data-behaviour' => 'datepicker',
-            'readonly' => true, value: time_sheet.object.date || Date.today}, label: false
+          %td= time_sheet.input :date, input_html: {class: 'timesheet-input date-picker', type: 'date', value: time_sheet.object.date.try(:strftime, "%Y-%m-%d") || Date.today.strftime("%Y-%m-%d") }, label: false
           %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, placeholder: 'Select', label: false
           %td= time_sheet.input :description, as: :text, label: false
-          %td= time_sheet.link_to_remove '', class: 'icon-remove'
+          %td= time_sheet.link_to_remove '', class: 'icon-remove', role: 'button', 'aria-label': 'Click here to remove timesheet'
   = f.hidden_field :user_id, value: @user.id
   = f.hidden_field :from_date, value: @from_date
   = f.hidden_field :to_date, value: @to_date

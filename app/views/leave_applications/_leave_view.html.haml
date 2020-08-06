@@ -41,12 +41,12 @@
           - if (pending_leave) or can? :manage, LeaveApplication
             %td.action_style.action{id: "#{appr_leave.id}"}
               - if pending_leave and can? :edit, appr_leave
-                .btn.btn-mini.btn_style= link_to 'Edit', edit_leave_application_path(appr_leave)
+                .btn.btn-mini.btn_style= link_to 'Edit', edit_leave_application_path(appr_leave), role: 'button'
                 - if can? :manage, appr_leave
-                  %div.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
-                  %div.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject
+                  %button.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
+                  %button.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject
               - elsif can? :manage, appr_leave
                 - if appr_leave.leave_status == REJECTED
-                  %div.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
+                  %button.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
                 - else
-                  %div.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject
+                  %button.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject

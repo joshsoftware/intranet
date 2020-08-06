@@ -15,8 +15,8 @@
         %th.pull-right Manage
       %tbody
         - @policies.each do |policy|
-          %tr
-            - if policy.is_published or (can? :manage, Policy) 
+          - if policy.is_published or (can? :manage, Policy)  
+            %tr
               = render partial: 'policy_row', locals: {policy: policy}
   - else
     %h4
