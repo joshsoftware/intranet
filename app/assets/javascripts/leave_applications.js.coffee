@@ -1,7 +1,9 @@
 CalculateWeekendDays = (fromDate, toDate) ->
   weekDayCount = 0
+  fromDate = new Date(fromDate)
+  toDate = new Date(toDate)
   while fromDate <= toDate
-    date = convert(fromDate)
+    date = fromDate.toISOString().substring(0,10);
     ++weekDayCount if not (fromDate.getDay() is 0 or fromDate.getDay() is 6 or findHolidayDate(date))
     fromDate.setDate fromDate.getDate() + 1
   $("#leave_application_number_of_days").val(weekDayCount)
@@ -10,14 +12,12 @@ CalculateWeekendDays = (fromDate, toDate) ->
 @set_number_of_days = ->
   getHolidayList()
   $("#leave_application_start_at").on "change", ->
-    CalculateWeekendDays($("#leave_application_start_at").
-      datepicker('getDate'), $("#leave_application_end_at").
-      datepicker('getDate')) if $("#leave_application_end_at").val()
+    CalculateWeekendDays($("#leave_application_start_at").val(),
+     $("#leave_application_end_at").val()) if $("#leave_application_end_at").val()
 
   $("#leave_application_end_at").on "change", ->
-    CalculateWeekendDays($("#leave_application_start_at").
-      datepicker('getDate'), $("#leave_application_end_at").
-      datepicker('getDate')) if $("#leave_application_start_at").val()
+    CalculateWeekendDays($("#leave_application_start_at").val(),
+      $("#leave_application_end_at").val()) if $("#leave_application_start_at").val()
 
 $(document).ready ->
   $('.leave_table').dataTable 'ordering' : false
@@ -41,18 +41,6 @@ findHolidayDate = (fromDate) ->
       return true
     i++
   false
-
-convert = (fromDate) ->
-    date  = new Date(fromDate)
-    month = date.getMonth()
-    month = month + 1
-    month = ('0' + month).slice(-2)
-    day   = ('0' + date.getDate()).slice(-2)
-    [
-      date.getFullYear()
-      month
-      day
-    ].join '-'
 
 $(document).ready ->
   $("#reset_filter").on 'click', ->

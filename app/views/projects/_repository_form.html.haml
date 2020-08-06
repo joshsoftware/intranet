@@ -25,7 +25,7 @@
           .span2
             = t.label "visibility"
           .span3
-            .make-switch{"data-on" => "warning", "data-off" => "info", "data-on-label" => "Hidden", "data-off-label" => "All"}
+            .make-switch{ tabindex: 0, "data-on": "warning", "data-off": "info", "data-on-label": "Hidden", "data-off-label": "All"}
               = t.check_box :visibility, {class: "active-check-box"}, "false", "true"
         %br
         .row

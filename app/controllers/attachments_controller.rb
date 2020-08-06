@@ -33,7 +33,8 @@ class AttachmentsController < ApplicationController
   def download_document
     document = @attachment.document
     document_type = MIME::Types.type_for(document.url).first.content_type
-    send_file document.path, filename: document.model.name, type: "#{document_type}"
+    document_extension = '.' + document.file.extension.downcase
+    send_file document.path, filename: document.model.name + document_extension, type: "#{document_type}"
   end
 
   private

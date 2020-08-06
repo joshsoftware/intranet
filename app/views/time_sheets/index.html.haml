@@ -3,14 +3,14 @@
 .timesheet_report_form
   = form_tag time_sheets_path, method: 'GET', class: 'form form-inline' do
     %label From Date:
-    = text_field_tag :from_date, params[:from_date], class: "form-control datepicker", placeholder: "From Date", value: @from_date, style: "height: 2em;"
+    %input{ name: 'from_date', 'aria-label': 'From Date', class: 'form-control date-picker', type: 'date', placeholder: 'From Date', value: @from_date }
     %label To Date:
-    = text_field_tag :to_date, params[:to_date], class: "form-control datepicker", placeholder: "To Date", value: @to_date, style: "height: 2em;"
+    %input{ name: 'to_date', 'aria-label': 'To Date', class: 'form-control date-picker', type: 'date', placeholder: 'To Date', value: @to_date }
     = submit_tag "Search", class: "btn btn-primary"
     .pull-right.remove_underline
-      = link_to '', new_time_sheet_path(user_id: current_user.id, from_date: @from_date, to_date: @to_date), "data-toggle" => "tooltip", title: 'Add Timesheet', class: "icon-plus add-timesheet-icon"
+      = link_to '', new_time_sheet_path(user_id: current_user.id, from_date: @from_date, to_date: @to_date), 'data-toggle': 'tooltip', title: 'Add Timesheet', class: 'icon-plus add-timesheet-icon'
       - if current_user.role == 'HR'
-        = content_tag :a, "", href: '#upload_timesheets_modal', data: { toggle: 'modal'}, "data-toggle": "tooltip", title: "Click to upload timesheet csv file", class: "icon-upload-alt upload-timesheet-icon verticle-line" 
+        = content_tag :a, '', href: '#upload_timesheets_modal', data: { toggle: 'modal'}, 'data-toggle': 'tooltip', title: 'Click to upload timesheet csv file', class: 'icon-upload-alt upload-timesheet-icon verticle-line'
 
 %span{ id: 'activeProjectList', data: { value: project_names }, visibility: 'hidden'}
 %span{ id: 'activeProjectData', data: { value: project_data }, visibility: 'hidden'}

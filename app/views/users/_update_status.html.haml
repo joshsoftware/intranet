@@ -1,14 +1,14 @@
 = simple_form_for(@user, :url => user_path(@user), :html => { method: :put, class: "form-horizontal", multipart: true}) do |f|
   = f.input :status, disabled: true, label: 'Current status'
   = f.label "Approve"
-  .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label"=>"Yes", "data-off-label"=> "NO"}
+  .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "Yes", "data-off-label": "NO"}
     = f.check_box :status, {}, "#{STATUS[2]}", "#{STATUS[1]}"
   %br
   %br
   = f.input :role, collection: User::ROLES, prompt: 'Select Role', required: false, label: "Change Role"
   = f.input :website_sequence_number
   = f.label 'Visible On Website'
-  .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label"=>"Yes", "data-off-label"=> "NO"}
+  .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "Yes", "data-off-label": "NO"}
     = f.check_box :visible_on_website, {}, 'true', 'false'
   %br
   %br

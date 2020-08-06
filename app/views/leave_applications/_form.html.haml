@@ -1,35 +1,23 @@
 = f.hidden_field :user_id
 = f.input :leave_type, as: :radio_buttons, collection: [LeaveApplication::LEAVE, LeaveApplication::WFH], :item_wrapper_class => 'inline',
   checked: @leave_application.leave_type || LeaveApplication::LEAVE
-= f.input :start_at, label: 'Start Date', input_html: {class: 'datepicker', data: {'behaviour' => 'datepicker', 'validation-required-message' => 'You must select start date'}, required: true, value: f.object.start_at.try(:strftime, '%d-%m-%Y')}
-= f.input :end_at, label: 'End Date', input_html: {class: 'datepicker', data: {'behaviour' => 'datepicker', 'validation-required-message' => 'You must select end date'}, required: true, value: f.object.end_at.try(:strftime, '%d-%m-%Y')}
+= f.input :start_at, label: 'Start Date', input_html: { type: 'date', class: 'date-picker', min: Date.today.beginning_of_year.try(:strftime, '%Y-%m-%d'), max: Date.today.end_of_year.try(:strftime, '%Y-%m-%d'), data: { 'validation-required-message': 'You must select start date'}, required: true, value: f.object.start_at.try(:strftime, '%Y-%m-%d')}
+= f.input :end_at, label: 'End Date', input_html: { type: 'date', min: Date.today.beginning_of_year.try(:strftime, '%Y-%m-%d'), max: Date.today.end_of_year.try(:strftime, '%Y-%m-%d'), class: 'date-picker', data: { 'validation-required-message': 'You must select end date'}, required: true, value: f.object.end_at.try(:strftime, '%Y-%m-%d')}
 = f.input :number_of_days, as: :decimal, label: 'Days', input_html: {step: 1}, input_html: { required: true, :'data-validation-required-message' => 'Enter the number of days', min: "1", :'data-validation-min-message' => "Number of day can't be zero or negative"}, readonly: true
 = f.input :contact_number, as: :decimal, label: 'Emergency Contact No.', input_html: {required: true, :'data-validation-required-message' => 'You need to enter your emergency number', type: 'text', maxlength: 10}
 = f.input :reason, as: :text, label: 'Reason', input_html: {required: true, :'data-validation-required-message' => 'You have to specify valid reason for leave'}
 %center
   = f.submit (params[:action] == "new" ? 'Apply' : 'Save Changes'), class: 'btn'
+
 :javascript
-
-  DPGlobal = $.fn.datepicker.DPGlobal;
-  date_format = 'dd-mm-yyyy';
-
-
   $("input,select,textarea").not("[type=submit]").jqBootstrapValidation();
 
   $(document).ready(function(){
-    lastDayOfYear = new Date(new Date().getFullYear(), 11, 31);
-    $('#leave_application_end_at').data('datepicker').setEndDate(lastDayOfYear);
-
-    $('[data-behaviour="datepicker"]').datepicker({
-      format: "dd-mm-yyyy",
-      autoclose: true
-    });
-
     $('form').submit(function(){
       start_date_div = $('#leave_application_start_at')
       end_date_div = $('#leave_application_end_at')
-      start_at = DPGlobal.parseDate(start_date_div.val(), date_format)
-      end_at = DPGlobal.parseDate(end_date_div.val(), date_format)
+      start_at = new Date(start_date_div.val())
+      end_at = new Date(end_date_div.val())
       if(start_date_div.val() && start_at > end_at){
         $("<div class='help-block end_date_error'><ul role='alert'><li>End date can not be less than start date</li></ul></div>").insertAfter(end_date_div)
         end_date_div.parents('.control-group').addClass('error')

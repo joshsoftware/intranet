@@ -209,7 +209,8 @@ class User
     error_msg.push(errors.full_messages,
                    public_profile.errors.full_messages,
                    private_profile.errors.full_messages,
-                   employee_detail.try(:errors).try(:full_messages))
+                   employee_detail.try(:errors).try(:full_messages),
+                   attachments_errors)
     error_msg.join(' ')
   end
 
@@ -218,6 +219,10 @@ class User
     LeaveApplication.where(:start_at.gte => Date.today, user: self).each do |leave_application|
       leave_application.update(leave_status: 'Rejected')
     end
+  end
+
+  def attachments_errors
+    self.attachments.map { |i| i.errors.full_messages }.join(', ')
   end
 
   def add_or_remove_projects(params)

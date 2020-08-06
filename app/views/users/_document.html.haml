@@ -1,12 +1,29 @@
+%fieldset
+  %h3
+    %center.span4 Note 
+    %br
+  .row.span8
+    1. File format: Images (.png, .jpeg, .jpg) and Pdf files only
+  .row.span8
+    2. Images: Maximum size 3 MB.
+  .row.span8
+    3. PDF: Maximum size 5 MB.
+.row
+  %br
+
 = simple_nested_form_for(@user,:url => user_path(@user), :html => { method: :put, class: "form-horizontal", multipart: true}) do |f|
   = f.fields_for :attachments do |a|
-    = a.input :name
-    = a.input :document
+    = a.input :name, input_html: { 'aria-label': 'Enter the file name' }
+    = a.input :document, input_html: { 'aria-label': 'Choose file', role: 'button' }
     - if a.object.persisted?
       .document
         %h4
-          = link_to '', download_document_user_path(id: a.object.id), class: "icon-download", data: {'no-turbolink' =>  true}
+          = link_to '', download_document_user_path(id: a.object.id), class: 'icon-download', role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}
           |
-          = a.link_to_remove '', class: "icon-trash", data: { confirm: "Are you sure? You are requesting to delete document" }
-  = f.link_to_add 'Add new document', :attachments, class: 'btn controls'
-  = f.submit :save, class: "btn"
+          = a.link_to_remove '', class: 'icon-trash', 'aria-label': 'Remove the document', button: 'button', data: { confirm: 'Are you sure? You are requesting to delete document' }
+    - else
+      .document
+        %h4
+          = a.link_to_remove '', class: 'icon-trash', 'aria-label': 'Remove the document', role: 'button'
+  = f.link_to_add 'Add new document', :attachments,  'aria-label': 'Add new Document', class: 'btn controls'
+  = f.submit :save, value: 'Upload', 'aria-label': 'Upload Documents', class: "btn"

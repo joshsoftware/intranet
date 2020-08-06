@@ -1,8 +1,8 @@
 = form_tag individual_project_report_time_sheet_path, method: 'GET', class: 'form form-inline' do
   %label From Date:
-  =text_field_tag :from_date, params[:from_date], class: "form-control datepicker", placeholder: "From Date", value: @from_date, style: "height: 2em;"
+  =text_field_tag :from_date, params[:from_date], class: "form-control date-picker", type: 'date', placeholder: "From Date", value: @from_date, style: "height: 2em;"
   %label To Date:
-  =text_field_tag :to_date, params[:to_date], class: "form-control datepicker", placeholder: "To Date", value: @to_date, style: "height: 2em;"
+  =text_field_tag :to_date, params[:to_date], class: "form-control date-picker", type: 'date', placeholder: "To Date", value: @to_date, style: "height: 2em;"
   = submit_tag "Search", class: "btn btn-primary"
   
   - if @individual_project_report.present?

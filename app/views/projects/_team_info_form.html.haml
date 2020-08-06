@@ -14,16 +14,18 @@
       - if project_user_form.object.user.blank? || (project_user_form.object.user && project_user_form.object.user.is_approved? && (project_user_form.object.active || project_user_form.object.end_date.nil?))
         .row.span12
           .span2.width10
-            .make-switch{"data-on" => "success", "data-off" => "danger", "data-on-label" => "Yes", "data-off-label" => "No"}
+            .make-switch{ tabindex: 0, "data-on": "success", "data-off": "danger", "data-on-label": "Yes", "data-off-label": "No"}
               = project_user_form.check_box :active, {class: "active-check-box"}, 'true', 'false'
           .span2.width15
             = project_user_form.input :user_id, collection: users, input_html: {class: "user_select"}, label: false
           .span2.width15
-            = project_user_form.input :start_date, input_html: {class: :datepicker, style: "height: 32px"}, label: false
+            = project_user_form.input :start_date, label: false,
+              input_html: {type: :date, class: 'date-picker', style: 'height: 32px', value: project_user_form.object.start_date.try(:strftime, '%Y-%m-%d')}
           .span2.width15
-            = project_user_form.input :end_date, input_html: {class: :datepicker, style: "height: 32px", id: "end-date"},  label: false
+            = project_user_form.input :end_date, label: false,
+              input_html: {type: :date, class: 'date-picker', style: 'height: 32px', id: 'end-date', value: project_user_form.object.end_date.try(:strftime, '%Y-%m-%d')}
           .span2.width10
-            .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "REQ", "data-off-label" => "NREQ"}
+            .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "REQ", "data-off-label": "NREQ"}
               = project_user_form.check_box :time_sheet
           .span2.width10
             .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "True", "data-off-label" => "False"}

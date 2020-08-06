@@ -1,6 +1,6 @@
-= link_to "", attachments_path, class: "icon-arrow-left", title: 'Back'
-= simple_form_for @holiday, :html => {class: "form-horizontal"} do |f|
-  = f.input :holiday_date, input_html: { class: 'datepicker', 'data-behaviour' => 'datepicker', 'readonly' => 'true'}
+= link_to '', attachments_path, class: 'icon-arrow-left', title: 'Back'
+= simple_form_for @holiday, html: {class: 'form-horizontal'} do |f|
+  = f.input :holiday_date, input_html: { type: :date, class: 'date-picker'}
   = f.input :reason, as: :text
   .submit_holiday
     = f.button :submit

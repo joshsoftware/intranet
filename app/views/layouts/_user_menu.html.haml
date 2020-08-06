@@ -1,68 +1,66 @@
 -#= image_tag current_user.public_profile.image.thumb.url, class: 'img-rounded'
-= link_to current_user.public_profile.try(:name), '#', 'data-toggle' => "dropdown", class: "dropdown-toggle user-name"
+= link_to current_user.public_profile.try(:name), '#', 'data-toggle' => 'dropdown', class: 'dropdown-toggle user-name', role: 'menuitem', 'aria-haspopup': true
 %ul.dropdown-menu.drop
 
   - if can? :manage, Schedule
     /
       %li
-        = link_to "Schedules", main_app.schedules_path
+        = link_to "Schedules", main_app.schedules_path, role: 'menuitem'
   - if can? :resource_list, User
     %li
-      = link_to 'Resource List', main_app.resource_list_path
+      = link_to 'Resource List', main_app.resource_list_path, role: 'menuitem'
 
   - if can? :manage, Project
     %li
-      = link_to "Projects", main_app.projects_path
+      = link_to "Projects", main_app.projects_path, role: 'menuitem'
 
   - if can? :invite_user, User
     %li
-      = link_to "Company", main_app.companies_path
+      = link_to "Company", main_app.companies_path, role: 'menuitem'
     %li
-      = link_to "Invite Employee", main_app.invite_user_path
+      = link_to "Invite Employee", main_app.invite_user_path, role: 'menuitem'
   %li
-    = link_to "Profile", main_app.public_profile_user_path(current_user), data: {'no-turbolink' =>  true}
+    = link_to "Profile", main_app.public_profile_user_path(current_user), data: {'no-turbolink' =>  true}, role: 'menuitem'
   %li
-    = link_to "Documents", main_app.attachments_path, data: {'no-turbolink' =>  true}
+    = link_to "Documents", main_app.attachments_path, data: {'no-turbolink' =>  true}, role: 'menuitem'
   %li
-    = link_to "Events", "https://intranet.joshsoftware.com/functions", 'target' => '_blank'
+    = link_to "Events", "https://intranet.joshsoftware.com/functions", 'target' => '_blank', 'aria-describedby': 'new-window-1', role: 'menuitem'
   - if ["HR", "Admin", "Super Admin"].include?(current_user.role)
     %li
-      = link_to "Newsletter", main_app.light_path
+      = link_to "Newsletter", main_app.light_path, role: 'menuitem'
   - if can? :manage, Designation
-    %li= link_to 'Manage Designations', main_app.designations_path
+    %li= link_to 'Manage Designations', main_app.designations_path, role: 'menuitem'
   %li
-    = link_to "Leave Applications", main_app.view_leaves_path
+    = link_to "Leave Applications", main_app.view_leaves_path, role: 'menuitem'
   - if ["Admin", "Super Admin"].include?(current_user.role)
     %li
       = link_to "Contacts", main_app.site_contacts_path, data: { 'no-turbolink' => true }, role: 'menuitem'
   - if ["Admin", "Super Admin", "HR"].include?(current_user.role)
     %li
-      = link_to "Manage Leave", main_app.leave_applications_path
+      = link_to "Manage Leave", main_app.leave_applications_path, role: 'menuitem'
   %li.hide
-    = link_to "Calendar", main_app.calendar_path
+    = link_to "Calendar", main_app.calendar_path, role: 'menuitem'
   %li.dropdown-submenu.pull-left
-    %a.test{:href => "#", :tabindex => "-1"}
+    %a.test{:href => '#', role: 'menuitem', 'aria-haspopup': true }
       Timesheets
     %ul.dropdown-menu{class: "timesheet-menu"}
       %li
-        = link_to "Employees", main_app.time_sheets_path, class: 'menu-font'
+        = link_to "Employees", main_app.time_sheets_path, class: 'menu-font', role: 'menuitem'
         - if can? :manage, TimeSheet
           %li
-            = link_to "Projects", main_app.projects_report_time_sheets_path, class: 'menu-font'
+            = link_to "Projects", main_app.projects_report_time_sheets_path, class: 'menu-font', role: 'menuitem'
           %li
             = link_to "Export Reports", main_app.export_project_report_time_sheets_path, class: 'menu-font'
   %li
-    = link_to "Assessments", ENV['snowflake_url']
+    = link_to "Assessments", ENV['snowflake_url'], role: 'menuitem'
   %li
-    = link_to "Office Entry Pass", '/entry_passes'
-
+    = link_to "Office Entry Pass", '/entry_passes', role: 'menuitem'
   %li
-    = link_to 'Repositories', main_app.overview_index_repositories_path, data: {'no-turbolink' =>  true}
-  
+    = link_to "Repositories", main_app.overview_index_repositories_path, data: {'no-turbolink' =>  true}, role: 'menuitem'
   %li.divider
 
   %li
-    = link_to 'Sign out', main_app.destroy_user_session_path, method: :delete
+    = link_to 'Sign out', main_app.destroy_user_session_path, method: :delete, role: 'menuitem'
 :css
   .img-rounded{width: 4%; position: absolute; top: 26px; z-index: 1; margin-left: 10px;height: 36px;}
   .user-name{position: relative; left: 15px;}

@@ -4,14 +4,14 @@
   = link_to "Add Document", "#document_modal_new", "data-toggle" => "modal",  data: {'no-turbolink' =>  true}
 .form-horizontal
   - unless @company_docs.empty?
-    %table.table.table-hover
+    %table.table.table-hover{ role: 'table', 'aria-label': 'Documents Table' }
       %thead
         %th Document Name
         %th.pull-right Manage
       %tbody
         - @company_docs.each do |doc|
-          %tr
-            - if doc.is_visible_to_all or (can? :manage, Attachment) 
+          - if doc.is_visible_to_all or (can? :manage, Attachment) 
+            %tr
               = render partial: 'document_row', locals: {doc: doc}
   - else
     %h4

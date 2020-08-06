@@ -29,7 +29,11 @@ class UsersController < ApplicationController
     return_value_of_add_project, return_value_of_remove_project = @user.add_or_remove_projects(params) if params[:user][:project_ids].present?
     if return_value_of_add_project && return_value_of_remove_project
       if @user.save
-        flash.notice = 'Profile updated Successfully'
+        flash.notice = if params[:user][:attachments_attributes].present?
+                        'Documents uploaded Successfully'
+                       else
+                        'Profile updated Successfully'
+                       end
       else
         flash[:error] = "Error #{@user.generate_errors_message}"
       end
@@ -89,7 +93,8 @@ class UsersController < ApplicationController
 
   def download_document
     document_type = MIME::Types.type_for(@document.url).first.content_type
-    send_file @document.path, filename: @document.model.name, type: "#{document_type}"
+    document_extension = '.' + @document.file.extension.downcase
+    send_file @document.path, filename: @document.model.name + document_extension, type: "#{document_type}"
   end
 
   def update_available_leave

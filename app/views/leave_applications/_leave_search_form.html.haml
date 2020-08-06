@@ -1,14 +1,16 @@
 %li
   .search-form
-    = form_tag view_leaves_path, method: 'GET', class: "form form-inline" do
-      - if ["Admin", "HR", "Manager"].include? current_user.role
+    = form_tag view_leaves_path, method: 'GET', class: 'form form-inline' do
+      %label From Date:
+      %input{ name: 'from', 'aria-label': 'From Date', class: 'form-control date-picker', type: 'date', placeholder: 'From Date', value: params[:from] }
+      %label To Date:
+      %input{ name: 'to', 'aria-label': 'To Date', class: 'form-control date-picker', type: 'date', placeholder: 'To Date', value: params[:to] }
+      - if ['Admin', 'HR', 'Manager'].include? current_user.role
         = select_tag 'project_id', options_for_select(Project.all_active.collect{ |p| [p.name, p.id]}, params[:project_id]), prompt: 'Select Project'
-        = select_tag "user_id", options_for_select(User.approved.employees.collect{ |u| [u.name, u.id]}, params[:user_id]), prompt: 'Select User'
-      = text_field_tag :from, params[:from], class: "form-control datepicker", placeholder: "From Date" 
-      = text_field_tag :to, params[:to], class: "form-control datepicker", placeholder: "To date"
-      = select_tag :active_or_all_flag, options_for_select([["Show Active Users", "active"], ["Show All Users", "all"]], params[:active_or_all_flag]), id: "active_or_all"
-      = submit_tag "Search", class: "btn btn-success", id: 'submit_btn'
-      = button_tag  'Reset', type: 'reset', class: 'btn btn-info', id: "reset_filter"
+        = select_tag 'user_id', options_for_select(User.approved.employees.collect{ |u| [u.name, u.id]}, params[:user_id]), prompt: 'Select User'
+        = select_tag :active_or_all_flag, options_for_select([['Show Active Users', 'active'], ['Show All Users', 'all']], params[:active_or_all_flag]), id: 'active_or_all'
+      = submit_tag 'Search', class: 'btn btn-success', id: 'submit_btn'
+      = button_tag  'Reset', type: 'reset', class: 'btn btn-info', id: 'reset_filter'
 
 :javascript
   $(".datepicker").css("height", "30px")

@@ -13,54 +13,54 @@
       .media.notification-menu, .media .media{ width: 430px; }
 %body
   #header
-    - if (params[:controller].eql?('light/users') and (params[:action].eql?('subscribe') or params[:action].eql?('unsubscribe'))) or (params[:controller].eql?('light/newsletters') and (params[:action].eql?('web_version')))
-      .wrap
-        .logo
-          =link_to(image_tag("Josh-Software-Logo.svg"), "#", data: {'no-turbolink' =>  true})
-    - else
-      .wrap
-        .logo
-          =link_to(image_tag("Josh-Software-Logo.svg"), main_app.root_path, data: {'no-turbolink' =>  true})
-        .main-menu
-          %ul.nav.nav-pills
-            - if user_signed_in?
-              %li.dropdown.hide
-                = link_to "#", {:'data-toggle' => 'dropdown', class: 'dropdown-toggle'} do
-                  Notifications
-                  %span.badge.badge-important
+    .wrap
+      .logo
+        - if (params[:controller].eql?('light/users') and (params[:action].eql?('subscribe') or params[:action].eql?('unsubscribe'))) or (params[:controller].eql?('light/newsletters') and (params[:action].eql?('web_version')))
+          = link_to(image_tag("Josh-Software-Logo.svg"), "#", data: {'no-turbolink' =>  true})
+        - else
+          = link_to(image_tag("Josh-Software-Logo.svg"), main_app.root_path, data: {'no-turbolink' =>  true})
+      
+      .main-menu
+        %ul.nav.nav-pills{ role: 'menubar'}
+          - if user_signed_in?
+            %li.dropdown.hide
+              = link_to "#", {:'data-toggle' => 'dropdown', class: 'dropdown-toggle'} do
+                Notifications
+                %span.badge.badge-important
 
-                %ul.dropdown-menu
-                  %li
-                    .media.notification-menu
-                      = link_to "#", {class: 'pull-left'} do
-                        //%img.media-object{src: "/uploads/public_profile/image/525e3cf541c90efd02000001/medium_naruto.jpeg", height: 64}
-                      .media-body
-                        Cras sit amet nibh libero, in gravida nulla. Nulla metus scelerisque ante sollicitudin commodo
-              %li
-                = link_to "Employees", main_app.users_path
-              %li
-                = link_to "Screamout", screamout.contents_path, data: {'no-turbolink' =>  true}
-              %li
-                = link_to "Vendors", main_app.vendors_path, data: { 'no-turbolink' => true }
+              %ul.dropdown-menu
+                %li
+                  .media.notification-menu
+                    = link_to "#", {class: 'pull-left'} do
+                      //%img.media-object{src: "/uploads/public_profile/image/525e3cf541c90efd02000001/medium_naruto.jpeg", height: 64}
+                    .media-body
+                      Cras sit amet nibh libero, in gravida nulla. Nulla metus scelerisque ante sollicitudin commodo
+            %li
+              = link_to 'Employees', main_app.users_path, role: 'menuitem'
+            %li
+              = link_to 'Screamout', screamout.contents_path, data: {'no-turbolink' =>  true}, role: 'menuitem'
+            %li
+              = link_to 'Vendors', main_app.vendors_path, data: { 'no-turbolink' => true }, role: 'menuitem'
 
 
-                =# render 'layouts/project_menu'
-                =# render 'layouts/vendor_menu'
-              // Not this menu needs to be last in nav margin issues add any menu before this
+              =# render 'layouts/project_menu'
+              =# render 'layouts/vendor_menu'
+            // Not this menu needs to be last in nav margin issues add any menu before this
+            %li
+              = render 'layouts/user_menu'
+          - else
+            - if Rails.env.production?
               %li
-                = render 'layouts/user_menu'
+                =link_to "Sign in with Josh account", main_app.user_omniauth_authorize_path(:google_oauth2), role: 'menuitem'
             - else
-              - if Rails.env.production?
-                %li
-                  =link_to "Sign in with Josh account", main_app.user_omniauth_authorize_path(:google_oauth2)
-              - else
-                %li
-                  = link_to "Sign In", main_app.new_user_session_path
+              %li
+                = link_to "Sign In", main_app.new_user_session_path, role: 'menuitem'
+
   .container
     #spinner-wrapper
       #spinnerDiv
     - flash.each do |key, msg|
-      %div{class: flash_class(key), style: "margin-top: 15px;"}
+      %div{class: flash_class(key), role: 'alert', style: "margin-top: 15px;"}
         = msg
     - flash.clear
     = yield

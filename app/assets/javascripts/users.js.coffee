@@ -41,6 +41,7 @@ $(document).ready ->
         dataType: 'script'
         url:'/users' + '?' + params
       $(this).text('Show Approved')
+      $(this).attr('aria-label', 'Click here to show all approved users')
       $('tr[hide]').removeAttr('hidden')
       $('#show_text').text('Showing all- active & Inactive users.')
     else
@@ -49,6 +50,7 @@ $(document).ready ->
         dataType: 'script'
         url:'/users'
       $(this).text('Show All')
+      $(this).attr('aria-label', 'Click here to show all users')
       $('tr[hide]').attr('hidden', 'true')
       $('#show_text').text('Showing active users only.')
 

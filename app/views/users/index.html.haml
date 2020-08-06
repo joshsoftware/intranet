@@ -2,8 +2,8 @@
   %h2 Employees
   - if can? :edit, User
     .align.align-right
-      %h5.btn{id: 'show'} Show All
-      %h5.btn{id:'download_btn'}Download
+      %button{ type: 'button', id: 'show', role: 'button', 'arial-label': 'click here to show all users'} Show All
+      %button{ type: 'button', id:'download_btn', role: 'button', 'aria-label': 'Download all users'}Download
       %h5{id: 'show_text'} Showing active users only.
   %br
   %br

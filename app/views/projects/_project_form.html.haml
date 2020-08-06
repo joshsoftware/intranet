@@ -6,32 +6,32 @@
           = label_tag "Company Name", nil, class: 'control-label'
           .controls
             = select_tag :company_id, options_for_select(Company.pluck(:name, :id), f.object.try(:company).try(:id)), {:prompt => "-- Select Company --", class: "members", name: "project[company_id]", style: "width: 340px"}
-        = f.input :name, required: false, class: 'pull-left'
+        = f.input :name, required: true, 'aria-required': true, class: 'pull-left'
         = f.input :batch_name, collection: Project::TYPE_OF_BATCHES, prompt: 'Select Batch', label: 'Batch Name'
         = f.input :display_name, required: false
         = f.input :description, as: :text, input_html: {class: "text-description"}
         = f.input :url
         = f.input :billing_frequency, collection: Project::BILLING_FREQUENCY_TYPES, include_blank: false, label: 'Billing Frequency'
         = f.input :type_of_project, collection: Project::TYPE_OF_PROJECTS, include_blank: false, label: 'Type Of Project'
-        %div
+        %div.control-group
           = f.label "Is Active"
-          .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "True", "data-off-label" => "False"}
+          .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
             = f.check_box :is_active, {}, 'true', 'false'
-        %div
-          = f.label "Is Activity"
-          .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "True", "data-off-label" => "False"}
+        %div.control-group
+          = f.label "Is Activity" 
+          .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
             = f.check_box :is_activity, {}, 'true', 'false'
-        %div
+        %div.control-group
           =f.label 'Timesheet Mandatory'
-          .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "True", "data-off-label" => "False"}
+          .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
             = f.check_box :timesheet_mandatory, {}, 'true', 'false'
-        = f.input :start_date, input_html: {class: :datepicker}, value: f.object.start_date.try(:strftime, '%d-%m-%Y')
-        = f.input :end_date, input_html: {class: :datepicker}, value: f.object.end_date.try(:strftime, '%d-%m-%Y')
+        = f.input :start_date, required: true, 'aria-required': true, input_html: {type: :date, class: 'date-picker', value: f.object.start_date.try(:strftime, '%Y-%m-%d')}
+        = f.input :end_date, input_html: {type: :date, class: 'date-picker', value: f.object.end_date.try(:strftime, '%d-%m-%Y')}
         = label_tag "Case Study", nil, class: 'control-label'
-        = f.file_field :case_study, required: true, class: 'case_study_upload', accept: "application/pdf"
+        = f.file_field :case_study, required: true, 'aria-required': true, class: 'case_study_upload', accept: "application/pdf"
         %br
         = f.label 'Visible On Website'
-        .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "Yes", "data-off-label" => "No"}
+        .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "Yes", "data-off-label": "No"}
           = f.check_box :visible_on_website, {}, 'true', 'false'
         .control-group
           = label_tag "Managed By", nil, class: 'control-label'
@@ -39,10 +39,10 @@
             = select_tag :manager_ids, options_from_collection_for_select(Project.approved_manager_and_admin.to_a, :id, :name, @project.managers.collect{|user| user.id}), class: 'members', multiple: true, style: "width: 340px;", "data-placeholder"=> "You can add multiple managers", name: "project[manager_ids][]"
         .control-group
           = label_tag 'Client Logo', nil, class: 'control-label'
-          = f.file_field :logo, required: true, id: 'logo-upload', class: 'case_study_upload'
+          = f.file_field :logo, required: true, 'aria-required': true, id: 'logo-upload', class: 'case_study_upload'
           = image_tag f.object.logo, size: "50x50", id: 'project-logo'
-          = f.input :invoice_date, input_html: {class: :datepicker}, value: f.object.start_date.try(:strftime, '%d-%m-%Y')
-          = f.input :code, label: "Project Code", id: "projectcode" do
+          = f.input :invoice_date, input_html: {type: :date, class: 'date-picker', value: f.object.start_date.try(:strftime, '%Y-%m-%d')}
+          = f.input :code, label: 'Project Code', required: true, 'aria-required': true, id: 'projectcode' do
             = f.text_field :code, readonly: f.object.code
             - unless f.object.code.present?
               = link_to "javascript:void(0)", onclick: "generate_code();" do
@@ -55,7 +55,7 @@
 
       .col-md-6.pull-right.upload
         = image_tag f.object.image, size: "200x200", id: 'project-image'
-        = f.file_field :image, required: true, id: 'image-upload'
+        = f.file_field :image, required: true,' aria-required': true, id: 'image-upload'
   = f.hidden_field :update_project, value: "update_project"
   - if (@project.persisted? && @project.is_active) || @project.new_record?
     = f.submit :Save, class: 'btn controls btn-info'

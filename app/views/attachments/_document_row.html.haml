@@ -1,8 +1,8 @@
 %td
   %h4
     .remove_underline
-      = link_to doc.name, doc.document.url, data: { :colorbox => true, :colorbox_height => '700px', :colorbox_width => '700px', :colorbox_iframe => true }
-      = link_to "", download_document_attachment_path(doc), class: "icon-download"
+      = link_to doc.name, doc.document.url, role: 'button','aria-label': "Click here to view the document #{doc.name}", data: { :colorbox => true, :colorbox_height => '700px', :colorbox_width => '700px', :colorbox_iframe => true }
+      = link_to "", download_document_attachment_path(doc), role: 'button', 'aria-label': 'Download document', class: "icon-download"
 %td
   %h4.pull-right
     -if can? :mannage, Attachment

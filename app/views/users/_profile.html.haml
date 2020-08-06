@@ -36,17 +36,17 @@
           %tr 
             %td= image_tag "github_small.png", title: "Github Handle"
             %td
-              = link_to @user.public_profile.github_handle, "https://github.com/#{@user.public_profile.github_handle}", target: '_blank'
+              = link_to @user.public_profile.github_handle, "https://github.com/#{@user.public_profile.github_handle}", target: '_blank', 'aria-describedby': 'new-window-1'
         - if @user.public_profile.twitter_handle?
           %tr 
             %td= image_tag "twitter_small.png", title: "Twitter Handle"
             %td
-              = link_to @user.public_profile.twitter_handle, "https://twitter.com/#{@user.public_profile.twitter_handle}", target: '_blank'
+              = link_to @user.public_profile.twitter_handle, "https://twitter.com/#{@user.public_profile.twitter_handle}", target: '_blank', 'aria-describedby': 'new-window-1'
         - if @user.public_profile.blog_url?
           %tr 
             %td= image_tag "rss_small.png", title: "Blog Url"
             %td
-              = link_to truncate(@user.public_profile.blog_url, length: 30), "http://#{@user.public_profile.blog_url}", target: '_blank'
+              = link_to truncate(@user.public_profile.blog_url, length: 30), "http://#{@user.public_profile.blog_url}", target: '_blank', 'aria-describedby': 'new-window-1'
 :css
   .table{margin-top: 30px;}
   .table th { border-top: 1px solid #ffffff; }
