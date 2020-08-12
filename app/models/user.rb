@@ -90,6 +90,27 @@ class User
     [record.id.to_s, record.authenticatable_salt]
   end
 
+  def set_user_project_entries_inactive
+    projects.each do |project|
+      user_project_entry = user_projects.find_by(project: project)
+      user_project_entry.set(active: false, end_date: Date.today)
+    end
+  end
+
+  def remove_from_manager_ids
+    managed_projects.each do |project|
+      project.set(manager_ids: project.manager_ids.reject {|manager_id| manager_id == id})
+      self.set(managed_project_ids: [])
+    end
+  end
+
+  def remove_from_notification_emails
+    User.all.each do |user|
+      next if user.employee_detail.notification_emails.nil?
+      user.employee_detail.set(notification_emails: user.employee_detail.notification_emails.reject {|email| email == self.email})
+    end
+  end
+
   def notification_emails
     [
       User.approved.where(role: 'HR').pluck(:email), User.approved.where(role: 'Admin').first.try(:email),
