@@ -91,22 +91,18 @@ class User
   end
 
   def set_user_project_entries_inactive
-    projects.each do |project|
-      user_project_entry = user_projects.find_by(project: project)
-      user_project_entry.set(active: false, end_date: Date.today)
-    end
+    UserProject.where(user_id: self.id, active: true).update_all(active: false, end_date: Date.today)
   end
 
   def remove_from_manager_ids
     managed_projects.each do |project|
       project.set(manager_ids: project.manager_ids.reject {|manager_id| manager_id == id})
-      self.set(managed_project_ids: [])
     end
+    self.set(managed_project_ids: [])
   end
 
   def remove_from_notification_emails
-    User.all.each do |user|
-      next if user.employee_detail.notification_emails.nil?
+    User.where(:'employee_detail.notification_emails'.in => [self.email]).each do |user|
       user.employee_detail.set(notification_emails: user.employee_detail.notification_emails.reject {|email| email == self.email})
     end
   end
