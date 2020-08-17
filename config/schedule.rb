@@ -109,6 +109,10 @@ every :monday, :at => '09:00am' do
   rake "fetch_rollbar_statistics"
 end
 
+every :monday, :at => '09:30am' do
+  rake 'employees_working_hour_report'
+end
+
 every :tuesday, :at => '09:00am' do
   rake 'weekend_timesheet_report'
 end

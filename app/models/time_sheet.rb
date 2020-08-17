@@ -233,6 +233,12 @@ class TimeSheet
     return_value
   end
 
+  def self.formatted_duration(total_minute)
+    hours = total_minute / 60
+    minutes = (total_minute) % 60
+    "#{ hours }h #{ minutes }min"
+  end
+
   def check_time_format(time)
     return false if time.to_s.include?('.')
     return time + (':00') unless time.to_s.include?(':')
@@ -519,7 +525,7 @@ class TimeSheet
           weekend_report += timesheets.map { |i| [ i.project.name,
                                                    i.user.name,
                                                    i.date.to_s,
-                                                   DURATION_HASH[i.duration],
+                                                   formatted_duration(i.duration),
                                                    i.description] }
         end 
       end
@@ -527,6 +533,29 @@ class TimeSheet
     if weekend_report.present?
       csv = generate_weekend_report_in_csv_format(weekend_report)
       WeeklyTimesheetReportMailer.send_weekend_timesheet_report(csv, start_date).deliver_now!
+    end
+  end
+
+  def self.generate_and_send_employees_working_hour_report(dates, duration)
+    reports = []
+    dates.each do |date|
+      result = TimeSheet.get_users_and_total_worked_hours(date, duration)
+      if result.present?
+        users = result.map { |i| i[:_id][:user_id] }
+        users.each do |user|
+          timesheets = TimeSheet.where(date: date, user_id: user)
+          reports += timesheets.map { |i| [ i.project.name,
+                                            i.user.name,
+                                            i.date.to_s,
+                                            formatted_duration(i.duration),
+                                            i.description] }
+        end      
+      end
+    end
+
+    if reports.present?
+      csv = generate_weekend_report_in_csv_format(reports)
+      WeeklyTimesheetReportMailer.send_employees_working_hour_report(csv, dates.first).deliver_now!  
     end
   end
 
@@ -1179,6 +1208,33 @@ class TimeSheet
                 1000
               ]
             }
+          }
+        }
+      }
+    ])
+  end
+
+  def self.get_users_and_total_worked_hours(date, duration)
+    TimeSheet.collection.aggregate([
+      {
+        "$match" => {
+          "date" => date
+        }
+      },
+      {
+        "$group" => {
+          "_id" => {
+            "user_id" => "$user_id"
+          },
+          "total_duration" => {
+            "$sum" => "$duration"
+          }
+        }
+      },
+      {
+        "$match" => {
+          "total_duration" => {
+            "$gte" => duration
           }
         }
       }
