@@ -184,6 +184,13 @@ class User
     error_msg.join(' ')
   end
 
+  def reject_future_leaves
+    return if self.status == 'approved'
+    LeaveApplication.where(:start_at.gte => Date.today, user: self).each do |leave_application|
+      leave_application.update(leave_status: 'Rejected')
+    end
+  end
+
   def add_or_remove_projects(params)
     return_value_of_add_project = return_value_of_remove_project = true
     existing_project_ids = UserProject.where(user_id: id, end_date: nil).pluck(:project_id)
