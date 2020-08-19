@@ -30,4 +30,20 @@ describe PublicProfile do
         to_allow(BLOOD_GROUPS).on(:update)
      }
 
+  context 'Trigger - should call code monitor service' do
+    it 'when Public Profile(github, gitlab, bitbucket handles) is updated' do
+      user = FactoryGirl.build(:user)
+      user.build_public_profile
+      user.public_profile.github_handle = 'jiren'
+      stub_request(:get, "http://localhost?event_type=User+Updated&user_id=#{user.id}&public_profile_details=%7B%22bitbucket_handle%22%3D%3Enil%2C+%22github_handle%22%3D%3E%22jiren%22%2C+%22gitlab_handle%22%3D%3Enil%7D").
+        with(
+          headers: {
+            'Accept'=>'*/*',
+            'User-Agent'=>'Ruby'
+          }).
+        to_return(status: 200, body: "", headers: {})
+      user.save
+      expect(user.public_profile.github_handle).to eq('jiren')
+    end
+  end
 end
