@@ -144,7 +144,9 @@ class Project
         project.allocated_employees = project.users.count
         project.manager_name        = manager_names(project)
         project.employee_names      = employee_names(project)
-        csv << project.attributes.values_at(*column_names)
+        csv << project.as_json(
+          methods: [:manager_name, :allocated_employees, :employee_names]
+        ).values_at(*column_names)
       end;nil
     end
   end

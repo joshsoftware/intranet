@@ -3,6 +3,7 @@ namespace :resigned_employees do
   task reject_future_leaves: :environment do
     User.where(:status.ne => 'approved').each do |user|
       user.reject_future_leaves
+      p user.email
     end
   end
 

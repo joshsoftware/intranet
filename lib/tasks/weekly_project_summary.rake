@@ -1,4 +1,4 @@
-desc "Instanciate Weekly Project Summary Email notifiaction"
+desc "Instanciate Weekly Project Summary Email notification"
 task :weekly_project_summary => :environment do
   projects = Project.all
   weeks = 4 # Number of weeks we want to add in Notification Email.
