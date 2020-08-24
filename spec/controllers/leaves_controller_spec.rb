@@ -362,7 +362,7 @@ describe LeaveApplicationsController do
       expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
     end
 
-    it "should not deduct leaves if rejected already rejected leave" do
+    it "should not deduct leaves if already rejected leave" do
       available_leaves = @user.employee_detail.available_leaves
       leave_application = FactoryGirl.create(:leave_application, user: @user)
       number_of_days = HolidayList.number_of_working_days(leave_application.start_at, leave_application.end_at)
@@ -480,6 +480,28 @@ describe LeaveApplicationsController do
       expect(flash[:error]).to eq("End at should not be less than start date.")
       should render_template(:edit)
       expect(employee.reload.employee_detail.available_leaves).to eq(available_leaves)
+    end
+
+    it 'should update available_leaves leave_type is changed' do
+      sign_in employee
+      leave_app
+      employee.employee_detail.available_leaves = 10
+      employee.save
+      post :update, id: leave_app.id, leave_application: {
+        leave_type: LeaveApplication::WFH
+      }
+      expect(employee.reload.employee_detail.available_leaves).to eq(12)
+    end
+
+    it 'should update available_leaves leave_type is changed' do
+      sign_in employee
+      leave_app = FactoryGirl.create(:leave_application, user: employee, leave_type: LeaveApplication::WFH)
+      employee.employee_detail.available_leaves = 10
+      employee.save
+      post :update, id: leave_app.id, leave_application: {
+        leave_type: LeaveApplication::LEAVE
+      }
+      expect(employee.reload.employee_detail.available_leaves).to eq(8)
     end
   end
 

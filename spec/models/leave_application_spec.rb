@@ -268,7 +268,7 @@ describe LeaveApplication do
       end
 
       context 'Leave reminder mail' do
-        let!(:user) { FactoryGirl.create(:user) }
+        let!(:user) { FactoryGirl.create(:employee) }
         let!(:project) { FactoryGirl.create(:project, manager_ids: [user.id])}
         let!(:user_project) { FactoryGirl.create(:user_project, user: user, project: project
         )}
@@ -336,8 +336,8 @@ describe LeaveApplication do
       it 'deduct leave from available leave' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        leave_application = create(:leave_application, user: user, number_of_days: 1)
-        expect(employee_detail.available_leaves).to eq(available_leaves - 1)
+        leave_application = create(:leave_application, user: user, number_of_days: 2)
+        expect(employee_detail.available_leaves).to eq(available_leaves - 2)
       end
     end
 
@@ -362,6 +362,26 @@ describe LeaveApplication do
         leave_application.number_of_days = 2
         leave_application.save
         expect(employee_detail.available_leaves).to eq(available_leaves - leave_application.number_of_days)
+      end
+
+      it 'should update available leaves when leave type changed from LEAVE to WFH' do
+        employee_detail = user.employee_detail
+        available_leaves = employee_detail.available_leaves
+        leave_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LeaveApplication::LEAVE)
+        expect(employee_detail.reload.available_leaves).to eq(available_leaves - leave_application.number_of_days)
+        leave_application.leave_type = LeaveApplication::WFH
+        leave_application.save
+        expect(employee_detail.reload.available_leaves).to eq(available_leaves)
+      end
+
+      it 'should update available leaves when leave type changed from WFH to LEAVE' do
+        employee_detail = user.employee_detail
+        available_leaves = employee_detail.available_leaves
+        leave_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LeaveApplication::WFH)
+        expect(employee_detail.reload.available_leaves).to eq(available_leaves)
+        leave_application.leave_type = LeaveApplication::LEAVE
+        leave_application.save
+        expect(employee_detail.reload.available_leaves).to eq(available_leaves - leave_application.number_of_days)
       end
     end
   end

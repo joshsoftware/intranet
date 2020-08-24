@@ -3,5 +3,6 @@ FactoryGirl.define do
     designation
     location {"Pune"}
     available_leaves { 24 }
+    notification_emails { [] }
   end
 end

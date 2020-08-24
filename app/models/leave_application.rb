@@ -153,36 +153,42 @@ class LeaveApplication
   end
 
   private
-
+  # this will execute always after_save
   def deduct_available_leave_send_mail
     # Since leave has been deducted on creation, don't deduct leaves
     # if changed from PENDING to APPROVED
     # Deduct on creation and changed from 'Rejected' to 'Approved'
     user = self.user
-    start_at = self.start_at
-    end_at = self.end_at
-    number_of_days = 0
-    # deduction should happen only for the leaves applied this year
-    if Date.today.year == start_at.year
-      # current end_at date is the minimum value as addition or deduction is of only this years' leaves
-      # for 25th DEC to 5th JAN, end_at = 31st DEC
-      # for 20th DEC to 23rd DEC, end_at = 23rd DEC
-      end_at = [end_at, start_at.end_of_year].min
-      number_of_days = HolidayList.number_of_working_days(start_at, end_at)
-    elsif Date.today.year == end_at.year
-      # for last year leaves lying end date in current year
-      start_at = [start_at, end_at.beginning_of_year].max
-      number_of_days = HolidayList.number_of_working_days(start_at, end_at)
+    # this if block will be executed only if is a leave and leave_status was nil and now is pending or is changed from rejected to approved
+    if (leave_request? and ((pending? and self.leave_status_was.nil?) or (approved? and self.leave_status_was == REJECTED)))
+      start_at = self.start_at
+      end_at = self.end_at
+
+      # deduction should happen only for the leaves applied this year
+      if Date.today.year == start_at.year
+        # current end_at date is the minimum value as addition or deduction is of only this years' leaves
+        # for 25th DEC to 5th JAN, end_at = 31st DEC
+        # for 20th DEC to 23rd DEC, end_at = 23rd DEC
+        end_at = [end_at, start_at.end_of_year].min
+        number_of_days = HolidayList.number_of_working_days(start_at, end_at)
+        user.employee_detail.deduct_available_leaves(number_of_days)
+      elsif Date.today.year == end_at.year
+        # for last year leaves lying end date in current year
+        start_at = [start_at, end_at.beginning_of_year].max
+        number_of_days = HolidayList.number_of_working_days(start_at, end_at)
+        user.employee_detail.deduct_available_leaves(number_of_days)
+      end
     end
-    if (pending? and self.leave_status_was.nil?) or (approved? and self.leave_status_was == REJECTED)
-      user.employee_detail.deduct_available_leaves(number_of_days) if leave_request?
+
+    if (pending? and self.leave_status_was.nil?)
       user.sent_mail_for_approval(self.id)
     end
   end
 
+  # this will execute only if leave_status is pending and some update is done
   def update_available_leave_send_mail
     user = self.user
-    if leave_request?
+    if leave_type_was == LEAVE
       end_at_was = self.end_at_was
       start_at_was = self.start_at_was
       # same condition as in deduct_available_leave_send_mail
@@ -195,6 +201,9 @@ class LeaveApplication
         prev_number_of_days = HolidayList.number_of_working_days(start_at_was, end_at_was)
         user.employee_detail.add_rejected_leave(prev_number_of_days)
       end
+    end
+
+    if leave_request?
       start_at = self.start_at
       end_at = self.end_at
       # the leave currently is for going year
