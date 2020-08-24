@@ -10,7 +10,7 @@ namespace :timesheet_reminder do
   end
 
   desc "Reminds if user has filled timesheet for project which is not assigned to him"
-  task :timesheet_for_diffrent_project => :environment do
-    TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_diffrent_project
+  task :timesheet_for_different_project => :environment do
+    TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_different_project
   end
 end

@@ -72,6 +72,34 @@
   font-size: 36px;
 }
 
+.upload-timesheet-icon{
+  font-size: 36px;
+  color: #005580;
+  padding-left: 10px;
+}
+
+.verticle-line {
+  border-left: 1px solid black;
+  padding: 0px 10px 0px 10px;
+}
+
+#import_timesheet_table {
+  width: 400px;
+  margin-left: 20%;
+  tr {
+    border-style: hidden;
+  }
+}
+
+.file-hint {
+  font-size: 14px;
+}
+
 .add-new-timesheet{
   margin-left: 30em;
+}
+
+#sample_report {
+  text-decoration: none;
+  font-size: 0.9em;
 }

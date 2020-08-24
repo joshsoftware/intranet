@@ -1,0 +1,10 @@
+#upload_timesheets_modal.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "Upload Timesheet", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h3.modal-title Upload Timesheet
+      .modal-body
+        = render 'upload_form'
+      .modal-footer

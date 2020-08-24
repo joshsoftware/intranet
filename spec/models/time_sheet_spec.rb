@@ -1343,11 +1343,12 @@ RSpec.describe TimeSheet, type: :model do
 
   context 'Generate weekly report in csv format' do
     it 'Should generate csv' do
+      headers = ['Employee name', 'Project name', 'No of days worked', 'Leaves', 'Holidays']
       weekly_report = [
         ['employee_test1', 'project_test1', '0 days 6h (6h)', 1, 0],
         ['employee_test2', 'project_test2', '0 days 3h (3h)', 2, 1]
       ]
-      csv = TimeSheet.generate_weekly_report_in_csv_format(weekly_report)
+      csv = TimeSheet.generate_report_in_csv_format(headers, weekly_report)
       expect(csv).to eq(
         "Employee name,Project name,No of days worked,Leaves,Holidays\nemployee_test1,project_test1,0 days 6h (6h),1,0\nemployee_test2,project_test2,0 days 3h (3h),2,1\n"
       )
@@ -2082,7 +2083,7 @@ RSpec.describe TimeSheet, type: :model do
     let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 5) }
     it 'should send mail if user is not assinged on project and filled timesheet' do
       time_sheet = FactoryGirl.create(:time_sheet, user: user, project: project, created_at: Date.today - 1)
-      TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_diffrent_project
+      TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_different_project
       expect(ActionMailer::Base.deliveries.count).to eq(1)
     end
 
@@ -2256,12 +2257,12 @@ RSpec.describe TimeSheet, type: :model do
       to_date   = Date.today
       TimeSheet.get_users_who_not_filled_timesheet(from_date, to_date)
       timesheet    = FactoryGirl.create(:time_sheet, user: user, project: project, date: Date.today - 1)
-      TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_diffrent_project
+      TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_different_project
       expect(ActionMailer::Base.deliveries.count).to eq(0)
     end
 
     it "should not send mail if timesheet data empty" do
-      TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_diffrent_project
+      TimeSheet.get_users_and_timesheet_who_have_filled_timesheet_for_different_project
       expect(ActionMailer::Base.deliveries.count).to eq(0)
     end
   end

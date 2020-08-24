@@ -86,7 +86,7 @@ every :month, :at => 'start of the month at 09:30am' do
 end
 
 every :day, :at => '10:00am' do
-  rake "timesheet_reminder:timesheet_for_diffrent_project"
+  rake "timesheet_reminder:timesheet_for_different_project"
 end
 
 every :day, :at => '09:30am' do

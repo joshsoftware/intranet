@@ -1,0 +1,20 @@
+= form_tag import_time_sheets_path, multipart: true do
+  %table.table#import_timesheet_table
+    %tbody
+      %tr
+        %th
+          %label{for: 'fileName'} Name
+        %td
+          %input#fileName{placeholder: 'Enter File Name', type: 'text', name: 'file_name', required: true, style: 'height: 2em;'}
+      %tr
+        %th
+          %label Upload File  
+        %td
+          = file_field_tag :file, required: true, accept: '.csv'
+          %p.file-hint (Note: Select only .csv file)
+          %br
+            = link_to 'Download Sample CSV file', '/sample_import_timesheet_report.csv', id: 'sample_report'
+
+  %br.text-center
+    %button.btn{type: 'submit'} Submit
+    %button.btn{type: 'button', 'data-dismiss': 'modal' } Close

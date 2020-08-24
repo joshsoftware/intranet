@@ -1,3 +1,5 @@
+= render 'upload_modal'
+
 .timesheet_report_form
   = form_tag time_sheets_path, method: 'GET', class: 'form form-inline' do
     %label From Date:
@@ -5,7 +7,10 @@
     %label To Date:
     = text_field_tag :to_date, params[:to_date], class: "form-control datepicker", placeholder: "To Date", value: @to_date, style: "height: 2em;"
     = submit_tag "Search", class: "btn btn-primary"
-    .pull-right
+    .pull-right.remove_underline
       = link_to '', new_time_sheet_path(user_id: current_user.id, from_date: @from_date, to_date: @to_date), "data-toggle" => "tooltip", title: 'Add Timesheet', class: "icon-plus add-timesheet-icon"
+      - if current_user.role == 'HR'
+        = content_tag :a, "", href: '#upload_timesheets_modal', data: { toggle: 'modal'}, "data-toggle": "tooltip", title: "Click to upload timesheet csv file", class: "icon-upload-alt upload-timesheet-icon verticle-line" 
+
 .timesheet_report
   = render 'time_sheets/timesheet_report_view', timesheet_reports: @timesheet_report

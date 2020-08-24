@@ -531,7 +531,8 @@ class TimeSheet
       end
     end
     if weekend_report.present?
-      csv = generate_weekend_report_in_csv_format(weekend_report)
+      headers = ['Project Name', 'Employee Name', 'Date', 'Duration', 'Description']
+      csv = generate_report_in_csv_format(headers, weekend_report)
       WeeklyTimesheetReportMailer.send_weekend_timesheet_report(csv, start_date).deliver_now!
     end
   end
@@ -554,7 +555,8 @@ class TimeSheet
     end
 
     if reports.present?
-      csv = generate_weekend_report_in_csv_format(reports)
+      headers = ['Project Name', 'Employee Name', 'Date', 'Duration', 'Description']
+      csv = generate_report_in_csv_format(headers, reports)
       WeeklyTimesheetReportMailer.send_employees_working_hour_report(csv, dates.first).deliver_now!  
     end
   end
@@ -704,7 +706,8 @@ class TimeSheet
   end
 
   def self.send_report_through_mail(weekly_report, email, unfilled_time_sheet_report)
-    csv = generate_weekly_report_in_csv_format(weekly_report)
+    headers = ['Employee name', 'Project name', 'No of days worked', 'Leaves', 'Holidays'] 
+    csv = generate_report_in_csv_format(headers, weekly_report)
     WeeklyTimesheetReportMailer.send_weekly_timesheet_report(csv, email, unfilled_time_sheet_report).deliver_now!
   end
 
@@ -786,40 +789,15 @@ class TimeSheet
     total_leaves_count
   end
 
-  def self.generate_weekly_report_in_csv_format(weekly_report)
-    headers = ['Employee name', 'Project name', 'No of days worked', 'Leaves', 'Holidays']
-    weekly_report_in_csv =
+  def self.generate_report_in_csv_format(headers, reports)
+    report_in_csv =
       CSV.generate(headers: true) do |csv|
         csv << headers
-        weekly_report.each do |report|
+        reports.each do |report|
           csv << report
         end
       end
-    weekly_report_in_csv
-  end
-
-  def self.generate_weekend_report_in_csv_format(weekly_report)
-    headers = ['Project Name', 'Employee Name', 'Date', 'Duration', 'Description']
-    weekly_report_in_csv =
-      CSV.generate(headers: true) do |csv|
-        csv << headers
-        weekly_report.each do |report|
-          csv << report
-        end
-      end
-    weekly_report_in_csv
-  end
-
-  def self.generate_csv_for_project_record(time_sheet_details)
-    headers = ['Employee name', 'Date(dd/mm/yyyy)', 'No of hours', 'Details']
-    project_report =
-      CSV.generate(headers: true) do |csv|
-        csv << headers
-        time_sheet_details.each do |time_sheet|
-          csv << time_sheet
-        end
-      end
-    project_report
+    report_in_csv
   end
 
   def self.sort_on_user_name_and_project_name(timesheet_reports)
@@ -1107,7 +1085,7 @@ class TimeSheet
     Project.find_by(id: project_id)
   end
 
-  def self.get_users_and_timesheet_who_have_filled_timesheet_for_diffrent_project
+  def self.get_users_and_timesheet_who_have_filled_timesheet_for_different_project
     activity_ids = Project.where(is_activity: true).pluck(:id)
     User.approved.each do | user |
       user_timesheet = []
@@ -1132,7 +1110,7 @@ class TimeSheet
         user_timesheet << time_sheet_data
       end
       if user_timesheet.present?
-        TimesheetRemainderMailer.user_timesheet_for_diffrent_project(user, user_timesheet).deliver_now
+        TimesheetRemainderMailer.user_timesheet_for_different_project(user, user_timesheet).deliver_now
       end
     end
   end
@@ -1288,21 +1266,10 @@ class TimeSheet
     ])
   end
 
-  def self.generate_csv_for_employees_not_filled_timesheet(employee_list)
-    headers = ['Employee ID', 'Employee Name', 'Employee Email', 'Date_Not_filled']
-      weekly_report_in_csv =
-        CSV.generate(headers: true) do |csv|
-          csv << headers
-          employee_list.each do |employee|
-            csv << employee
-          end
-        end
-    weekly_report_in_csv
-  end
-
   def self.send_employee_list_through_mail(employee_list,from_date, to_date)
     emails  = User.get_hr_emails
-    csv     = generate_csv_for_employees_not_filled_timesheet(employee_list)
+    headers = ['Employee ID', 'Employee Name', 'Employee Email', 'Date_Not_filled']
+    csv     = generate_report_in_csv_format(headers, employee_list)
     text    = "PFA Employee List- Who have not filled timesheet from #{from_date} to #{to_date}"
     options = { csv: csv, text: text, emails: emails, from_date: from_date, to_date: to_date }
     WeeklyTimesheetReportMailer.send_report_who_havent_filled_timesheet(options).deliver_now!

@@ -345,6 +345,37 @@ RSpec.describe TimeSheetsController, type: :controller do
     end
   end
 
+  context 'Import' do
+    let!(:hr) { FactoryGirl.create(:hr) }
+
+    before(:all) do
+      FactoryGirl.create(:user, email: 'test@joshsoftware.com')
+      FactoryGirl.create(:project, name: 'Brand Scope')
+    end
+
+    it 'send mail after processing the uploaded file' do
+      Sidekiq::Testing.inline! do
+        sign_in hr
+        file_path = Rails.root.join('spec/fixtures/files/timesheets.csv')
+        file = fixture_file_upload(file_path)
+        name = 'Testing'
+        email = hr.email
+        params = {
+          file: file,
+          file_name: name,
+          email: email
+        }
+        post :import, params
+
+        should redirect_to(time_sheets_path)
+        expect(flash[:notice]).to eq('File Uploaded Successfully, you will ' +
+          'shortly receive a mail regarding the current status of the file')
+        expect(ActionMailer::Base.deliveries.count).to eq(1)
+        expect(ActionMailer::Base.deliveries.first.subject).to eq('Uploaded Timesheet Status Report')
+      end
+    end
+  end
+
   context 'Show' do
     let!(:user) { FactoryGirl.create(:admin) }
     let!(:project1) { FactoryGirl.create(:project) }

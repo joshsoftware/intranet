@@ -13,7 +13,7 @@ class TimesheetRemainderMailer < ActionMailer::Base
     mail(subject: 'Timesheet Reminder', to: user.email, cc: receivers )
   end
 
-  def user_timesheet_for_diffrent_project(user, timesheets)
+  def user_timesheet_for_different_project(user, timesheets)
     managers_emails = []
     @user           = user
     managers_emails = @user.get_managers_emails_for_timesheet
@@ -24,6 +24,17 @@ class TimesheetRemainderMailer < ActionMailer::Base
       to: user.email,
       cc: managers_emails + hr_emails
     )
+  end
 
+  def import_timesheet_report(email, file_name, csv)
+    user = User.where(email: email).first
+    @user_name = user.public_profile.first_name
+    @file_name = file_name
+    csv_name = file_name.downcase.gsub(' ', '_')
+    attachments["#{csv_name}_timesheet_file_#{Date.today}.csv"] = csv
+    mail(
+      subject: 'Result for Uploaded Timesheet File',
+      to: email
+    )
   end
 end

@@ -1,7 +1,8 @@
 class TimeSheetsController < ApplicationController
   before_action :authenticate_user!
   skip_before_filter :verify_authenticity_token
-  load_and_authorize_resource only: [:index, :users_timesheet, :edit_timesheet, :update_timesheet, :new, :projects_report, :add_time_sheet]
+  load_and_authorize_resource only: [:index, :users_timesheet, :edit_timesheet, :update_timesheet,
+                                     :new, :projects_report, :add_time_sheet, :import]
   load_and_authorize_resource only: :individual_project_report, class: Project
   before_action :user_exists?, only: [:create, :daily_status]
 
@@ -161,6 +162,16 @@ class TimeSheetsController < ApplicationController
       flash[:success] = "You will receive summary report to your mail shortly."
       WeeklyTimesheetReportMailer.delay.send_timesheet_summary_report(options) if options.present?
     end
+  end
+
+  def import
+    if params[:file].present? && params[:file_name]
+      ImportTimesheetWorker.perform_async(params[:file].path, params[:file_name], current_user.email)
+      flash[:notice] = 'File Uploaded Successfully, you will shortly receive a mail regarding the processing result of the file.'
+    else
+      flash[:error] = 'Please enter all the required fields.'
+    end
+    redirect_to time_sheets_path
   end
 
   private
