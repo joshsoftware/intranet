@@ -1,9 +1,14 @@
 class RepositoriesController < ApplicationController
   before_action :authenticate_user!
+  before_action :load_repository, only: [:repository_issues]
   @@snap_id = nil
 
   def overview_index
     @repositories = Repository.where(:name.nin => [nil, ''])
+    if ['Employee', 'Intern'].include?(current_user.role)
+      project_ids = current_user.project_ids
+      @repositories = @repositories.where( project_id: { '$in': project_ids })
+    end
   end
 
   def repository_issues
@@ -12,7 +17,7 @@ class RepositoriesController < ApplicationController
     begin
       response = HTTParty.get(url, headers: headers, timeout: 20)
     rescue Timeout::Error => e
-      puts "Error: Request Timeout for #{repo.project.name}"
+      puts "Error: Request Timeout for #{@repo.project.name}"
     end
     response = JSON.parse(response.body)['data']
     if response
@@ -46,7 +51,7 @@ class RepositoriesController < ApplicationController
     begin
       response = HTTParty.get(url, headers: headers, timeout: 20)
     rescue Timeout::Error => e
-      puts "Error: Request Timeout for #{repo.project.name}"
+      puts "Error: Request Timeout for  #{@repo.project.name}"
     end
     response = JSON.parse(response.body)
     if response && response['meta'] && response['meta']['current_page'] <= response['meta']['total_pages']
@@ -54,5 +59,9 @@ class RepositoriesController < ApplicationController
     else
       return {}
     end
+  end
+
+  def load_repository
+    @repo = Repository.where(code_climate_id: params[:repo_id]).first
   end
 end

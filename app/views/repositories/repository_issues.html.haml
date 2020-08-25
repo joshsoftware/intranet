@@ -6,7 +6,16 @@
     %h4.right Total Issues : #{@response_body['meta']['total_count']}
 
 %div{class:"form-horizontal"}
-  %table.table.table-hover#issues_table
+  %nav.navbar.navbar-inverse
+    .container-fluid
+      %ul.nav.navbar-nav
+        %li.nav-item
+          %span#issues_per_page.content
+        %li.nav-item
+          %input#searchbox.form-control{:autocomplete => 'off', :placeholder => 'Search', :type => 'text'}/
+          %span.glyphicon.glyphicon-search.search-icon
+
+  %table.table.table-hover{ id: "#{@repo_name}_issues_table"}
     %thead
       %tr
         %th #
@@ -16,26 +25,41 @@
         %th File
         %th Line Number
     %tbody
-      %script#issues_template{:type => "text/html"}
-        %tr
-          {{#record}}
-          %td
-            {{index}}
-          %td
-            {{attributes.description}}
-          %td.severity{style:"color:{{color}}"}
-            {{attributes.severity}}
-          %td
-            {{attributes.categories}}
-          %td
-            {{attributes.constant_name}}
-          %td
-            {{attributes.location.start_line}}
-          {{/record}}
+      - if @response_body["data"].present?
+        %script{type: 'text/html', id: "#{@repo_name}_issues_template"}
+          %tr
+            {{#record}}
+            %td
+              {{index}}
+            %td
+              {{attributes.description}}
+            %td.severity{style:"color:{{color}}"}
+              {{attributes.severity}}
+            %td
+              {{attributes.categories}}
+            %td
+              {{attributes.constant_name}}
+            %td
+              {{attributes.location.start_line}}
+            {{/record}}
 
-  - if @response_body["data"].nil?
-    %center
-      NO Rows Found
+      - else
+        %tr
+          %td{ colspan: 6}
+            %center
+              NO Rows Found
+
+.col-lg-12.padding_none.pull-right
+  #repo_issues_pagination.col-lg-12
+  .col-lg-6.content
 
 :coffeescript
+  $('.per-page').css 'height', 30
   @data = #{@response_body["data"].to_json}
+  @repo_name = "#{@repo_name}"
+  FilterJSInitialize();
+
+  $(document).on 'page:before-change', ->
+    if typeof fjs isnt 'undefined'
+      fjs.stopStreaming()
+

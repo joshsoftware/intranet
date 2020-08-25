@@ -55,9 +55,8 @@
   %li
     = link_to "Office Entry Pass", '/entry_passes'
 
-  - if ['Manager'].include?(current_user.role)  
-    %li
-      = link_to 'Repositories', main_app.overview_index_repositories_path, data: {'no-turbolink' =>  true}
+  %li
+    = link_to 'Repositories', main_app.overview_index_repositories_path, data: {'no-turbolink' =>  true}
   
   %li.divider
 
