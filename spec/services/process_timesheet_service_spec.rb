@@ -103,7 +103,7 @@ RSpec.describe ProcessTimesheetService do
         ImportTimesheetWorker.perform_async(file_path, file_name, email)
 
         expect(ActionMailer::Base.deliveries.count).to eq(1)
-        expect(ActionMailer::Base.deliveries.first.subject).to eq('Uploaded Timesheet Status Report')
+        expect(ActionMailer::Base.deliveries.first.subject).to eq('Result for Uploaded Timesheet File')
       end
     end
   end

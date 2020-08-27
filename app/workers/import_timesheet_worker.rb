@@ -9,7 +9,7 @@ class ImportTimesheetWorker
       if check_values(row)
         processed_timesheets << service.call(row)
       else
-        processed_timesheets << update_status(row, 'Should Enter all Fields')
+        processed_timesheets << service.update_status(row, 'Should Enter all Fields')
       end
     end
 
