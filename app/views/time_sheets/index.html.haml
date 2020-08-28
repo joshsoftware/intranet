@@ -12,5 +12,8 @@
       - if current_user.role == 'HR'
         = content_tag :a, "", href: '#upload_timesheets_modal', data: { toggle: 'modal'}, "data-toggle": "tooltip", title: "Click to upload timesheet csv file", class: "icon-upload-alt upload-timesheet-icon verticle-line" 
 
+%span{ id: 'activeProjectList', data: { value: project_names }, visibility: 'hidden'}
+%span{ id: 'activeProjectData', data: { value: project_data }, visibility: 'hidden'}
+
 .timesheet_report
   = render 'time_sheets/timesheet_report_view', timesheet_reports: @timesheet_report

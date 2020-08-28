@@ -26,3 +26,7 @@
           %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, placeholder: 'Select', label: false
           %td= time_sheet.input :description, as: :text, label: false
   = f.submit :Update, class: "btn edit-timesheet-update"
+
+%span{ id: 'activeProjectList', data: { value: project_names }, visibility: 'hidden'}
+%span{ id: 'activeProjectData', data: { value: project_data }, visibility: 'hidden'}
+  

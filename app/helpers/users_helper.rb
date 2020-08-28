@@ -27,4 +27,11 @@ module UsersHelper
       months
     end
   end
+
+  def project_info
+    details = []
+    projects = @user.project_details
+    projects.each { |i| details << { name: i[:name], path: edit_project_url(i[:id]) }}
+    details
+  end
 end

@@ -25,8 +25,9 @@ class TimeSheetsController < ApplicationController
   def index
     @from_date = params[:from_date] || Date.today.beginning_of_month.to_s
     @to_date = params[:to_date] || Date.today.to_s
+    @user = current_user
     timesheets = TimeSheet.load_timesheet(@time_sheets.pluck(:id), @from_date.to_date, @to_date.to_date) if TimeSheet.from_date_less_than_to_date?(@from_date, @to_date)
-    @timesheet_report, @users_without_timesheet = TimeSheet.generate_employee_timesheet_report(timesheets, @from_date.to_date, @to_date.to_date, current_user) if timesheets.present?
+    @timesheet_report, @users_without_timesheet = TimeSheet.generate_employee_timesheet_report(timesheets, @from_date.to_date, @to_date.to_date, @user) if timesheets.present?
   end
 
   def users_timesheet

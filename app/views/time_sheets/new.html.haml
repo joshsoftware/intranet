@@ -28,3 +28,6 @@
   = f.hidden_field :to_date, value: @to_date
   = f.link_to_add 'Add new timesheet', :time_sheets, data: {target: '#timesheets'}, class: 'btn add-new-timesheet'
   = f.submit :Save, class: "btn"
+
+%span{ id: 'activeProjectList', data: { value: project_names }, visibility: 'hidden'}
+%span{ id: 'activeProjectData', data: { value: project_data }, visibility: 'hidden'}

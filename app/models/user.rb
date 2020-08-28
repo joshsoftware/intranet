@@ -252,7 +252,24 @@ class User
   end
 
   def project_ids
-    project_ids = user_projects.where(end_date: nil).pluck(:project_id)
+    project_ids = user_projects.where(active: true, end_date: nil)
+                               .pluck(:project_id)
+  end
+
+  def project_details
+    details = employee_project_details
+    manager_projects = managed_projects.where(is_active: true)
+    manager_projects.each { |i| details << { id: i.id, name: i.name }}
+    details
+  end
+
+  def employee_project_details
+    details = []
+    project_ids.each do |id|
+      project = Project.where(id: id).first
+      details << { id: project.id, name: project.name }
+    end
+    details
   end
 
   def worked_on_projects(from_date, to_date)
