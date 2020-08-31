@@ -544,11 +544,14 @@ class TimeSheet
       if result.present?
         users = result.map { |i| i[:_id][:user_id] }
         users.each do |user|
-          timesheets = TimeSheet.where(date: date, user_id: user)
-          reports += timesheets.map { |i| [ i.date.to_s,
-                                            i.user.name,
-                                            i.project.name,
-                                            formatted_duration(i.duration)] }
+          timesheets = TimeSheet.where(date: date, user_id: user).group_by(&:project_id)
+          timesheets.keys.each do |key|
+            total_duration = timesheets[key].map(&:duration).sum
+            reports << [  timesheets[key].first.date.to_s,
+                          timesheets[key].first.user.name,
+                          timesheets[key].first.project.name,
+                          formatted_duration(total_duration)]
+          end
         end
       end
     end
