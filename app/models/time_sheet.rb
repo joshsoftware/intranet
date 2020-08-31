@@ -545,17 +545,16 @@ class TimeSheet
         users = result.map { |i| i[:_id][:user_id] }
         users.each do |user|
           timesheets = TimeSheet.where(date: date, user_id: user)
-          reports += timesheets.map { |i| [ i.project.name,
+          reports += timesheets.map { |i| [ i.date.to_s,
                                             i.user.name,
-                                            i.date.to_s,
-                                            formatted_duration(i.duration),
-                                            i.description] }
-        end      
+                                            i.project.name,
+                                            formatted_duration(i.duration)] }
+        end
       end
     end
 
     if reports.present?
-      headers = ['Project Name', 'Employee Name', 'Date', 'Duration', 'Description']
+      headers = ['Date', 'Employee Name', 'Project Name', 'Total time spent']
       csv = generate_report_in_csv_format(headers, reports)
       WeeklyTimesheetReportMailer.send_employees_working_hour_report(csv, dates.first).deliver_now!  
     end
