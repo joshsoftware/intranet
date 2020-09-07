@@ -78,11 +78,15 @@ class User
   scope :leaders, ->{ visible_on_website.asc(:website_sequence_number).in(role: ROLE[:admin]) }
   scope :members, ->{ visible_on_website.nin(role: ROLE[:admin]).asc(['public_profile.first_name']) }
 
-
   before_create do
     self.website_sequence_number = (User.max(:website_sequence_number) || 0) + 1
   end
 
+  before_save do
+    assign_leave('Role Updated') if self.role_changed? &&
+                                    self.role_was == INTERN_ROLE &&
+                                    self.role == 'Employee'
+  end
 
   slug :name
   # Hack for Devise as specified in https://github.com/plataformatec/devise/issues/2949#issuecomment-40520236
