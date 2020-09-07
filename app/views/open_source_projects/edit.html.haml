@@ -1,0 +1,10 @@
+%h2.row
+  .span6
+    Edit #{@open_source_project.name}
+  .offset7{style: "float: right;"}
+    = link_to '', new_open_source_project_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Add Project",
+                 class: "icon-plus"
+    |
+    = link_to '', open_source_projects_path, "data-toggle" => "tooltip", title: "All Projects",
+                 class: " icon-th-list"
+= render 'form'

@@ -1,0 +1,49 @@
+- new_project = !@open_source_project.persisted?
+
+= simple_nested_form_for @open_source_project, :html => {class: "form-horizontal"} do |f|
+  .control-group
+    .row
+      = f.input :name, class: 'pull-left'
+      = f.input :description, as: :text, input_html: {class: "text-description"}
+      %div
+        = f.label "Showcase on Website"
+        .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "Yes", "data-off-label" => "No"}
+          = f.check_box :showcase_on_website, {}, 'true', 'false'
+      = f.input :url
+      .control-group
+        = label_tag "Developed By", nil, class: 'control-label'
+        .controls
+          = select_tag :user_ids, options_from_collection_for_select(User.employees.to_a, :id, :name, @open_source_project.users.collect{|user| user.id}), class: 'members', multiple: true, style: "width: 340px;", "data-placeholder"=> "You can add multiple developers", name: "open_source_project[user_ids][]"
+      = label_tag "Case Study", nil, class: 'control-label'
+      = f.file_field :case_study, required: true, class: 'case_study_upload', accept: "application/pdf"
+      %br
+      %br
+      = label_tag 'Image', nil, class: 'control-label'
+      .photo
+        = image_tag f.object.image, size: "200x200", id: 'project-logo', style: "margin-left: 20"
+        %br
+        %br
+        = f.file_field :image, required: true, id: 'logo-upload', style: 'margin-left: 180'
+      %br
+    .row
+      %hr
+      %h4 Technology Details
+      #tech_detail_fields
+        = f.fields_for :technology_details do|t|
+          .row
+            .span4.off-set2
+              = t.input :name, collection: (LANGUAGE + FRAMEWORK).sort_by(&:downcase), input_html: {"data-placeholder" => "Add Technology",class:'technology'}, label: "Technology/Framework", include_blank: true, include_hidden: false
+            .span4.off-set2
+              = t.input :version
+            .span2.off-set2
+              = t.link_to_remove 'Remove', class: 'btn btn-danger'
+      .offset3
+        = f.link_to_add 'Add More', :technology_details, data: {target: "#tech_detail_fields"}, class: 'btn btn-success'
+  = f.submit :Save, class: 'btn controls btn-info'
+
+:javascript
+  $(".members").select2();
+  $(".technology").select2({width:'100%'})
+  $(document).on('nested:fieldAdded', function() {
+    $('select.technology').select2({ width : '100%' });
+  });

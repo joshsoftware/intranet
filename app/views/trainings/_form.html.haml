@@ -1,0 +1,77 @@
+= simple_nested_form_for @training, :html => {class: "form-horizontal"} do |f|
+  .control-group
+    .row
+      .span4.off-set2
+        = f.input :subject, required: true, class: 'pull-left'
+      .span4.off-set2
+        = f.input :objectives
+    .row
+      .span4.off-set2
+        = f.label "Showcase on Website"
+        .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "Yes", "data-off-label" => "No"}
+          = f.check_box :showcase_on_website, {}, 'true', 'false'
+      .span4.off-set2
+        = f.input :date, input_html: {class: :datepicker}, value: f.object.date.try(:strftime, '%d-%m-%Y')
+    .row
+      .span4.off-set2
+        = f.input :venue
+      .span4.off-set2
+        = f.input :duration, input_html: {placeholder: 'duration in days', type: 'number', min: '1'}, label: "Duration (days)"
+    .row
+      .span4.off-set2
+        = label_tag "Trainers", nil, class: 'control-label'
+        = f.input :trainer_ids, collection: (User.approved.to_a).sort_by(&:name), input_html: {class:'members', multiple: true}, label: false
+      .span4.off-set2
+        = f.input :video
+    .row
+      .span4.off-set2
+        = f.input :blog_link
+      .span4.off-set2
+        = f.input :ppts, as: :file, input_html: {:multiple => true}, label: "PPT's"
+    .row
+      .span4.off-set2
+        = f.input :photos, as: :file, input_html: {:multiple => true}
+    .row
+      %hr
+      %h4 Chapters
+      = f.fields_for :chapters do |chapter_form|
+        %h5 Chapter Details
+        .row
+          .span4.off-set2
+            = chapter_form.input :chapter_number, input_html: {type: 'number'}, required: true
+          .span4.off-set2
+            = chapter_form.input :subject, required: true
+        .row
+          .span4.off-set2
+            = chapter_form.input :objectives
+          .span4.off-set2
+            = chapter_form.input :video
+        .row
+          .span4.off-set2
+            = chapter_form.input :blog_link
+          .span4.off-set2
+            = chapter_form.input :duration, input_html: {placeholder: 'duration in days', type: 'number', min: '1'}, label: "Duration (days)"
+        .row
+          .span4.off-set2
+            = label_tag "Trainers", nil, class: 'control-label'
+            = chapter_form.input :trainer_ids, collection: (User.approved.to_a).sort_by(&:name), input_html: {class:'members', multiple: true}, label: false
+          .span4.off-set2
+            = chapter_form.input :photos, as: :file, input_html: {:multiple => true}
+        .row
+          .span4.off-set2
+            = chapter_form.input :ppts, as: :file, input_html: {:multiple => true}, label: "PPT's"
+        = chapter_form.link_to_remove 'Remove', class: 'btn btn-danger', style: 'float: right'
+        %br
+        %hr
+      = f.link_to_add 'Add More Chapters', :chapters, class: 'btn btn-info', style: 'margin-left: 100'
+      = f.submit :Save, class: 'btn controls btn-success'
+
+:javascript
+  $(".members").select2();
+  $('.members').width('206')
+
+  $(document).on('nested:fieldAdded', function(event){
+    var selectField = event.field.find(".members")
+    selectField.select2()
+    $('.members').width('206')
+  })

@@ -1,0 +1,10 @@
+%h2.row
+  .span6
+    Edit #{@training.subject}
+  .offset7{style: "float: right;"}
+    = link_to '', new_training_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Add Training Record",
+                 class: "icon-plus"
+    |
+    = link_to '', trainings_path, "data-toggle" => "tooltip", title: "All Training Records",
+                 class: " icon-th-list"
+= render 'form'

@@ -1,0 +1,33 @@
+= simple_nested_form_for @showcase_event, :html => {class: "form-horizontal"} do |f|
+  .control-group
+    .row
+      = f.input :name, class: 'pull-left'
+      = f.input :type, as: :radio_buttons, collection: ["Hackathon", "Community"], :item_wrapper_class => 'inline',
+        checked: @showcase_event.type || "Hackathon"
+      = f.input :description, as: :text, input_html: {class: "text-description"}
+      %div
+        = f.label "Showcase on Website"
+        .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "Yes", "data-off-label" => "No"}
+          = f.check_box :showcase_on_website, {}, 'true', 'false'
+      = f.input :date, label: 'Date', input_html: {class: 'datepicker', data: {'behaviour' => 'datepicker', 'validation-required-message' => 'You must select date'}, required: true, value: f.object.date.try(:strftime, '%d-%m-%Y')}
+      = f.input :venue, as: :text, input_html: {class: "text-description", style: 'height:70; width: 208'}
+      = f.input :video
+      = f.input :photos, as: :file, input_html: {:multiple => true}
+      - if @showcase_event.file_attachments.count > 0
+        %table{style: 'margin-left: 50'}
+          %h4 Photos
+          - @showcase_event.file_attachments.each_slice(3).each do |photo_attachments|
+            %tr
+              - photo_attachments.each do |photo_attachment|
+                %td{style: 'padding: 5'}= image_tag(photo_attachment.doc, size: '300x300')
+  = f.submit :Save, class: 'btn controls btn-success'
+
+:css
+  #showcase_event_type_community, #showcase_event_type_hackathon {
+    height: auto;
+  }
+
+:coffeescript
+  $('#logo-upload').on 'change', ->
+    readURL this, '#photos'
+    return

@@ -13,6 +13,15 @@ Rails.application.routes.draw do
   resources :policies
   resources :holiday_lists
   resources :designations
+  resources :open_source_projects
+  resources :showcase_events
+
+  resources :trainings do
+    collection do
+      get '/video_render/:id', to: 'trainings#video_render', as: :video_render
+    end
+  end
+
   resources :entry_passes do
     collection do
       get :report, defaults: { format: :csv }
@@ -105,7 +114,11 @@ Rails.application.routes.draw do
       get 'users/info', to: 'users#info'
       get 'team', to: "website#team"
       get 'news', to: "website#news"
+      get 'hackathons', to: "website#hackathons"
+      get 'trainings', to: "website#trainings"
+      get 'community_events', to: "website#community_events"
       get 'portfolio', to: "website#portfolio"
+      get 'open_source_contributions', to: 'website#open_source_contributions'
       post 'contact_us', to: "website#contact_us"
       post 'contact_clipp', to: "clipp_contacts#contact_clipp"
       post 'career', to: "website#career"

@@ -83,7 +83,7 @@ RSpec.describe UserProject, type: :model do
     end
 
     context 'user_id should be unique for active users' do
-      it 'Should fail because duplcate active users are not allowed' do
+      it 'Should fail because duplicate active users are not allowed' do
         project = FactoryGirl.create(:project)
         user = FactoryGirl.create(:user)
         FactoryGirl.create(:user_project, project_id: project.id, user_id: user.id)

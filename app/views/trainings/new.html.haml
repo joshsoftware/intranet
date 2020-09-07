@@ -1,0 +1,8 @@
+.form-heading.row
+  %h2
+    .span6
+      New Training
+    .offset6{style: "float: right;"}
+      = link_to '', trainings_path, "data-toggle" => "tooltip", title: "All Training Records",
+                   class: " icon-th-list"
+= render 'form'

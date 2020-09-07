@@ -1,0 +1,24 @@
+%table.table.table-hover#sortable
+  %thead
+    %tr
+      %th #
+      %th Project Name
+      %th Repository URL
+      %th Showcase on Website
+      - if can? :manage, OpenSourceProject
+        %th Action
+  %tbody
+    - @open_source_projects.each_with_index do |open_source_project, i|
+      %tr.item{"data-item-id" => open_source_project.id}
+        %td= i+1
+        %td= link_to open_source_project.name, open_source_project_path(open_source_project)
+        %td= link_to open_source_project.url, "https://#{open_source_project.url}"
+        %td= open_source_project.showcase_on_website
+        - if can? :manage, OpenSourceProject
+          %td
+            =link_to '', edit_open_source_project_path(open_source_project), class: "icon-edit", data: {'no-turbolink' =>  true}
+            |
+            =link_to '', open_source_project_path(open_source_project), method: :delete, "data-confirm" => "Are you sure?", class: "icon-trash"
+
+:javascript
+  $('#sortable').dataTable({ "aaSorting": [] });

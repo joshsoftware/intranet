@@ -1,0 +1,9 @@
+.form-heading.row
+  %h2
+    .span4
+      Showcase Event
+    .offset8{style: "float: right;"}
+      = link_to '', new_showcase_event_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Add Event",
+                   class: "icon-plus"
+.form-horizontal#event_list
+  = render 'list'

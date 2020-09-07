@@ -1,0 +1,53 @@
+= simple_nested_form_for @showcase_event, :html => {class: "form-horizontal"} do |showcase_event_form|
+  %h3 Teams in #{@showcase_event.name}
+  #event_teams
+    - index = 0
+    = showcase_event_form.fields_for :showcase_event_teams do |f|
+      %br
+      %hr
+      %h4 Team Details
+      .team-details
+        .remove{style: 'float: right'}
+          = f.link_to_remove "Remove Team #{f.object.name}", class: 'btn btn-danger', style: 'float: top'
+        - index += 1
+        = f.input :name
+        = label_tag "Application", nil, class: 'control-label'
+        = f.input :showcase_event_application_id, collection: @showcase_event_applications, label: false
+        = label_tag "Members", nil, class: 'control-label'
+        .control-group
+          = f.input :member_ids, collection: User.employees.to_a, input_html: {class: 'members', multiple: true}, style: "width: 340px;", "data-placeholder"=> "You can add multiple developers", label: false
+        = f.input :proposed_solution, as: :text, input_html: {class: "text-description"}
+        = f.input :repository_link
+        = f.input :demo_link
+        %hr
+        %h4 Technology Details
+        %div{id: "#{index}_tech_detail_fields"}
+          = f.fields_for :technology_details do |t|
+            .row
+              .span4.off-set2
+                = t.input :name, collection: (LANGUAGE + FRAMEWORK).sort_by(&:downcase), input_html: {"data-placeholder" => "Add Technology",class:'technology'}, label: "Technology/Framework", include_blank: true, include_hidden: false
+              .span4.off-set2
+                = t.input :version
+              .span2.off-set2
+                = t.link_to_remove 'Remove', class: 'btn btn-danger'
+          = f.link_to_add 'Add More', :technology_details, class: 'btn btn-info', style: 'margin-left: 100'
+        %br
+  .offset1
+    %br
+    = showcase_event_form.link_to_add "Add More Teams", :showcase_event_teams, data: {target: '#event_teams'}, class: "btn btn-info", id: "add-event-applications-button"
+    = showcase_event_form.submit "Save Teams", class: 'btn controls btn-success'
+
+:javascript
+  $(document).ready(function(){
+    $('.members').select2()
+    $('.members').width('340')
+  })
+
+  $(document).on('nested:fieldAdded', function(event){
+    var selectField = event.field.find(".members")
+    selectField.select2()
+    $('.members').width('340')
+  })
+
+:css
+  .team-details{border-style: ridge; border-width: thin}

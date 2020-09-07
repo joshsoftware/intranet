@@ -1,0 +1,28 @@
+- if event_application.showcase_event_teams.count > 0
+  - event_application.showcase_event_teams.each do |team|
+    %table.table.table-hover.table-striped
+      %tr
+        %th{style: 'width: 231'} Team Name
+        %td= team.name
+      %tr
+        %th{style: 'width: 231'} Proposed Solution
+        %td= team.proposed_solution
+      %tr
+        %th{style: 'width: 231'} Repository Link
+        %td= team.repository_link
+      %tr
+        %th{style: 'width: 231'} Demo Link
+        %td= team.demo_link
+      %tr
+        %th{style: 'width: 231'} Team Members
+        %td
+          = team.members.map{|m| m.name}.join(", ")
+      %tr
+        %th{style: 'width: 231'} Technologies
+        %td
+          = team.technology_details.map{|t| "#{t.name} #{t.version}"}.join(", ")
+    %br
+- else
+  %b
+    No team is currently present to display
+  %br

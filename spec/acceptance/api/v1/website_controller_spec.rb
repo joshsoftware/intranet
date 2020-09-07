@@ -134,4 +134,69 @@ resource "Website Apis" do
       expect(status).to eq(422)
     end
   end
+
+  get "/api/v1/open_source_contributions" do
+    example 'Should return open source projects' do
+      header 'Referer', "http://#{ORGANIZATION_DOMAIN}"
+      open_source_project = FactoryGirl.create(:open_source_project, name: 'Shoptok', showcase_on_website: true)
+      project = FactoryGirl.create(:project, name: 'Intranet', showcase_as_open_source: true)
+      do_request
+      res = JSON.parse(response_body)
+      expected_response = {
+        'projects' => [
+          project.as_json({only: [:name, :description, :url], methods: [:case_study_url, :tags, :image_url]}),
+          open_source_project.as_json({only: [:name, :description, :url], methods: [:case_study_url, :tags, :image_url]})
+        ]
+      }
+      expect(status).to eq 200
+      expect(res).to eq(expected_response)
+    end
+  end
+
+  get "/api/v1/hackathons" do
+    example 'Should return hackathon events' do
+      header 'Referer', "http://#{ORGANIZATION_DOMAIN}"
+      hackathon = FactoryGirl.create(:showcase_event, showcase_on_website: true)
+      showcase_event_application = FactoryGirl.create(:showcase_event_application, showcase_event: hackathon)
+      member = FactoryGirl.create(:user)
+      showcase_event_team = FactoryGirl.create(:showcase_event_team, showcase_event_application: showcase_event_application, member_ids: [member.id])
+      do_request
+      res = JSON.parse(response_body)
+      expect(status).to eq 200
+      expect(res['hackathons'][0]["name"]).to eq(hackathon.name)
+      expect(res['hackathons'][0]["showcase_event_applications"].count).to eq(1)
+      expect(res['hackathons'][0]["showcase_event_applications"][0]["name"]).to eq(showcase_event_application.name)
+      expect(res['hackathons'][0]["showcase_event_applications"][0]["showcase_event_teams"].count).to eq(1)
+      expect(res['hackathons'][0]["showcase_event_applications"][0]["showcase_event_teams"][0]["name"]).to eq(showcase_event_team.name)
+    end
+  end
+
+  get "/api/v1/community_events" do
+    example 'Should return community events' do
+      header 'Referer', "http://#{ORGANIZATION_DOMAIN}"
+      community_event = FactoryGirl.create(:showcase_event, type: 'Community', showcase_on_website: true)
+      do_request
+      res = JSON.parse(response_body)
+      expect(status).to eq 200
+      expect(res['community_events'][0]["name"]).to eq(community_event.name)
+      expect(res['community_events'][0]["venue"]).to eq(community_event.venue)
+      expect(res['community_events'][0]["description"]).to eq(community_event.description)
+    end
+  end
+
+  get "/api/v1/trainings" do
+    example 'Should return all training records' do
+      header 'Referer', "http://#{ORGANIZATION_DOMAIN}"
+      training = FactoryGirl.create(:training, showcase_on_website: true)
+      chapter = FactoryGirl.create(:chapter, training: training)
+      do_request
+      res = JSON.parse(response_body)
+      expect(status).to eq 200
+      expect(res['trainings'][0]["subject"]).to eq(training.subject)
+      expect(res['trainings'][0]["objectives"]).to eq(training.objectives)
+      expect(res['trainings'][0]["chapters"][0]["chapter_number"]).to eq(chapter.chapter_number)
+      expect(res['trainings'][0]["chapters"][0]["subject"]).to eq(chapter.subject)
+      expect(res['trainings'][0]["chapters"][0]["objectives"]).to eq(chapter.objectives)
+    end
+  end
 end

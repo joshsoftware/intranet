@@ -1,0 +1,5 @@
+%center
+  - if @training.video.blank?
+    %h4{style: 'margin-top: 50'} Please add a valid video link
+  - else
+    %iframe{width:"1050", height:"700", src:"#{@training.video}"}

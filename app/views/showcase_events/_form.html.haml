@@ -1,0 +1,39 @@
+- new_event = !@showcase_event.persisted?
+- event_application_error = @showcase_event.errors.full_messages.first == "Showcase event applications is invalid"
+- event_team_error = @showcase_event.errors.full_messages.first == "Showcase event teams is invalid"
+
+%ul.nav.nav-tabs
+  %li{:class => ("active" if !(event_application_error || event_team_error))}
+    %a{data:{toggle: 'tab'}, href: '#event_form'}
+      #{new_event ? 'Create' : 'Update'} Event
+  %li{:class => ("active" if event_application_error)}
+    = link_to 'Event Topics', '#event_applications_info', data:{toggle: ('tab' unless new_event || @showcase_event.type == 'Community' )}, class: :event_applications
+  %li{:class => ("active" if event_team_error)}
+    = link_to 'Event Teams', '#event_teams_info', data:{toggle: ('tab' unless new_event || @showcase_event.type == 'Community')}, class: :event_teams
+
+.event_tab_content.tab-content
+  #event_form.tab-pane.fade{:class => ("in active" if !(event_application_error || event_team_error))}
+    = render 'event_form'
+  #event_applications_info.tab-pane.fade{:class => ("in active" if event_application_error)}
+    = render 'event_applications_form'
+  #event_teams_info.tab-pane.fade{:class => ("in active" if event_team_error)}
+    = render 'event_teams_form'
+
+:javascript
+  $('.event_applications').click(function(){
+    if(#{new_event}){
+      alert('Please first create event to fill Event Application details.')
+    }
+    if(#{@showcase_event.type == 'Community'}){
+      alert("Can't fill Event Application details for Community Events.")
+    }
+  })
+
+  $('.event_teams').click(function(){
+    if(#{new_event}){
+      alert('Please first create event to fill Event Team details.')
+    }
+    if(#{@showcase_event.type == 'Community'}){
+      alert("Can't fill Event Team details for Community Events.")
+    }
+  })

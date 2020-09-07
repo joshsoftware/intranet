@@ -1,0 +1,9 @@
+.form-heading.row
+  %h2
+    .span4
+      Open Source Projects
+    .offset8{style: "float: right;"}
+      = link_to '', new_open_source_project_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Add Project",
+                   class: "icon-plus"
+.form-horizontal#projects_list
+  = render 'list'

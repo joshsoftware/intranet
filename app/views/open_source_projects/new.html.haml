@@ -1,0 +1,8 @@
+.form-heading.row
+  %h2
+    .span6
+      New Open Source Project
+    .offset6{style: "float: right;"}
+      = link_to '', open_source_projects_path, "data-toggle" => "tooltip", title: "All Projects",
+                   class: " icon-th-list"
+= render 'form'

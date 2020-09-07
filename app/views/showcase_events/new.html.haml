@@ -1,0 +1,8 @@
+.form-heading.row
+  %h2
+    .span6
+      New Showcase Event
+    .offset6{style: "float: right;"}
+      = link_to '', showcase_events_path, "data-toggle" => "tooltip", title: "All Events",
+                   class: " icon-th-list"
+= render 'form'

@@ -1,0 +1,89 @@
+.form-horizontal.row
+  %h2
+    = @training.subject
+    .offset4{style: "float: right;"}
+      = link_to '', edit_training_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Edit Training Record",
+                   class: "icon-edit"
+      |
+      = link_to '', trainings_path, "data-toggle" => "tooltip", title: "All Training Records",
+                   class: " icon-th-list"
+
+  %div
+    %table.table.table-hover.table-striped
+      %tr
+        %th Subject
+        %td= @training.subject
+      %tr
+        %th Objectives
+        %td= @training.objectives
+      %tr
+        %th Showcase on Website
+        %td= @training.showcase_on_website
+      %tr
+        %th Date
+        %td= @training.date
+      %tr
+        %th Trainers
+        %td= @training.trainers.map {|trainer| "#{trainer.name}(#{trainer.designation_name})"} .join(', ')
+      %tr
+        %th Duration
+        %td= @training.duration_to_display
+      %tr
+        %th Venue
+        %td= @training.venue
+      %tr
+        %th Video
+        %td= link_to @training.video, @training.video
+      %tr
+        %th Blog Link
+        %td= @training.blog_link
+      - if @training.photos.count > 0
+        %tr
+          %th Photos
+          %td
+            - if @training.photos.count > 0
+              %table
+                - @training.photos.each_slice(3).each do |photo_attachments|
+                  %tr
+                    - photo_attachments.each do |photo|
+                      %td{style: 'padding: 5'}= image_tag(photo['url'], size: '300x300')
+            - else
+              No Photos to display
+  - if @training.chapters.count > 0
+    %h4 Chapters
+    %div{style: 'margin-left: 20'}
+      - @training.chapters.each do |chapter|
+        %table.table.table-hover.table-striped
+          %tr
+            %th{style: 'width: 231'} Chapter Number
+            %td= chapter.chapter_number
+          %tr
+            %th{style: 'width: 231'} Subject
+            %td= chapter.subject
+          %tr
+            %th{style: 'width: 231'} Objectives
+            %td= chapter.objectives
+          %tr
+            %th{style: 'width: 231'} Trainers
+            %td= chapter.trainers.map {|trainer| "#{trainer.name}(#{trainer.designation_name})"} .join(', ')
+          %tr
+            %th Duration
+            %td= chapter.duration_to_display
+          %tr
+            %th{style: 'width: 231'} Video
+            %td= link_to chapter.video, chapter.video
+          %tr
+            %th{style: 'width: 231'} Blog Url
+            %td= link_to chapter.blog_link, chapter.blog_link
+          %tr
+            %th Photos
+            %td
+              - if chapter.photos.count > 0
+                %table
+                  - chapter.photos.each_slice(3).each do |photo_attachments|
+                    %tr
+                      - photo_attachments.each do |photo|
+                        %td{style: 'padding: 5'}= image_tag(photo['url'], size: '300x300')
+              - else
+                No Photos to display
+        %hr

@@ -1,0 +1,28 @@
+%table.table.table-hover#sortable
+  %thead
+    %tr
+      %th #
+      %th Name
+      %th Type
+      %th Date
+      %th Venue
+      %th Showcase on Website
+      - if can? :manage, ShowcaseEvent
+        %th Action
+  %tbody
+    - @showcase_events.each_with_index do |showcase_event, i|
+      %tr.item{"data-item-id" => showcase_event.id}
+        %td= i+1
+        %td= link_to showcase_event.name, showcase_event_path(showcase_event)
+        %td= showcase_event.type
+        %td= showcase_event.date
+        %td= showcase_event.venue
+        %td= showcase_event.showcase_on_website
+        - if can? :manage, ShowcaseEvent
+          %td
+            =link_to '', edit_showcase_event_path(showcase_event), class: "icon-edit", data: {'no-turbolink' =>  true}
+            |
+            =link_to '', showcase_event_path(showcase_event), method: :delete, "data-confirm" => "Are you sure?", class: "icon-trash"
+
+:javascript
+  $('#sortable').dataTable({ "aaSorting": [] });

@@ -1,0 +1,47 @@
+.form-horizontal.row
+  %h3
+    = @open_source_project.name
+    .offset4{style: "float: right;"}
+      = link_to '', edit_open_source_project_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Edit Project",
+                   class: "icon-edit"
+      |
+      = link_to '', open_source_projects_path, "data-toggle" => "tooltip", title: "All Projects",
+                   class: " icon-th-list"
+
+  %div
+    %table.table.table-hover.table-striped
+      %tr
+        %th Project Name
+        %td= @open_source_project.name
+      %tr
+        %th Description
+        %td= @open_source_project.description
+      %tr
+        %th Showcase on Website
+        %td= @open_source_project.showcase_on_website
+      %tr
+        %th Repository URL
+        %td= link_to @open_source_project.url
+      %tr
+        %th Image
+        %td= image_tag @open_source_project.image, size: "200x200"
+
+.form-horizontal.row
+  %h3
+    = "#{@open_source_project.name} Team Members"
+  %table.table.table-hover
+    %thead
+      %tr
+        %th Profile Image
+        %th Name
+        %th Email
+    %tbody
+      - if @team_members.present?
+        - @team_members.each do |user|
+          %tr
+            - if user.public_profile.present? && Rails.env.production?
+              %td= image_tag(user.public_profile.image.thumb.url, class: 'img-polaroid')
+            - else
+              %td= image_tag('dummy_image.png', class: 'img-polaroid')
+            %td= link_to user.public_profile.name, user_path(user)
+            %td= user.email

@@ -34,6 +34,12 @@
         = f.label 'Visible On Website'
         .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "Yes", "data-off-label" => "No"}
           = f.check_box :visible_on_website, {}, 'true', 'false'
+        %br
+        = f.label 'Showcase as Open-source'
+        .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "Yes", "data-off-label" => "No"}
+          = f.check_box :showcase_as_open_source, {}, 'true', 'false'
+        %br
+        %br
         .control-group
           = label_tag "Managed By", nil, class: 'control-label'
           .controls

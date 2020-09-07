@@ -1,0 +1,61 @@
+.form-horizontal.row
+  %h2
+    = @showcase_event.name
+    .offset4{style: "float: right;"}
+      = link_to '', edit_showcase_event_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Edit Event",
+                   class: "icon-edit"
+      |
+      = link_to '', showcase_events_path, "data-toggle" => "tooltip", title: "All Events",
+                   class: " icon-th-list"
+
+  %div
+    %table.table.table-hover.table-striped
+      %tr
+        %th Event Name
+        %td= @showcase_event.name
+      %tr
+        %th Description
+        %td= @showcase_event.description
+      %tr
+        %th Type
+        %td= @showcase_event.type
+      %tr
+        %th Date
+        %td= @showcase_event.date
+      %tr
+        %th Showcase on Website
+        %td= @showcase_event.showcase_on_website
+      %tr
+        %th Venue
+        %td= @showcase_event.venue
+      %tr
+        %th Video
+        %td= link_to @showcase_event.video, @showcase_event.video
+      %tr
+        %th Photos
+        %td
+          %table
+            - @showcase_event.file_attachments.each_slice(3).each do |photo_attachments|
+              %tr
+                - photo_attachments.each do |photo_attachment|
+                  %td{style: 'padding: 5'}= image_tag(photo_attachment.doc, size: '300x300')
+  - if @showcase_event.is_hackathon? and @showcase_event_applications.count > 0
+    %h3 Topics
+    %div{style: 'margin-left: 20'}
+      - @showcase_event_applications.each do | event_application |
+        %table.table.table-hover.table-striped
+          %tr
+            %th{style: 'width: 231'} Topic Name
+            %td= event_application.name
+          %tr
+            %th{style: 'width: 231'} Description
+            %td= event_application.description
+          %tr
+            %th{style: 'width: 231'} Domain
+            %td= event_application.domain
+        %h4
+          %a{href: "##{event_application.name}", 'data-toggle':"collapse"}
+            View Teams
+        %div.collapse{id: "#{event_application.name}", style: 'margin-left: 20'}
+          = render 'event_teams_info', event_application: event_application
+        %hr
