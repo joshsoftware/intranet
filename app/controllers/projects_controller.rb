@@ -14,7 +14,7 @@ class ProjectsController < ApplicationController
       format.js
       format.html
       format.csv do
-        send_data @projects.to_csv, filename: "projects_data_#{Date.today.strftime("%d%b%y")}.csv"
+        send_data @projects.to_csv, filename: "ProjectsData - #{Date.today.strftime("%d%b%y")}.csv"
       end
     end
   end

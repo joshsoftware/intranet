@@ -34,7 +34,7 @@ class EntryPassesController < ApplicationController
     @entry_passes = EntryPass.where(date: @report_date)
     respond_to do |format|
       format.csv do
-        send_data EntryPass.to_csv(@entry_passes), filename: "Office_entries_#{@report_date}.csv"
+        send_data EntryPass.to_csv(@entry_passes), filename: "OfficeEntries - #{@report_date}.csv"
       end
     end
   end

@@ -30,8 +30,8 @@ class TimesheetRemainderMailer < ActionMailer::Base
     user = User.where(email: email).first
     @user_name = user.public_profile.first_name
     @file_name = file_name
-    csv_name = file_name.downcase.gsub(' ', '_')
-    attachments["#{csv_name}_timesheet_file_#{Date.today}.csv"] = csv
+    csv_name = file_name.titleize.gsub(' ', '')
+    attachments["#{csv_name}TimesheetFile - #{Date.today}.csv"] = csv
     mail(
       subject: 'Result for Uploaded Timesheet File',
       to: email

@@ -31,4 +31,17 @@ class Company
   def project_codes
     projects.as_json(only: [:name,:code])
   end
+
+  def self.to_csv
+    attributes = %w{Name GST_No Website ContactPerson ContactEmail Projects}
+    CSV.generate(headers: true) do |csv|
+      csv << attributes
+      all.each do |company|
+        project = company.projects.map(&:name).join(" \n")
+        contact_name = company.contact_persons.map(&:name).join(" \n")
+        contact_email = company.contact_persons.map(&:email).join(" \n")
+        csv << [company.name, company.try(:gstno), company.try(:website), contact_name, contact_email, project]
+      end
+    end
+  end
 end

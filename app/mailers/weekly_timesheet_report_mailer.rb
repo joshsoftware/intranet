@@ -4,13 +4,13 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
   
   def send_weekly_timesheet_report(csv, email, unfilled_time_sheet_report)
     @unfilled_time_sheet_report = unfilled_time_sheet_report
-    attachments["weekly_timesheet_report_#{Date.today}.csv"] = csv
+    attachments["WeeklyTimesheetReport - #{Date.today}.csv"] = csv
     emails = ([email] + DEFAULT_TIMESHEET_MANAGERS).uniq
     mail(subject: 'Weekly timesheet report', to: emails)
   end
 
   def send_weekend_timesheet_report(csv, start_date)
-    attachments["weekend_timesheet_report_#{Date.today}.csv"] = csv
+    attachments["WeekendTimesheetReport - #{Date.today}.csv"] = csv
     hr_emails = User.approved.where(role: 'HR').collect(&:email)
     emails = [ 'sameert@joshsoftware.com', 
                'shailesh.kalekar@joshsoftware.com',
@@ -23,7 +23,7 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
   end
 
   def send_employees_working_hour_report(csv, start_date)
-    attachments["employees_working_hour_report_#{Date.today}.csv"] = csv
+    attachments["EmployeesWorkingHourReport - #{Date.today}.csv"] = csv
     hr_emails = User.approved.where(role: 'HR').collect(&:email)
     emails = [ 'sameert@joshsoftware.com', 
                'shailesh.kalekar@joshsoftware.com',
@@ -37,7 +37,7 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
 
   def send_report_who_havent_filled_timesheet( options = {} )
     @text = options[:text]
-    attachments["Employees- Not Filled Timesheet.csv"] = options[:csv]
+    attachments["EmployeesNotFilledTimesheet.csv"] = options[:csv]
     mail(
       subject:"Employees List-  who haven't filled timesheet between #{options[:from_date]} to #{options[:to_date]} ",
       to: options[:emails]
@@ -61,7 +61,7 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
     attachment = { mime_type: Mime[:xlsx],
                    content: data_file }
 
-    attachments["Timesheet_report_from #{options[:from_date]} to #{options[:to_date]}.xlsx"] = attachment
+    attachments["TimesheetReportFrom - #{options[:from_date]} to #{options[:to_date]}.xlsx"] = attachment
     mail(
       subject: options[:subject],
       to: options[:user_email]

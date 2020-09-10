@@ -11,7 +11,9 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       format.html
       format.json { render json: @companies.to_json(only:[:_slugs, :name, :gstno, :website])}
-      format.csv { send_data @companies.to_csv }
+      format.csv do
+        send_data Company.to_csv, filename: "Compaines - #{Date.today}.csv"
+      end
     end
   end
 
