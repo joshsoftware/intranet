@@ -152,22 +152,19 @@ class TimeSheetsController < ApplicationController
   def export_project_report
     @from_date = params[:from_date] || Date.today.beginning_of_month.to_s
     @to_date = params[:to_date] || Date.today.to_s
-    @params = params['summary']
-    if params[:project_id].present?
-      if @params.present?
-        options = TimeSheet.generate_summary_report(@from_date, @to_date, @params, current_user)
-      else
-        project = Project.where(id: params[:project_id]).first
-        options = TimeSheet.generate_project_report(@from_date, @to_date, project, @params, current_user)
-      end
+    if params['project_id'].present?
+      TimesheetSummaryReportWorker.perform_async(
+        params,
+        @from_date,
+        @to_date,
+        current_user.id.to_s
+      )
       flash[:success] = "You will receive summary report to your mail shortly."
-      WeeklyTimesheetReportMailer.delay.send_timesheet_summary_report(options) if options.present?
     end
   end
 
   def export_resource_report
     ResourceCategorisationWorker.perform_async(current_user.email)
-
     flash[:success] = 'You will receive resource categorisation report to your mail shortly.'
     redirect_to export_project_report_time_sheets_path
   end
