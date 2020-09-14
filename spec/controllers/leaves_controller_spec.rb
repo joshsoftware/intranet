@@ -147,7 +147,7 @@ describe LeaveApplicationsController do
       @user.public_profile = FactoryGirl.build(:public_profile)
       @user.save
       remaining_leave = @user.employee_detail.available_leaves -
-        @leave_application.number_of_days
+        HolidayList.number_of_working_days(@leave_application.start_at, @leave_application.end_at)
       post :create, {
         user_id: @user.id,
         leave_application: @leave_application.attributes
@@ -226,8 +226,8 @@ describe LeaveApplicationsController do
 
     it "Role(admin) should able to accept/reject as many times as he wants" do
       available_leaves = @user.employee_detail.available_leaves
-      number_of_days = 2
       leave_application = FactoryGirl.create(:leave_application, user: @user)
+      number_of_days = HolidayList.number_of_working_days(leave_application.start_at, leave_application.end_at)
       xhr :get, :process_leave, {
         id: leave_application.id,
         leave_action: :approve
@@ -362,10 +362,10 @@ describe LeaveApplicationsController do
       expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
     end
 
-    it "should not deduct leaves if rejected already rejected leave" do
+    it "should not deduct leaves if already rejected leave" do
       available_leaves = @user.employee_detail.available_leaves
-      number_of_days = 2
       leave_application = FactoryGirl.create(:leave_application, user: @user)
+      number_of_days = HolidayList.number_of_working_days(leave_application.start_at, leave_application.end_at)
       @user.reload
       expect(@user.employee_detail.available_leaves).
         to eq(available_leaves-number_of_days)
@@ -436,12 +436,14 @@ describe LeaveApplicationsController do
     it 'number of days should get updated if updated' do
       sign_in employee
       number_of_leaves = employee.employee_detail.available_leaves
-      end_at, days = leave_app.end_at.to_date + 1.day,
-        leave_app.number_of_days + 1
+      start_at = leave_app.start_at
+      end_at = leave_app.end_at + 4
+      days = HolidayList.number_of_working_days(start_at, end_at)
       post :update, id: leave_app.id, leave_application: {
         end_at: end_at,
         number_of_days: days
       }
+      employee.reload
       l_app = assigns(:leave_application)
       expect(l_app.number_of_days).to eq(days)
       expect(l_app.end_at).to eq(end_at)
@@ -478,6 +480,28 @@ describe LeaveApplicationsController do
       expect(flash[:error]).to eq("End at should not be less than start date.")
       should render_template(:edit)
       expect(employee.reload.employee_detail.available_leaves).to eq(available_leaves)
+    end
+
+    it 'should update available_leaves leave_type is changed' do
+      sign_in employee
+      leave_app
+      employee.employee_detail.available_leaves = 10
+      employee.save
+      post :update, id: leave_app.id, leave_application: {
+        leave_type: LeaveApplication::WFH
+      }
+      expect(employee.reload.employee_detail.available_leaves).to eq(12)
+    end
+
+    it 'should update available_leaves leave_type is changed' do
+      sign_in employee
+      leave_app = FactoryGirl.create(:leave_application, user: employee, leave_type: LeaveApplication::WFH)
+      employee.employee_detail.available_leaves = 10
+      employee.save
+      post :update, id: leave_app.id, leave_application: {
+        leave_type: LeaveApplication::LEAVE
+      }
+      expect(employee.reload.employee_detail.available_leaves).to eq(8)
     end
   end
 

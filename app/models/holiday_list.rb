@@ -7,6 +7,15 @@ class HolidayList
   validates :holiday_date, uniqueness: true
   validate  :is_weekend?
 
+  # to calculate number of working days between dates to add or deduct
+  def self.number_of_working_days(start_at, end_at)
+    difference = 0
+    for date in start_at.to_date..end_at.to_date
+      difference += 1 unless self.is_holiday?(date)
+    end
+    difference
+  end
+
   def self.is_holiday?(date)
     date.strftime("%A").eql?("Saturday") or date.strftime("%A").eql?("Sunday") or
       HolidayList.all.collect(&:holiday_date).include?(date)

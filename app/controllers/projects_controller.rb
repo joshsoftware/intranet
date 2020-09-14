@@ -48,7 +48,7 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    @managers = @project.managers.approved
+    @managers = @project.managers
     @team_members = @project.users - @managers
   end
 
