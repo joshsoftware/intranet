@@ -16,8 +16,8 @@ class UserProject
   validates :user_id, uniqueness: {scope: :project_id}, if: :active_user?
   validates :allocation, numericality: {
       only_integer: true,
-      greater_than_or_equal_to: 0, less_than_or_equal_to: 100,
-      message: 'should be between range of 0-100'
+      greater_than_or_equal_to: 0, less_than_or_equal_to: 160,
+      message: 'not less than 0 & not more than 160'
   }
 
 

@@ -1,36 +1,9 @@
 wb = xlsx_package.workbook
 
 wb.add_worksheet(name: 'Billable Resources') do |sheet|
-  sheet.add_row(['Employee Name', 'Total Allocation'])
-  billable_resources.each do | resource |
-    sheet.add_row [ resource[:name], resource[:allocation] ]
-  end
-end
-
-wb.add_worksheet(name: 'Non Billable Resources') do |sheet|
-  sheet.add_row(['Employee Name', 'Total Allocation'])
-  non_billable_resources.each do | resource |
-    sheet.add_row [ resource[:name], resource[:allocation] ]
-  end
-end
-
-wb.add_worksheet(name: 'Investment Resources') do |sheet|
-  sheet.add_row(['Employee Name', 'Total Allocation'])
-  investment_resources.each do | resource |
-    sheet.add_row [ resource[:name], resource[:allocation] ]
-  end
-end
-
-wb.add_worksheet(name: 'Free Resources') do |sheet|
-  sheet.add_row(['Employee Name', 'Total Allocation'])
-  free_resources.each do | resource |
-    sheet.add_row [ resource[:name], resource[:allocation] ]
-  end
-end
-
-wb.add_worksheet(name: 'Bench Resources') do |sheet|
-  sheet.add_row(['Employee Name'])
-  bench_resources.each do | resource |
-    sheet.add_row [ resource[:name] ]
+  sheet.add_row(['Employee Name', 'Allocation (hrs/month)', 'Billable', 'Non Billable', 'Investment', 'Bench'])
+  resources.each do | resource |
+    sheet.add_row [ resource[:name], resource[:total_allocation], resource[:billable],
+                    resource[:non_billable], resource[:investment], resource[:bench] ]
   end
 end

@@ -1,102 +1,67 @@
 class ResourceCategorisationService
+
   def initialize(emails)
     @emails = emails
-    @headers = ['Employee Name', 'Total Allocation']
   end
 
   def call
-    files = {
-      billable_resources: billable.values,
-      non_billable_resources: non_billable.values,
-      investment_resources: investment.values,
-      free_resources: free_project.values,
-      bench_resources: bench
-    }
+    files = { resources: generate_resource_report }
     ReportMailer.send_resource_categorisation_report(files, @emails).deliver_now
   end
 
-  def billable
-    user_project_ids = []
-    projects = Project.where(:type_of_project.in => ['T&M', 'Fixbid'], is_active: true)
-    user_project_ids = UserProject.where(
-      :project_id.in => projects.pluck(:id),
-      active: true,
-      billable: true,
-      :allocation.gt => 1
-    ).pluck(:id)
-    get_users(user_project_ids)
-  end
-
-  def non_billable
-    user_project_ids = []
-    projects = Project.where(:type_of_project.in => ['T&M', 'Fixbid'], is_active: true)
-    user_project_ids = UserProject.where(
-      :project_id.in => projects.pluck(:id),
-      active: true,
-      billable: false,
-      :allocation.lte => 1
-    ).pluck(:id)
-    get_users(user_project_ids)
-  end
-
-  def investment
-    user_project_ids = []
-    projects = Project.where(type_of_project: 'Investment', is_active: true, is_activity: false)
-    user_project_ids = UserProject.where(
-      :project_id.in => projects.pluck(:id),
-      active: true
-    ).pluck(:id)
-    get_users(user_project_ids)
-  end
-
-  def free_project
-    user_project_ids = []
-    projects = Project.where(type_of_project: 'Free', is_active: true)
-    user_project_ids = UserProject.where(
-      :project_id.in => projects.pluck(:id),
-      active: true
-    ).pluck(:id)
-    get_users(user_project_ids)
-  end
-
-  def bench
-    bench_users = []
+  def generate_resource_report
+    resource_report = []
     exclude_designations = [
       'Assistant Vice President - Sales',
       'Business Development Executive',
       'Office Assistant'
     ]
-    users = User.approved.where(:role.in => ['Intern', 'Employee'])
-    users.each do |user|
+    User.approved.where(:role.in => ['Employee', 'Intern']).each do |user|
       unless exclude_designations.include?(user.designation.try(:name))
-        active_project_count = UserProject.where(user_id: user.id, active: true).count
-        bench_users << { name: user.name } unless active_project_count > 0
+        billable_allocation = billable_projects_allocation(user.id)
+        billable_allocation = billable_allocation > 160 ? 160 : billable_allocation
+        non_billable_allocation = non_billable_projects_allocation(user.id)
+        investment_allocation = investment_projects_allocation(user.id)
+        total_allocation = billable_allocation + non_billable_allocation + investment_allocation
+        bench_allocation =  (160 - total_allocation) < 0 ? 0 : (160 - total_allocation)
+        resource_report << { name: user.name,
+                             total_allocation: total_allocation,
+                             billable: billable_allocation,
+                             non_billable: non_billable_allocation,
+                             investment: investment_allocation,
+                             bench: bench_allocation
+                            }
       end
     end
-    bench_users
+    resource_report.sort_by { |k,v| k[:name] }
   end
 
-  def active_user_ids
-    @active_user_ids ||= User.approved.pluck(:id)
+  def billable_projects_allocation(user_id)
+    projects = Project.where(:type_of_project.in => ['T&M', 'Fixbid'], is_active: true)
+    UserProject.where(
+      :project_id.in => projects.pluck(:id),
+      active: true,
+      billable: true,
+      user_id: user_id
+    ).pluck(:allocation).sum
   end
 
-  def get_users(user_project_ids)
-    users = {}
-    user_project_ids.each do |user_project_id|
-      user_project = UserProject.where(id: user_project_id).first
-      if active_user_ids.include?(user_project.user_id)
-        user_id = user_project.user_id.to_s
-        if users[user_id].present? && users[user_id][:allocation].present?
-          users[user_id][:allocation] += user_project.allocation
-        else
-          users[user_id] = {
-            name: user_project.user.name,
-            allocation: user_project.allocation
-          }
-        end
-      end
-    end
+  def non_billable_projects_allocation(user_id)
+    projects = Project.where(:type_of_project.in => ['T&M', 'Free', 'Fixbid'], is_active: true)
+    UserProject.where(
+      :project_id.in => projects.pluck(:id),
+      active: true,
+      billable: false,
+      user_id: user_id
+    ).pluck(:allocation).sum
+  end
 
-    users.sort_by{|k, v| v[:name]}.to_h
+  def investment_projects_allocation(user_id)
+    projects = Project.where(type_of_project: 'Investment', is_active: true, is_activity: false)
+    UserProject.where(
+      :project_id.in => projects.pluck(:id),
+      active: true,
+      user_id: user_id
+    ).pluck(:allocation).sum
   end
 end

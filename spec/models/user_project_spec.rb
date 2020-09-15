@@ -52,7 +52,7 @@ RSpec.describe UserProject, type: :model do
       user_project.allocation = 101
       user_project.save
       expect(user_project.errors.full_messages).
-        to eq(["Allocation should be between range of 1-100"])
+        to eq(["Allocation not less than 0 & not more than 160"])
     end
 
     context 'end_date compulsory if user is inactive' do

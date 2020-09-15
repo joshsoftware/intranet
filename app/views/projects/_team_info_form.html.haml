@@ -8,7 +8,7 @@
     .span2.width12 End Date
     .span2.width10 Timesheet Required?
     .span2.width10 Billable?
-    .span2.width10 Allocation Percentage
+    .span2.width10 Allocation (hrs/month)
   #team-members
     = f.fields_for :user_projects do |project_user_form|
       - if project_user_form.object.user.blank? || (project_user_form.object.user && project_user_form.object.user.is_approved? && (project_user_form.object.active || project_user_form.object.end_date.nil?))
@@ -29,7 +29,7 @@
             .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "True", "data-off-label" => "False"}
               = project_user_form.check_box :billable
           .span2.width10
-            = project_user_form.input :allocation, {min: 0, max: 100, step: 1, style: "height: 32px;", label: false, class: 'allotment'}
+            = project_user_form.input :allocation, {min: 0, max: 160, step: 1, style: "height: 32px;", label: false, class: 'allotment'}
           - if project_user_form.object.user.blank?
             = project_user_form.link_to_remove "Cancel", class: "btn btn-danger"
   .offset3
@@ -47,7 +47,7 @@
         %th.span2 Start Date
         %th.span2 End Date
         %th Timesheet Required?
-        %th Allocation Percentage
+        %th Allocation (hrs/month)
     %tbody
       - @project.user_projects.inactive_users.sort_by{|i| i.user.name }.each do |project_user_form|
         %tr
