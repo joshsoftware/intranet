@@ -73,6 +73,10 @@ every :day, :at => '03:00pm' do
   rake "timesheet_reminder:ts_reminders"
 end
 
+every :day, :at => '07:00am' do
+  rake 'approved_leave_notification'
+end
+
 every :monday, :at => '09:30am' do
   rake "user_without_timesheet:weekly_report"
 end

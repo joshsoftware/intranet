@@ -49,6 +49,10 @@ class LeaveApplication
     leave_type == LEAVE
   end
 
+  def leave_count
+    (self.end_at - self.start_at).to_i + 1
+  end
+
   def process_after_update(status)
     send("process_#{status}")
   end
@@ -81,6 +85,24 @@ class LeaveApplication
 
   def process_accept_application
     UserMailer.delay.accept_leave(self.id)
+    send_leave_notification
+  end
+
+  def send_leave_notification
+    if start_at >= Date.today && leave_request?
+      emails = get_team_members
+      UserMailer.send_accept_leave_notification(id, emails).deliver_now!
+    end
+  end
+
+  def get_team_members
+    emails = []
+    project_ids = self.user.project_details
+    project_ids.each do |project_id|
+      project = Project.where(id: project_id[:id]).first
+      emails << project.users.pluck(:email)
+    end
+    emails = emails.flatten.uniq
   end
 
   def self.process_leave(id, leave_status, call_function, reject_reason = '', processed_by)
@@ -148,7 +170,7 @@ class LeaveApplication
     if (pending? and self.leave_status_was.nil?) or (approved? and self.leave_status_was == REJECTED)
       user = self.user
       user.employee_detail.deduct_available_leaves(number_of_days) if leave_request?
-      user.sent_mail_for_approval(self.id)
+      user.sent_mail_for_approval(self.id) unless self.leave_status_was == REJECTED
     end
   end
 

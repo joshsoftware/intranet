@@ -38,6 +38,19 @@ class UserMailer < ActionMailer::Base
     mail(to: @notification_emails, subject: "Congrats! #{@leave_application.leave_type} Request got accepted")
   end
 
+  def send_accept_leave_notification(leave_id, emails)
+    get_leave(leave_id)
+    message = get_leave_message
+    @leave_message = ['tomorrow.','today.'].include?(message) ? 'for ' + message : message
+    mail(to: emails, subject: "Approved Leave Application - #{@user.name}")
+  end
+
+  def send_approved_leave_notification(leave_id, emails)
+    get_leave(leave_id)
+    @leave_message = get_leave_message
+    mail(to: emails, subject: "Employee on Leave - #{@user.name}")
+  end
+
   def download_notification(downloader_id, document_name)
     @downloader = User.find(downloader_id)
     @document_name = document_name
@@ -150,5 +163,20 @@ class UserMailer < ActionMailer::Base
     @user = @leave_application.user
     @processed_by = User.find(@leave_application.processed_by)
     @notification_emails = [@user.email, User.leave_notification_emails(@user.id)].flatten.compact.uniq.join(', ')
+  end
+
+  def get_leave_message
+    start_date = @leave_application.start_at
+    end_date = @leave_application.end_at
+    leave_count = @leave_application.leave_count
+    if leave_count == 1 && start_date == Date.tomorrow
+      'tomorrow.'
+    elsif leave_count == 1 && start_date == Date.today
+      'today.'
+    elsif leave_count == 1
+      "on #{start_date}."
+    else
+      "from #{start_date} to #{end_date}." 
+    end
   end
 end
