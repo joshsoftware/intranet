@@ -115,9 +115,10 @@ class UserMailer < ActionMailer::Base
   def new_entry_passes(entry_passes_ids)
     @entry_passes = EntryPass.where(:id.in => entry_passes_ids).sort_by(&:date)
     @user = @entry_passes.first.user
+    emails = [@user.email, 'seema@joshsoftware.com']
     mail(
       subject: "Office Entry Pass created by #{@user.name}",
-      to: [OFFICE_ENTRY_PASS_MAIL_RECEPIENT, @user.email].flatten
+      to: [OFFICE_ENTRY_PASS_MAIL_RECEPIENT, emails].flatten
     )
   end
 
