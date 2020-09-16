@@ -116,6 +116,7 @@ Rails.application.routes.draw do
     post :daily_status, on: :collection
     post :import, on: :collection
     post :add_time_sheet, on: :collection
+    get :add_time_sheet, on: :collection
     get :projects_report, on: :collection
     get :individual_project_report, on: :member
     get :export_project_report, on: :collection

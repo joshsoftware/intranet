@@ -7,8 +7,8 @@ class TimeSheetsController < ApplicationController
   before_action :user_exists?, only: [:create, :daily_status]
 
   def new
-    @from_date = params[:from_date]
-    @to_date = params[:to_date]
+    @from_date = params[:from_date] || Date.today.beginning_of_month.to_s
+    @to_date = params[:to_date] || Date.today.to_s
     @user = User.find_by(id: params[:user_id]) if params[:user_id].present?
     @time_sheets = @user.time_sheets.build
   end
@@ -85,21 +85,25 @@ class TimeSheetsController < ApplicationController
   end
 
   def add_time_sheet
-    @from_date = params['user']['from_date']
-    @to_date = params['user']['to_date']
-    @user = User.find_by(id: params['user']['user_id'])
-
-    data_params = timesheet_params['time_sheets_attributes'].reject{|key, data| data["_destroy"] == "1"}
-    data_params = {"time_sheets_attributes"=>data_params}
-    return_values, @time_sheets = TimeSheet.create_time_sheet(@user.id, current_user, data_params)
-    unless return_values.include?(false)
-      flash[:notice] = 'Timesheet created successfully'
-      redirect_to users_time_sheets_path(user_id: @user.id, from_date: @from_date, to_date: @to_date)
-    else
-      if return_values.include?(true)
-        flash[:notice] = "#{return_values.count(true)} #{'timesheet'.pluralize(return_values.count(true))} created successfully"
+    if params['user'].present?
+      @from_date = params['user']['from_date']
+      @to_date = params['user']['to_date']
+      @user = User.find_by(id: params['user']['user_id'])
+    
+      data_params = timesheet_params['time_sheets_attributes'].reject{|key, data| data["_destroy"] == "1"}
+      data_params = {"time_sheets_attributes"=>data_params}
+      return_values, @time_sheets = TimeSheet.create_time_sheet(@user.id, current_user, data_params)
+      unless return_values.include?(false)
+        flash[:notice] = 'Timesheet created successfully'
+        redirect_to users_time_sheets_path(user_id: @user.id, from_date: @from_date, to_date: @to_date)
+      else
+        if return_values.include?(true)
+          flash[:notice] = "#{return_values.count(true)} #{'timesheet'.pluralize(return_values.count(true))} created successfully"
+        end
+        render 'new'
       end
-      render 'new'
+    elsif request.env['REQUEST_METHOD'] == 'GET'
+      redirect_to time_sheets_path
     end
   end
 

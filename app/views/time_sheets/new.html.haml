@@ -3,23 +3,15 @@
   %table.table
     %th Project
     %th Date
-    %th From Time(HH:MM 24hrs)
-    %th To Time(HH:MM 24hrs)
     %th No. of hours
     %th Description
     %tbody#timesheets
       = f.fields_for :time_sheets, @time_sheets, wrapper: false do |time_sheet|
         %tr.fields
-          %td= time_sheet.select :project_id, options_for_select(active_project_ids(@user), time_sheet.object.project_id), {}, {style: "margin-bottom: 16px"}
+          %td= time_sheet.input :project_id, collection: active_project_ids(@user), selected: time_sheet.object.project_id, input_html: { class: 'project_id', style: "margin-bottom: 16px"}, label: false
           %td= time_sheet.input :date, input_html: {class: 'timesheet-input datepicker',
             'data-behaviour' => 'datepicker',
             'readonly' => true, value: time_sheet.object.date || Date.today}, label: false
-          %td= time_sheet.input :from_time,
-            input_html: {value: time_sheet.object.from_time.try(:strftime, "%H:%M"),
-            type: 'time', class: 'timesheet-input time-range', required: true}, label: false, id: 'from-time'
-          %td= time_sheet.input :to_time,
-            input_html: {value: time_sheet.object.to_time.try(:strftime, "%H:%M"),
-            type: 'time', class: 'timesheet-input time-range'}, label: false
           %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, placeholder: 'Select', label: false
           %td= time_sheet.input :description, as: :text, label: false
           %td= time_sheet.link_to_remove '', class: 'icon-remove'
@@ -28,6 +20,8 @@
   = f.hidden_field :to_date, value: @to_date
   = f.link_to_add 'Add new timesheet', :time_sheets, data: {target: '#timesheets'}, class: 'btn add-new-timesheet'
   = f.submit :Save, class: "btn"
+
+  .note* If by any chance you need to enter timesheet for more than 12 hours for any project, then kindly get in touch with HR &amp; manager of your project.
 
 %span{ id: 'activeProjectList', data: { value: project_names }, visibility: 'hidden'}
 %span{ id: 'activeProjectData', data: { value: project_data }, visibility: 'hidden'}

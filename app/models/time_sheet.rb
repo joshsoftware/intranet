@@ -19,7 +19,7 @@ class TimeSheet
   validates :project_id, :date, :description, presence: true
   validate :is_future_date?
   before_validation :valid_date_for_create?, unless: :is_management?
-
+  validates_uniqueness_of :project_id, scope: [:date, :user_id], message: 'Cannot add multiple timesheets for same project'
   validates :from_time, :to_time, uniqueness: { scope: [:user_id, :date], message: "Record already present" }, if: :is_from_time_and_to_time_present?
   # when both of them are absent thats when we have to check for the duration
   validates :duration, presence: true, unless: :is_from_time_or_to_time_present?
@@ -30,12 +30,14 @@ class TimeSheet
   # validate :timesheet_date_greater_than_project_start_date, if: :is_project_assigned_to_user?
 
   DURATION_HASH = {
-    30 => "30 mins", 60 => "1 hour", 90 => "1 hour 30 mins",
-    120 => "2 hours", 150 => "2 hours 30 mins", 180 => "3 hours",
-    210 => "3 hours 30 mins", 240 => "4 hours", 270 => "4 hours 30 mins",
-    300 => "5 hours", 330 => "5 hours 30 mins", 360 => "6 hours",
-    390 => "6 hours 30 mins", 420 => "7 hours",
-    450 => "7 hours 30 mins", 480 => "8 hours"
+    30 => '30 mins', 60 => '1 hour', 90 => '1 hour 30 mins',
+    120 => '2 hours', 150 => '2 hours 30 mins', 180 => '3 hours',
+    210 => '3 hours 30 mins', 240 => '4 hours', 270 => '4 hours 30 mins',
+    300 => '5 hours', 330 => '5 hours 30 mins', 360 => '6 hours',
+    390 => '6 hours 30 mins', 420 => '7 hours',
+    450 => '7 hours 30 mins', 480 => '8 hours',
+    540 => '9 hours', 600 => '9 hours',
+    660 => '11 hours', 720 => '12 hours'
   }
   MAX_TIMESHEET_COMMAND_LENGTH = 5
   DATE_FORMAT_LENGTH = 3

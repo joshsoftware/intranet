@@ -18,6 +18,18 @@ on_time_range_change = ->
       duration_id = str.replace("from_time", "duration")
     $("#" + duration_id)[0].selectedIndex = '0'
 
+update_project_list = ->
+  previous_project = []
+  $('select').each ->
+    if $(this).attr('class').includes('project_id')
+      input = $(this)
+      $.each previous_project, (index, value) ->
+        input.find('option[value=' + String(value) + ']').remove()
+        return
+      previous_project.push input.val()
+    return
+  return
+
 $(document).ready ->
   $('.dropdown-submenu a.test').on 'click', (e) ->
     $(this).next('ul').toggle()
@@ -27,8 +39,10 @@ $(document).ready ->
 
   on_duration_change()
   on_time_range_change()
+  update_project_list()
 
   $("body").on "nested:fieldAdded", () ->
     on_duration_change()
     on_time_range_change()
+    update_project_list()
   return
