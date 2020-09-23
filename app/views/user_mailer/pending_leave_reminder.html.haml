@@ -75,10 +75,11 @@
                                                     %p
                                                       = "Following employee(s) have applied for leave starting from #{@leave.start_at},which are still neither 'Approved' nor 'Rejected'. Kindly take appropriate action on them."
                                                       %br
-                                                      %table
+                                                      %br
+                                                      %table{:border => '1px solid black;', :style => 'border-collapse: collapse;', :width => '600'}
                                                         %tr
                                                           %th Name
-                                                          %th Number of days
+                                                          %th{:width => "15%"} No. of days
                                                           %th Reason
                                                           %th Start Date
                                                           %th End Date
@@ -90,6 +91,7 @@
                                                             %td #{@leave.start_at}
                                                             %td #{@leave.end_at}
                                                             %td #{@user.get_managers_names.join(', ')}
+                                                      %br
                                                       = link_to "Approve", process_leave_url(id: @leave.id, leave_action: 'approve'), class: 'btn btn-success'
                                                       |
                                                       = link_to "Reject", process_leave_url(id: @leave.id, leave_action: 'reject'), class: 'btn btn-danger'

@@ -114,6 +114,22 @@ class User
     end
   end
 
+  def self.leave_notification_emails(user_ids)
+    emails = [
+      User.approved.where(role: 'HR').pluck(:email),
+      'hr@joshsoftware.com',
+      'shailesh.kalekar@joshsoftware.com',
+      'sameert@joshsoftware.com',
+    ].flatten.compact.uniq
+
+    users = User.where(:id.in => [user_ids].flatten)
+    users.each do |user|
+      emails += user.get_managers_emails +
+       user.employee_detail.try(:get_notification_emails)
+    end
+    emails.flatten.compact.uniq
+  end
+
   def notification_emails
     [
       User.approved.where(role: 'HR').pluck(:email), User.approved.where(role: 'Admin').first.try(:email),
@@ -126,9 +142,10 @@ class User
   end
 
   def sent_mail_for_approval(leave_application_id)
-    notified_users = notification_emails
+    notified_users = User.leave_notification_emails(self.id)
     UserMailer.delay.leave_application(self.email, notified_users, leave_application_id)
   end
+
   def role?(role)
     self.role == role
   end

@@ -83,6 +83,8 @@
                                                         Remaining leaves: #{User.find(@leave_application.user_id).employee_detail.available_leaves}
                                                       %br/
                                                       Sanctioning Manager: #{@user.get_managers_names.join(', ')}
+                                                      %br/
+                                                      Notification To: #{@notification_names.join(', ')}
                                                       %br
                                                       - if @older_leaves && @older_leaves.count > 0
                                                         %h4 Previously Approved Leaves

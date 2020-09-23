@@ -34,8 +34,11 @@ class EmployeeDetail
   end
 
   def get_notification_emails
-    unapproved_employees = User.where(:status.ne => 'approved').pluck(:email)
-    notification_emails - unapproved_employees
+    User.where(:email.in => notification_emails, status: 'approved').pluck(:email)
+  end
+
+  def get_notification_names
+    User.where(:email.in => notification_emails, status: 'approved').collect(&:name)
   end
 
   def add_rejected_leave(number_of_days)

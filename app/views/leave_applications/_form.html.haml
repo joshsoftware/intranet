@@ -4,7 +4,7 @@
 = f.input :start_at, label: 'Start Date', input_html: {class: 'datepicker', data: {'behaviour' => 'datepicker', 'validation-required-message' => 'You must select start date'}, required: true, value: f.object.start_at.try(:strftime, '%d-%m-%Y')}
 = f.input :end_at, label: 'End Date', input_html: {class: 'datepicker', data: {'behaviour' => 'datepicker', 'validation-required-message' => 'You must select end date'}, required: true, value: f.object.end_at.try(:strftime, '%d-%m-%Y')}
 = f.input :number_of_days, as: :decimal, label: 'Days', input_html: {step: 1}, input_html: { required: true, :'data-validation-required-message' => 'Enter the number of days', min: "1", :'data-validation-min-message' => "Number of day can't be zero or negative"}, readonly: true
-= f.input :contact_number, as: :decimal, label: 'Emergency Contact No.', input_html: {required: true, :'data-validation-required-message' => 'You need to enter your emergency number', type: 'text'}
+= f.input :contact_number, as: :decimal, label: 'Emergency Contact No.', input_html: {required: true, :'data-validation-required-message' => 'You need to enter your emergency number', type: 'text', maxlength: 10}
 = f.input :reason, as: :text, label: 'Reason', input_html: {required: true, :'data-validation-required-message' => 'You have to specify valid reason for leave'}
 %center
   = f.submit (params[:action] == "new" ? 'Apply' : 'Save Changes'), class: 'btn'
