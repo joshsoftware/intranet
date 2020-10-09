@@ -1,5 +1,5 @@
 %ul.media-list
   - github_entries.each do |entry|
     .project-name
-      - entry.content.gsub!( %r{<a href=\"/},'<a href="https://github.com/')
+      - entry.content.gsub!( %r{<a(.*)href=\"/},'<a \1 href="https://github.com/')
       = raw entry.content
