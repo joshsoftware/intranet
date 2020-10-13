@@ -78,6 +78,10 @@
                                                       %br
                                                       By:
                                                       = @processed_by.name
+                                                      - if @leave_application.reject_reason.present?
+                                                        %br
+                                                        Approval Comment:
+                                                        = @leave_application.reject_reason
                                                     %p{:style => "margin:0;padding-bottom:0"}
                                                       Regards,
                                                       %br/
