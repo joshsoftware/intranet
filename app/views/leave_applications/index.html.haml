@@ -1,33 +1,22 @@
-%table.table.table-hover.table-striped
-  %h5.btn{id: 'show'} Show All
-  %h5{id: 'show_text'} Showing approved users only.
+%table.table.table-hover.table-striped#leave-table
   %thead
     %tr
       %th
         Name
       %th
-        = image_tag(asset_url("paid_leave.jpg"), class: "leave-icon")
+        Role
+      %th
         Available leaves
   %tbody
     - @users.each do|user|
-      %tr{hidden: (true if user.status != STATUS[2])}
+      %tr
         %td
           = user.name
         %td
+          = user.role
+        %td
           = link_to user.employee_detail.try(:available_leaves),'#', {class: 'available_leaves', id: "leave_#{user.try(:id)}", data:{pk: user.id, url: update_available_leave_path(id: user.id)}} if user.status.eql?(STATUS[2])
 
-:coffeescript
-  $('tr[hidden]').attr("hide", "true")
-  $('#show').click ->
-    if $(this).text() == 'Show All'
-      $(this).text('Show Approved')
-      $('tr[hide]').removeAttr('hidden')
-      $('#show_text').text('Showing all users.')
-    else
-      $(this).text('Show All')
-      $('tr[hide]').attr('hidden', 'true')
-      $('#show_text').text('Showing approved users only.')
-      
 :javascript
   $.fn.editable.defaults.ajaxOptions = {type: "PUT"}; 
   $('.available_leaves').editable({

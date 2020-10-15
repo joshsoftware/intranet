@@ -316,6 +316,14 @@ describe LeaveApplication do
         leave_application = create(:leave_application, user: user, number_of_days: 1)
         expect(employee_detail.available_leaves).to eq(available_leaves - 1)
       end
+
+      it 'do not deduct leave from available leave when employee role is Consultant' do
+        user1 = FactoryGirl.create(:user, role: ROLE[:consultant] )
+        employee_detail = user1.employee_detail
+        available_leaves = employee_detail.available_leaves
+        leave_application = create(:leave_application, user: user, number_of_days: 1)
+        expect(employee_detail.available_leaves).to eq(available_leaves)
+      end
     end
 
     context 'when request is for WFH' do

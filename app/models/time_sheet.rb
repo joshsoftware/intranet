@@ -872,7 +872,7 @@ class TimeSheet
   end
 
   def self.get_users_without_timesheet(from_date, to_date, current_user)
-    return if current_user.role == ROLE[:employee] || current_user.role == ROLE[:intern]
+    return if [ ROLE[:employee], ROLE[:intern], ROLE[:consultant] ].include?(current_user.role)
     user_ids = TimeSheet.where(date: {"$gte" => from_date, "$lte" => to_date}).distinct(:user_id)
     users = User.not_in(id: user_ids)
     users.where(status: STATUS[2], "$or" => [{role: ROLE[:employee]}, {role: ROLE[:intern]}]).order("public_profile.first_name" => :asc)

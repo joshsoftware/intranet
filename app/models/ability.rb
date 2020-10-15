@@ -11,6 +11,7 @@ class Ability
       hr_abilities(user.id)
     elsif user.role? 'Finance'
       can [:public_profile, :private_profile, :edit, :apply_leave], User
+      can :read, :dashboard
     elsif user.role? 'Manager'
       employee_abilities(user.id)
       can :manage, Project
@@ -26,6 +27,8 @@ class Ability
       can :manage, Designation
     elsif user.role? 'Employee'
       employee_abilities(user.id)
+    elsif user.role? 'Consultant'
+      consultant_abilities(user.id)
     elsif user.role? 'Intern'
       intern_abilities(user.id)
     end
@@ -44,6 +47,7 @@ class Ability
     can :manage, Designation
     can :resource_list, User
     can :manage, EntryPass
+    can :read, :dashboard
   end
 
   def intern_abilities(user_id)
@@ -51,6 +55,7 @@ class Ability
     can :read, [Policy, Attachment, Vendor]
     can [:index, :users_timesheet, :edit_timesheet, :update_timesheet, :new, :add_time_sheet], TimeSheet, user_id: user_id
     can :manage, EntryPass, user_id: user_id
+    can :read, :dashboard
   end
 
   def employee_abilities(user_id)
@@ -67,6 +72,20 @@ class Ability
     cannot [:projects_report, :individual_project_report], TimeSheet
     can :manage, EntryPass, user_id: user_id
     cannot :report, EntryPass
+    can :read, :dashboard
+  end
+
+  def consultant_abilities(user_id)
+    can [:public_profile, :private_profile, :apply_leave], User, id: user_id
+    can :read, Policy
+    cannot :manage, LeaveApplication
+    can [:new, :create], LeaveApplication, user_id: user_id
+    can [:edit, :update], LeaveApplication, leave_status: 'Pending', user_id: user_id
+    can [:index, :users_timesheet, :edit_timesheet, :update_timesheet, :new, :add_time_sheet], TimeSheet, user_id: user_id
+    cannot [:projects_report, :individual_project_report], TimeSheet
+    cannot :manage, EntryPass, user_id: user_id
+    cannot :report, EntryPass
+    cannot :read, :dashboard
   end
 
   def admin_abilities

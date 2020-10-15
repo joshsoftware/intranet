@@ -6,7 +6,8 @@
 .alert-message
 .leave_link.leave_btn_position
   =link_to "Apply Leave", new_user_leave_application_path(current_user), class: 'btn btn-primary'
-  %h5 Available Leaves: #{@available_leaves} 
+  - unless current_user.role == ROLE[:consultant]
+    %h5 Available Leaves: #{@available_leaves} 
 
 %ul.leave_applicationTab.nav.nav-tabs
   %li.active

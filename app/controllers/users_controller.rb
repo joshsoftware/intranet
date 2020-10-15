@@ -8,13 +8,18 @@ class UsersController < ApplicationController
   after_action :notify_document_download, only: :download_document
 
   def index
-    @users = params[:all].present? ?  User.employees : User.employees.approved
-    @usersxls = params[:status] == "all" ? User.employees : User.employees.approved
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xlsx
-      format.js
-      format.json { render json: @users.to_json }
+    if current_user.role == ROLE[:consultant]
+      flash[:error] = 'You are not authorized to access this page.'
+      redirect_to public_profile_user_path(current_user)
+    else
+      @users = params[:all].present? ?  User.employees : User.employees.approved
+      @usersxls = params[:status] == "all" ? User.employees : User.employees.approved
+      respond_to do |format|
+        format.html # index.html.erb
+        format.xlsx
+        format.js
+        format.json { render json: @users.to_json }
+      end
     end
   end
 

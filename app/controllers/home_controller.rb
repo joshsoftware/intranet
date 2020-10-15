@@ -1,6 +1,7 @@
 class HomeController < ApplicationController
-  
+
   def index
+    authorize! :read, :dashboard
     @projects = Project.all_active
     #@bonusly_updates = get_bonusly_updates
     feed = Feedjira::Feed.fetch_and_parse('http://blog.joshsoftware.com/feed/')

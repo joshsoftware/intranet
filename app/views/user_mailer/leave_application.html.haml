@@ -79,8 +79,8 @@
                                                       %br/
                                                       Days: #{@leave_application.number_of_days}
                                                       %br/
-                                                      - if @leave_application.leave_request?
-                                                        Remaining leaves: #{User.find(@leave_application.user_id).employee_detail.available_leaves}
+                                                      - if @leave_application.leave?
+                                                        Remaining leaves: #{@user.employee_detail.available_leaves}
                                                       %br/
                                                       Sanctioning Manager: #{@user.get_managers_names.join(', ')}
                                                       %br/

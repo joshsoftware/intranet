@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   before_filter :store_location
-  before_filter :check_for_light
+  before_filter :check_for_light, :check_for_screamout
   skip_before_filter :verify_authenticity_token, only: :blog_publish_hook
   after_filter :cors_set_access_control_headers
   def store_location
@@ -20,7 +20,11 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
-    INVALID_REDIRECTIONS.include?(session[:previous_url]) ? root_path : session[:previous_url]
+    if current_user.role == ROLE[:consultant]
+      public_profile_user_path(current_user)
+    else
+      INVALID_REDIRECTIONS.include?(session[:previous_url]) ? root_path : session[:previous_url]
+    end
   end
 
   def check_for_light
@@ -28,6 +32,13 @@ class ApplicationController < ActionController::Base
     if request.url.include?('newsletter') and !current_user.try(:role).in?(['Admin', 'HR', 'Super Admin'])
       flash[:error] = 'You are not authorized to access this page.'
       redirect_to main_app.root_url and return
+    end
+  end
+
+  def check_for_screamout
+    if params[:controller].eql?('screamout/contents') and [ROLE[:consultant]].include?(current_user.try(:role))
+      flash[:error] = 'You are not authorized to access this page.'
+      redirect_to main_app.public_profile_user_path(current_user) and return
     end
   end
 
@@ -42,7 +53,12 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from CanCan::AccessDenied do |exception|
-    redirect_to main_app.root_url, :alert => exception.message
+    if [ROLE[:consultant]].include?(current_user.try(:role))
+      flash[:error] = 'You are not authorized to access this page.'
+      redirect_to main_app.public_profile_user_path(current_user)
+    else
+      redirect_to main_app.root_url, :alert => exception.message
+    end
   end
 
 end

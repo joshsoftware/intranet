@@ -21,6 +21,7 @@ CalculateWeekendDays = (fromDate, toDate) ->
 
 $(document).ready ->
   $('.leave_table').dataTable 'ordering' : false
+  $('#leave-table').dataTable({'pageLength': 50})
 
 getHolidayList = ->
   $.ajax

@@ -1,4 +1,4 @@
-- unless @projects.blank?
+- if @projects.present? && current_user.present?
   .active-projects
     %table.table
       = render partial: 'users/project', collection: @projects

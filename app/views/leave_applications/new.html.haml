@@ -1,7 +1,8 @@
 .form-heading
   %h2
     Apply Leave
-  %h4
-    = "Available Leaves: #{@available_leaves}"
+  - unless current_user.role == ROLE[:consultant] 
+    %h4
+      = "Available Leaves: #{@available_leaves}"
 = simple_form_for @leave_application, url: user_leave_applications_path(current_user) , html:{class: 'form-horizontal', 'autocomplete': 'off'}  do|f|
   = render 'form', f: f

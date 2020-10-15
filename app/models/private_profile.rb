@@ -33,8 +33,7 @@ class PrivateProfile
 
   def check_status_and_role?
     return true if date_of_joining.blank? &&
-                   (user.role == ROLE[:employee] ||
-                   user.role == ROLE[:HR]) &&
+                   [ ROLE[:employee], ROLE[:HR], ROLE[:consultant] ].include?(user.role) &&
                    user.status == STATUS[STATUS.find_index('approved')]
 
     return false
