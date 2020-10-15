@@ -37,6 +37,7 @@ class User
   field :refresh_token,      :type => String
   field :visible_on_website, :type => Boolean, :default => false
   field :website_sequence_number, :type => Integer
+  field :allow_backdated_timesheet_entry, :type => Boolean, :default => false
 
   has_many :leave_applications
   has_many :attachments

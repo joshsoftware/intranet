@@ -44,7 +44,6 @@ class UsersController < ApplicationController
     update_profile(profile)
     load_emails_and_projects
     @user.attachments.first || @user.attachments.build
-
   end
 
   def private_profile
@@ -134,15 +133,11 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    safe_params = []
-    if params[:user][:employee_detail_attributes].present?
-      safe_params = [ employee_detail_attributes: [:id, :employee_id, :location, :date_of_relieving, :designation, :description, :is_billable, :designation_track, :notification_emails => [] ] ]
-    elsif params[:user][:attachments_attributes].present?
-      safe_params = [attachments_attributes: [:id, :name, :document, :_destroy]]
-    else
-      safe_params = [:status, :role, :visible_on_website, :website_sequence_number]
-    end
-    params.require(:user).permit(*safe_params)
+    params.require(:user).permit(:status, :role, :visible_on_website, :website_sequence_number,
+      :allow_backdated_timesheet_entry, employee_detail_attributes: [:id, :employee_id, :location,
+      :date_of_relieving, :designation, :description, :is_billable, :designation_track, :notification_emails => [] ],
+      attachments_attributes: [:id, :name, :document, :_destroy]
+    )
   end
 
   def load_profiles

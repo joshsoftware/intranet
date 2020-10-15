@@ -689,7 +689,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: employee.id,
+        put :update_timesheet, user_id: employee.id,
           user: params,
           time_sheet_date: Date.today - 1
         expect(time_sheet.reload.from_time.to_s).
@@ -724,7 +724,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
           user: params,
           time_sheet_date: Date.today - 4
         expect(time_sheet.reload.from_time.to_s).
@@ -761,7 +761,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id: user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
                                 user: params,
                                 time_sheet_date: Date.today - 1
         expect(time_sheet.reload.date).to eq(Date.today - 12)
@@ -798,7 +798,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
           user: params,
           time_sheet_date: Date.today - 1
         assigns(:time_sheets)[0].errors.full_messages ==
@@ -834,7 +834,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
           user: params,
           time_sheet_date: Date.today - 1
         assigns(:time_sheets)[0].errors.full_messages ==
@@ -871,7 +871,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id:user.id
         }
-        post :update_timesheet, user_id: user.id,
+        put :update_timesheet, user_id: user.id,
           user: params,
           time_sheet_date: Date.today - 1
         assigns(:time_sheets)[0].errors.full_messages ==
@@ -999,7 +999,7 @@ RSpec.describe TimeSheetsController, type: :controller do
           },
           id: user.id
         }
-        post :update_timesheet, user_id: employee.id,
+        put :update_timesheet, user_id: employee.id,
                                 user: params,
                                 time_sheet_date: Date.today - 9
         expect(time_sheet.reload.from_time).
@@ -1148,6 +1148,32 @@ RSpec.describe TimeSheetsController, type: :controller do
       expect(user.reload.time_sheets[0].user_id).to eq(user.id)
       expect(user.time_sheets[0].project_id).to eq(project.id)
       expect(user.time_sheets[0].created_by).to eq(user.id.to_s)
+    end
+
+    it 'Should add timesheet for more than 7 days if allow_backdated_entry flag is set true' do
+      user2 = FactoryGirl.create(:user, allow_backdated_timesheet_entry: true)
+      params = {
+        time_sheets_attributes: {
+          "0" => {
+            project_id: "#{project.id}",
+            date: "#{Date.today - 100}",
+            from_time: nil,
+            to_time: nil,
+            duration: 60,
+            description: "testing timesheet create"
+          }
+        },
+        user_id: user2.id,
+        from_date: Date.today - 20,
+        to_date: Date.today
+      }
+      sign_in user2
+      post :add_time_sheet, user_id: user2.id, user: params
+
+      expect(flash[:notice]).to eq('Timesheet created successfully')
+      expect(user2.reload.time_sheets[0].user_id).to eq(user2.id)
+      expect(user2.time_sheets[0].project_id).to eq(project.id)
+      expect(user2.time_sheets[0].created_by).to eq(user2.id.to_s)
     end
 
     it 'Should not add timesheet if only from_time or to_time is present' do

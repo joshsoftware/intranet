@@ -12,6 +12,11 @@
     = f.check_box :visible_on_website, {}, 'true', 'false'
   %br
   %br
+  = f.label 'Allow Timesheet Backdated Entry'
+  .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label"=>"Yes", "data-off-label"=> "NO"}
+    = f.check_box :allow_backdated_timesheet_entry, {}, 'true', 'false'
+  %br
+  %br
   = f.submit 'Update', class: 'btn controls'
 
 %span{ id: 'activeProjectDetails', data: { value: project_info }, visibility: 'hidden'}
