@@ -32,7 +32,7 @@ class LeaveApplication
   validates :start_at, :end_at, :contact_number, :reason, :number_of_days, :user_id, :leave_type, presence: true
   validates :leave_type, inclusion: { in: LEAVE_TYPES }
   validates :contact_number, numericality: {only_integer: true}, length: {is: 10}
-  validate :validate_available_leaves, on: [:create, :update], if: :leave_request?
+  validate :validate_available_leaves, on: [:create, :update], if: :leave?
   validate :end_date_less_than_start_date, if: 'start_at.present?'
   validate :validate_date, on: [:create, :update]
 
@@ -47,6 +47,10 @@ class LeaveApplication
 
   def leave_request?
     leave_type == LEAVE
+  end
+
+  def leave?
+    leave_request? && self.user.role != ROLE[:consultant]
   end
 
   def leave_count
@@ -76,7 +80,7 @@ class LeaveApplication
   end
 
   def process_reject_application
-    if leave_request?
+    if leave?
       user = self.user
       user.employee_detail.add_rejected_leave(number_of_days)
     end
@@ -173,14 +177,14 @@ class LeaveApplication
     # Deduct on creation and changed from 'Rejected' to 'Approved'
     if (pending? and self.leave_status_was.nil?) or (approved? and self.leave_status_was == REJECTED)
       user = self.user
-      user.employee_detail.deduct_available_leaves(number_of_days) if leave_request?
+      user.employee_detail.deduct_available_leaves(number_of_days) if leave?
       user.sent_mail_for_approval(self.id) unless self.leave_status_was == REJECTED
     end
   end
 
   def update_available_leave_send_mail
     user = self.user
-    if leave_request?
+    if leave?
       prev_days, changed_days = number_of_days_change ? number_of_days_change : number_of_days
       user.employee_detail.add_rejected_leave(prev_days)
       user.employee_detail.deduct_available_leaves(changed_days||prev_days)
