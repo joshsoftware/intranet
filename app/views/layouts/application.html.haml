@@ -3,11 +3,10 @@
     %title Josh Intranet
     = stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true
     /= stylesheet_link_tag    "screamout/global", media: "all", "data-turbolinks-track" => true
-
+    
     = javascript_include_tag "application", "data-turbolinks-track" => true
     /= javascript_include_tag "screamout/filter", "data-turbolinks-track" => true
     /= javascript_include_tag "screamout/global", "data-turbolinks-track" => true
-
     = csrf_meta_tags
     = favicon_link_tag "/images/favicon.ico"
     :css
@@ -67,3 +66,20 @@
     = yield
   #footer.pull-right
     = link_to "Privacy Policy", '/pdf/Intranet_Privacy_Policy.pdf'
+
+  %script{type: 'text/javascript'}
+    :plain
+      window.fwSettings = {
+        'widget_id': 24000000212
+      };
+      !function(){
+        if('function' != typeof window.FreshworksWidget){
+          var n = function(){
+            n.q.push(arguments)
+          };
+          n.q = [],
+          window.FreshworksWidget = n
+        }
+      }()
+  %script{ defer: true, src: 'https://widget.freshworks.com/widgets/24000000212.js', type: 'text/javascript' }
+
