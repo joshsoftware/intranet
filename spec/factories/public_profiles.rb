@@ -8,7 +8,7 @@ FactoryGirl.define do
     skills { 'Badminton,Cricket' }
     technical_skills { ['ReactJs', 'Ruby', 'UI/UX'] }
     date_of_birth { Date.today }
-    github_handle { Faker::Internet.username }
+    github_handle { Faker::Name.first_name }
     gitlab_handle { Faker::Internet.username }
     bitbucket_handle { Faker::Internet.username }
     blog_url { Faker::Internet.url }

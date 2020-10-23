@@ -36,7 +36,8 @@ class PublicProfile
   validates :technical_skills, length: { maximum: 3 , message: 'Atmost 3 core skills can be selected'}
   validates :gender, inclusion: { in: GENDER }, allow_blank: true, on: :update
   validates :blood_group, inclusion: { in: BLOOD_GROUPS }, allow_blank: true, on: :update
-  validates_format_of [:github_handle, :twitter_handle], without: URI.regexp(['http', 'https']), allow_blank: true
+  validates_format_of [:github_handle], with: /\A[a-zA-Z\d](?:[a-zA-Z\d]|[-|_](?=[a-zA-Z\d])){0,38}\z/, message: 'Invalid GitHub handle', allow_blank: true
+  validates_format_of [:twitter_handle], with: /\A[a-zA-Z_\d](?:[a-zA-Z_\d]|[-|_](?=[a-zA-Z_\d])){0,38}\z/, message: 'Invalid Twitter handle', allow_blank: true
   validates_format_of [:facebook_url, :linkedin_url], with: URI.regexp(['http', 'https']), allow_blank: true
   validates_presence_of :first_name, :last_name, on: :update
 

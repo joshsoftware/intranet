@@ -31,10 +31,25 @@ describe PublicProfile do
     employee.valid?
     expect(employee.public_profile.errors[:technical_skills]).to include('Atmost 3 core skills can be selected')
   end
+
+  it 'Validation should fail as github handle is invalid' do
+    user = FactoryGirl.build(:user, public_profile: {github_handle: '-invalid github handle'})
+    expect(user.valid?).to be_falsy
+    expect(user.public_profile.errors.full_messages).to eq(['Github handle Invalid GitHub handle'])
+  end
+
+  it 'Validation should fail as twitter handle is invalid' do
+    user = FactoryGirl.build(:user, public_profile: {twitter_handle: '_invalid twitter handle'})
+    expect(user.valid?).to be_falsy
+    expect(user.public_profile.errors.full_messages).to eq(['Twitter handle Invalid Twitter handle'])
+  end
+
   it { should validate_inclusion_of(:gender).to_allow(GENDER).on(:update) }
   it { should validate_inclusion_of(:blood_group).
         to_allow(BLOOD_GROUPS).on(:update)
      }
+  it { should allow_value('validhandle').for(:github_handle)}
+  it { should_not allow_value('invalid  handle').for(:github_handle)}
 
   context 'Trigger - should call code monitor service' do
     it 'when Public Profile(github, gitlab, bitbucket handles) is updated' do
