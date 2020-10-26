@@ -2,16 +2,21 @@ class CodeClimateStatistic
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  field :lines_of_code,        type: Integer, default: 0
-  field :total_issues,         type: Integer, default: 0
-  field :complexity_issues,    type: Integer, default: 0
-  field :duplication_issues,   type: Integer, default: 0
-  field :maintainability,      type: Float,   default: 0.0
-  field :quality_gpa,          type: Float,   default: 0.0
-  field :remediation_time,     type: Float,   default: 0.0
-  field :implementation_time,  type: Float,   default: 0.0
-  field :test_coverage,        type: Float,   default: 0.0
-  field :technical_debt_ratio, type: Float,   default: 0.0
+  field :snapshot_id,             type: String
+  field :snapshot_created_at,     type: DateTime
+  field :lines_of_code,           type: Integer
+  field :total_issues,            type: Integer
+  field :total_complexities,      type: Integer
+  field :total_duplications,      type: Integer
+  field :maintainability,         type: Float
+  field :quality_gpa,             type: Float
+  field :remediation_time,        type: Float
+  field :implementation_time,     type: Float
+  field :technical_debt_ratio,    type: Float
+  field :test_report_id,          type: String
+  field :test_report_received_at, type: DateTime
+  field :test_coverage,           type: Float
+  field :remarks,                 type: Array,   default: []
 
   belongs_to :repository
 end

@@ -87,7 +87,7 @@
                                                           %b : #{repo_name}
                                                         %br
                                                         - last_week_data = data.last
-                                                        - keys = %w(lines_of_code total_issues complexity_issues duplication_issues maintainability quality_gpa remediation_time implementation_time test_coverage technical_debt_ratio)
+                                                        - keys = %w(lines_of_code total_issues total_complexities total_duplications maintainability quality_gpa remediation_time implementation_time technical_debt_ratio test_coverage)
                                                         %table{border: 1}
                                                           %tr
                                                             %th{style: "padding: 4px 25px;"} Metric
@@ -101,21 +101,24 @@
                                                               %td{style: "padding: 4px 20px;"}
                                                                 %b #{metric.titleize}
                                                               - data.each do |d|
-                                                                %td{style: "padding: 4px 20px;"} #{d[metric] && d[metric].round(2) || 0}
+                                                                %td{style: "padding: 4px 20px;"} #{(d[metric] && d[metric].round(2)) || 'NA'}
                                                               - if data.length > 1
                                                                 - if data.last[metric] && data[data.length-2] && data[data.length-2][metric]
                                                                   - difference = (data.last[metric] - data[data.length-2][metric]).round(2)
-                                                                  - color = "black"
-                                                                  - if difference > 0
-                                                                    - if metric == 'technical_debt_ratio'
-                                                                      - color = 'red'
-                                                                    - else
+                                                                  - color = 'black'
+                                                                  - if %w(maintainability quality_gpa test_coverage).include? metric
+                                                                    - if difference > 0
                                                                       - color = 'green'
-                                                                  - if difference < 0
-                                                                    - color = 'red'
-                                                                  %td{style: "padding: 4px 20px;color:#{color}"} #{difference || 0}
+                                                                    - if difference < 0
+                                                                      - color = 'red'
+                                                                  - if %w(total_issues total_complexities total_duplications remediation_time technical_debt_ratio).include? metric
+                                                                    - if difference > 0
+                                                                      - color = 'red'
+                                                                    - if difference < 0
+                                                                      - color = 'green'
+                                                                  %td{style: "padding: 4px 20px;color:#{color}"} #{difference || 'NA'}
                                                                 - else
-                                                                  %td{style: "padding: 4px 20px;"} #{data.last[metric] || 0}
+                                                                  %td{style: "padding: 4px 20px;"} NA
                                                         %br
                                                         %hr
                                                     %br
