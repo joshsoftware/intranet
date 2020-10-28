@@ -211,8 +211,8 @@ describe User do
 
     it 'Should give the managers emails of particular user' do
       project = FactoryGirl.create(:project)
-      manager_one = FactoryGirl.create(:user, role: 'Manager')
-      manager_two = FactoryGirl.create(:user, role: 'Manager')
+      manager_one = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
+      manager_two = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
       user_project = FactoryGirl.create(:user_project,
         user: user,
         project: project,
@@ -230,8 +230,8 @@ describe User do
        ' is mandatory for particular Employee' do
       project_1 = FactoryGirl.create(:project)
       project_2 = FactoryGirl.create(:project, timesheet_mandatory: false)
-      manager_1 = FactoryGirl.create(:user, role: 'Manager')
-      manager_2 = FactoryGirl.create(:user, role: 'Manager')
+      manager_1 = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
+      manager_2 = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
       user_project_1 = FactoryGirl.create(:user_project,
         user: user,
         project: project_1,
@@ -263,7 +263,7 @@ describe User do
         project: project_two,
         start_date: Date.today - 2
       )
-      manager = FactoryGirl.create(:user, role: 'Manager')
+      manager = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
       project_one.managers << manager
       project_two.managers << manager
       managers_emails = user.get_managers_emails

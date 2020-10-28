@@ -40,6 +40,7 @@ RSpec.describe TimeSheet, type: :model do
     # end
 
     it 'Should fails because record is already present' do
+      project1 = FactoryGirl.create(:project)
       FactoryGirl.create(:time_sheet,
         user: user,
         project: project,
@@ -50,7 +51,7 @@ RSpec.describe TimeSheet, type: :model do
       )
       time_sheet = FactoryGirl.build(:time_sheet,
         user: user,
-        project: project,
+        project: project1,
         date: Date.today - 1,
         from_time: "#{Date.today - 1} 10:00",
         to_time: "#{Date.today - 1} 11:00",
@@ -1273,14 +1274,14 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:time_sheet,
         user: user_one,
         project: project,
-        date: Date.today - 1,
+        date: Date.today - 2,
         from_time: "#{Date.today - 1} 8:00",
         to_time: "#{Date.today - 1} 9:00"
       )
       FactoryGirl.create(:time_sheet,
         user: user_one,
         project: project,
-        date: Date.today - 2,
+        date: Date.today - 3,
         from_time: "#{Date.today - 1} 21:00",
         to_time: "#{Date.today - 1} 22:00"
       )
@@ -1301,7 +1302,7 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:time_sheet,
         user: user_two,
         project: project,
-        date: Date.today - 1,
+        date: Date.today - 2,
         from_time: "#{Date.today - 1} 8:00",
         to_time: "#{Date.today - 1} 10:00"
       )
@@ -1384,11 +1385,11 @@ RSpec.describe TimeSheet, type: :model do
         project: project,
         start_date: Date.today - 10
       )
-      for d in 10..12
+      for d in 1..3
         FactoryGirl.create(:time_sheet,
           user: user,
           project: project,
-          date: DateTime.now - 1,
+          date: DateTime.now - d,
           from_time: Time.parse("#{Date.today - 1} #{d}"),
           to_time: Time.parse("#{Date.today - 1} #{d+1}")
         )

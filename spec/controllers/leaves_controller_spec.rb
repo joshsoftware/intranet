@@ -187,20 +187,19 @@ describe LeaveApplicationsController do
       should respond_with(:success)
       should render_template(:new)
     end
-
-    it "should not be able to view all leave" do
-      get :index
-      expect(LeaveApplication.count).to eq(1)
-      should_not render_template(:index)
-    end
-
   end
 
   context "While accepting leaves" do
     before(:each) do
-      @admin = FactoryGirl.create(:admin)
+      @admin = FactoryGirl.create(:admin, status: 'approved')
       @hr = FactoryGirl.create(:hr)
       @user = FactoryGirl.create(:user)
+      user1 = FactoryGirl.create(:user)
+
+      project = FactoryGirl.create(:project, manager_ids: [@admin.id])
+      FactoryGirl.create(:user_project, user_id: @user.id, project_id: project.id)
+      FactoryGirl.create(:user_project, user_id: user1.id, project_id: project.id)
+
       sign_in @admin
     end
 
@@ -312,9 +311,14 @@ describe LeaveApplicationsController do
   context "Rejecting leaves" do
 
     before(:each) do
-      @admin = FactoryGirl.create(:admin)
+      @admin = FactoryGirl.create(:admin, status: 'approved')
       @hr = FactoryGirl.create(:hr)
       @user = FactoryGirl.create(:user)
+      user1 = FactoryGirl.create(:user)
+
+      project = FactoryGirl.create(:project, manager_ids: [@admin.id])
+      FactoryGirl.create(:user_project, user_id: @user.id, project_id: project.id)
+      FactoryGirl.create(:user_project, user_id: user1.id, project_id: project.id)
       sign_in @admin
     end
 

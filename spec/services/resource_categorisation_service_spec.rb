@@ -103,9 +103,9 @@ RSpec.describe ResourceCategorisationService do
 
       report = [
         { name: @emp_one.name, location: @emp_one.location, designation: @emp_one.designation.try(:name),
-          billable: @user_project_one.allocation, non_billable: 0, investment: 0, technical_skills: technical_skills_one, project: project_name_one },
+          billable: @user_project_one.allocation, non_billable: 0, investment: 0, project: project_name_one },
         { name: @emp_two.name, location: @emp_two.location, designation: @emp_one.designation.try(:name),
-          billable: 0, non_billable: @user_project_two.allocation, investment: 0, technical_skills: technical_skills_two, project: project_name_two }
+          billable: 0, non_billable: @user_project_two.allocation, investment: 0, project: project_name_two }
       ]
       report = report.sort_by { |k| k[:name] }
       response = @service.generate_resource_report
@@ -113,6 +113,7 @@ RSpec.describe ResourceCategorisationService do
     end 
 
     it 'should send mail' do
+      ActionMailer::Base.deliveries = []
       @service.call
       expect(ActionMailer::Base.deliveries.count).to eq(1)
       expect(ActionMailer::Base.deliveries.first.subject).to eq("Resource Categorisation Report - #{Date.today}")

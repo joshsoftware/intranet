@@ -92,6 +92,7 @@ RSpec.describe ProcessTimesheetService do
       FactoryGirl.create(:user, email: 'test@joshsoftware.com')
       FactoryGirl.create(:project, name: 'Brand Scope')
       @hr = FactoryGirl.create(:hr)
+      ActionMailer::Base.deliveries = []
     end
 
     it 'send mail after processing the uploaded file' do

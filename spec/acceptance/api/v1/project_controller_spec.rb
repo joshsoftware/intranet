@@ -16,9 +16,9 @@ resource "Project Apis" do
       UserProject.create( user_id: employees.last.id,
                           project_id: project.id,
                           start_date: DateTime.now - 2 )
-      user_ids = [{ 'id' => employees.first.id.to_s, 'name' => employees.first.name }, 
-                  { 'id' => employees.last.id.to_s, 'name' => employees.last.name },
-                  { 'id' => manager.id.to_s, 'name' => manager.name }]
+      user_ids = [{ 'id' => manager.id.to_s, 'name' => manager.name },
+                  { 'id' => employees.first.id.to_s, 'name' => employees.first.name },
+                  { 'id' => employees.last.id.to_s, 'name' => employees.last.name }]
 
       do_request
       response = JSON.parse(response_body)

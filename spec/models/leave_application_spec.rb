@@ -64,7 +64,6 @@ describe LeaveApplication do
 
     before do
       @user = FactoryGirl.create(:user)
-      @user = FactoryGirl.create(:user)
     end
 
     it 'end date can be equal to start date' do
@@ -101,7 +100,14 @@ describe LeaveApplication do
 
       before do
         @user = FactoryGirl.create(:user)
-        @user = FactoryGirl.create(:user)
+        @user1 = FactoryGirl.create(:user)
+        @admin = FactoryGirl.create(:admin, status: 'approved')
+
+        project = FactoryGirl.create(:project, manager_ids: [@admin.id])
+        FactoryGirl.create(:user_project, user_id: @user.id, project_id: project.id)
+        FactoryGirl.create(:user_project, user_id: @user1.id, project_id: project.id)
+
+        
         @available_leaves = @user.employee_detail.available_leaves
         @number_of_days = 2
       end
@@ -115,7 +121,8 @@ describe LeaveApplication do
           leave_application.id,
           APPROVED,
           :process_accept_application,
-          ''
+          '',
+          @admin.id
         )
         @user.reload
         expect(@user.employee_detail.available_leaves).
@@ -127,7 +134,8 @@ describe LeaveApplication do
           leave_application.id,
           REJECTED,
           :process_reject_application,
-          ''
+          '',
+          @admin.id
         )
         expect(@message).to eq({type: :notice, text: "Rejected Successfully"})
         @user.reload
@@ -156,7 +164,8 @@ describe LeaveApplication do
             leave_application.id,
             REJECTED,
             :process_reject_application,
-            ''
+            '',
+            @admin.id
           )
           expect(@message).to eq(
             {type: :notice, text: "Rejected Successfully"}
@@ -169,7 +178,8 @@ describe LeaveApplication do
             leave_application.id,
             APPROVED,
             :process_accept_application,
-            ''
+            '',
+            @admin.id
           )
           @user.reload
           expect(@user.employee_detail.available_leaves).
@@ -194,7 +204,8 @@ describe LeaveApplication do
             leave_application.id,
             APPROVED,
             :process_accept_application,
-            ''
+            '',
+            @admin.id
           )
           @user.reload
           expect(@user.employee_detail.available_leaves).to eq(available_leaves)
@@ -210,7 +221,8 @@ describe LeaveApplication do
             leave_application.id,
             APPROVED,
             :process_accept_application,
-            ''
+            '',
+            @admin.id
           )
           @user.reload
           available_leaves = @user.employee_detail.available_leaves
@@ -219,7 +231,8 @@ describe LeaveApplication do
             leave_application.id,
             APPROVED,
             :process_accept_application,
-            ''
+            '',
+            @admin.id
           )
           @user.reload
           expect(@user.employee_detail.available_leaves).to eq(available_leaves)
@@ -231,12 +244,14 @@ describe LeaveApplication do
 
       context 'Leave reminder mail' do
         let!(:user) { FactoryGirl.create(:user) }
-        let!(:project) { FactoryGirl.create(:project, manager_ids: [user.id])}
-        let!(:user_project) { FactoryGirl.create(:user_project, user: user, project: project
-        )}
+        let!(:admin) { FactoryGirl.create(:admin, status: 'approved') }
+        let!(:project) { FactoryGirl.create(:project, manager_ids: [admin.id])}
+        let!(:user_project) { FactoryGirl.create(:user_project, user: user, project: project)}
+
         before do
           ActionMailer::Base.deliveries = []
         end
+
         it 'send reminder mail if leave begins in next 2 day' do
           leave_application = FactoryGirl.create(:leave_application, user: user)
           LeaveApplication.pending_leaves_reminder

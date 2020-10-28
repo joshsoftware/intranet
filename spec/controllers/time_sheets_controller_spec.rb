@@ -354,6 +354,7 @@ RSpec.describe TimeSheetsController, type: :controller do
     end
 
     it 'send mail after processing the uploaded file' do
+      ActionMailer::Base.deliveries = []
       Sidekiq::Testing.inline! do
         sign_in hr
         file_path = Rails.root.join('spec/fixtures/files/timesheets.csv')
@@ -369,9 +370,9 @@ RSpec.describe TimeSheetsController, type: :controller do
 
         should redirect_to(time_sheets_path)
         expect(flash[:notice]).to eq('File Uploaded Successfully, you will ' +
-          'shortly receive a mail regarding the current status of the file')
+          'shortly receive a mail regarding the processing result of the file.')
         expect(ActionMailer::Base.deliveries.count).to eq(1)
-        expect(ActionMailer::Base.deliveries.first.subject).to eq('Uploaded Timesheet Status Report')
+        expect(ActionMailer::Base.deliveries.first.subject).to eq('Result for Uploaded Timesheet File')
       end
     end
   end
@@ -426,15 +427,13 @@ RSpec.describe TimeSheetsController, type: :controller do
           project: project1,
           user: @employee,
           date: DateTime.yesterday,
-          from_time: "#{Date.yesterday} 11:00",
-          to_time: "#{Date.yesterday} 12:00"
+          duration: 120
         )
         FactoryGirl.create(:time_sheet,
           project: project1,
           user: @employee,
-          date: DateTime.yesterday,
-          from_time: "#{Date.yesterday} 14:00",
-          to_time: "#{Date.yesterday} 16:00"
+          date: DateTime.yesterday - 1,
+          duration: 120
         )
       end
 
@@ -1235,8 +1234,8 @@ RSpec.describe TimeSheetsController, type: :controller do
         time_sheets_attributes: {
           "0" => {
             project_id: "#{project.id}",
-            date: "#{Date.today - 1}",
-            duration: 300,
+            date: "#{Date.today - 2}",
+            duration: 1500,
             description: "testing API and call with client"
           }
         },
@@ -1253,6 +1252,8 @@ RSpec.describe TimeSheetsController, type: :controller do
     end
 
     it 'should add only valid timesheets' do
+      project1 = FactoryGirl.create(:project)
+      project2 = FactoryGirl.create(:project)
       sign_in user
       params = {
         user: {
@@ -1265,14 +1266,14 @@ RSpec.describe TimeSheetsController, type: :controller do
               description: "testing API and call with client"
             },
             '1' => {
-              project_id: project.id,
+              project_id: project1.id,
               date: Date.today - 1,
               from_time: "#{Date.today - 1} 11:30",
               to_time: "#{Date.today - 1} 12:00",
               description: "testing API and call with client"
             },
             '2' => {
-              project_id: project.id,
+              project_id: project2.id,
               date: Date.today - 1,
               from_time: "#{Date.today - 1} 12:30",
               to_time: "#{Date.today - 1} 12:00",
