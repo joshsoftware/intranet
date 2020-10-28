@@ -24,12 +24,14 @@ class ResourceCategorisationService
         investment_allocation = investment_projects_allocation(user.id)
         total_allocation = billable_allocation + non_billable_allocation + investment_allocation
         bench_allocation =  (160 - total_allocation) < 0 ? 0 : (160 - total_allocation)
+        project_names = user.project_details.map { |i| i.values[1] }
         resource_report << { name: user.name,
                              total_allocation: total_allocation,
                              billable: billable_allocation,
                              non_billable: non_billable_allocation,
                              investment: investment_allocation,
-                             bench: bench_allocation
+                             bench: bench_allocation,
+                             projects: project_names.join(', ')
                             }
       end
     end

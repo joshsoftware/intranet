@@ -1,9 +1,9 @@
 wb = xlsx_package.workbook
 
 wb.add_worksheet(name: 'Billable Resources') do |sheet|
-  sheet.add_row(['Employee Name', 'Allocation (hrs/month)', 'Billable', 'Non Billable', 'Investment', 'Bench'])
+  sheet.add_row(['Employee Name', 'Allocation (hrs/month)', 'Billable', 'Non Billable', 'Investment', 'Bench', 'Projects' ])
   resources.each do | resource |
     sheet.add_row [ resource[:name], resource[:total_allocation], resource[:billable],
-                    resource[:non_billable], resource[:investment], resource[:bench] ]
+                    resource[:non_billable], resource[:investment], resource[:bench], resource[:projects] ]
   end
 end

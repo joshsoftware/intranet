@@ -73,9 +73,11 @@ RSpec.describe ResourceCategorisationService do
     end
 
     it 'should generate resource reports' do
+      project_name_one = @employee_one.project_details.map { |i| i.values[1] }.join(', ')
+      project_name_two = @employee_two.project_details.map { |i| i.values[1] }.join(', ')
       report = [
-        { name: @employee_one.name, total_allocation: 80, billable: @user_project_one.allocation, non_billable: 0, investment: 0, bench: 80},
-        { name: @employee_two.name, total_allocation: 100, billable: 0, non_billable: @user_project_two.allocation, investment:0, bench: 60}
+        { name: @employee_one.name, total_allocation: 80, billable: @user_project_one.allocation, non_billable: 0, investment: 0, bench: 80, projects: project_name_one },
+        { name: @employee_two.name, total_allocation: 100, billable: 0, non_billable: @user_project_two.allocation, investment:0, bench: 60, projects: project_name_two }
       ]
       report = report.sort_by { |k| k[:name] }
       response = @service.generate_resource_report
