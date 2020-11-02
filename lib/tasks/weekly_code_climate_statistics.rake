@@ -1,6 +1,7 @@
 desc 'Fetches & loads weekly CodeClimate Statistics for each repository'
 task :weekly_codeclimate_statistics => :environment do
-  Repository.each do |repo|
+  project_ids = Project.all_active.pluck(:id)
+  Repository.where(:project_id.in => project_ids).map do |repo|
     @repo_name = repo.name
     @project_name = repo.project.name
     @stat = repo.code_climate_statistics.new
@@ -27,7 +28,7 @@ task :weekly_codeclimate_statistics => :environment do
         "No code climate repo Id found for #{@project_name}'s #{@repo_name}."
     end
     @stat.save
-  end
+  end;nil
 end
 
 def make_call(url)

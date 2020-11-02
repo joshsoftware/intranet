@@ -1,6 +1,6 @@
 desc "Instanciate Weekly Project Summary Email notification"
 task :weekly_project_summary => :environment do
-  projects = Project.all
+  projects = Project.all_active.all
   weeks = 4 # Number of weeks we want to add in Notification Email.
   projects.each do |project|
     if project.repositories.count > 0
@@ -15,7 +15,7 @@ task :weekly_project_summary => :environment do
       unless repo_data.keys.empty?
         # TODO: Remove following line after testing.
         manager_emails = ["anuja@joshsoftware.com", "swapnil@joshsoftware.com",
-          "kaiwalya.pataskar@joshsoftware.com", "suraj.rajput@joshsoftware.com"]
+          "ashish.pande@joshsoftware.com", "suraj.rajput@joshsoftware.com"]
         ProjectMailer.delay.send_weekly_project_summary(project.name, manager_emails, repo_data)
       end
     end
