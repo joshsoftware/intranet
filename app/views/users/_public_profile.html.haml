@@ -5,7 +5,7 @@
         = pub.input :first_name
         = pub.input :last_name
         = pub.input :gender, collection: GENDER, prompt: 'Select'
-        = pub.input :mobile_number
+        = pub.input :mobile_number, input_html: { maxlength: 10 }
       %td.photo
         - if Rails.env.production?
           = image_tag(pub.object.image.medium.url, class: 'controls profile-image', size: '100x100')

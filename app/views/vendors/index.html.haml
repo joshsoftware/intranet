@@ -14,22 +14,25 @@
         %th Name
         %th Phone No
         %th Email
+        - if can? :manage, Vendor
+          %th Action
     %tbody
       %script#template{type: "text/html"}
         %tr
           {{#record}}
           %td.company_name{style: "width: auto;"}
             {{company}}
-            .actions
-              - if can? :manage, Vendor
-                %a{href: "/vendors/{{record._id.$oid}}/edit", class: "icon-edit", data: {'no-turbolink' =>  true}}
-                %a{href: "/vendors/{{record._id.$oid}}", "data-method" => :delete, "data-confirm" => "Are you sure?", class: "icon-trash"}
           %td {{category}}
           {{#first_contact}}
           %td {{role}}
           %td {{name}}
           %td {{phone_no}}
           %td {{email}}
+          - if can? :manage, Vendor
+            %td.actions
+              %a{href: "/vendors/{{record.id}}/edit", class: "icon-edit", data: {'no-turbolink' =>  true}}
+              %a{href: "/vendors/{{record.id}}", "data-method" => :delete, "data-confirm" => "Are you sure?", class: "icon-trash"}
+          
           {{/first_contact}}
         {{#remaining}}
         %tr

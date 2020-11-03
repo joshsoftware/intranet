@@ -35,6 +35,7 @@ class PublicProfile
   validates :blood_group, inclusion: { in: BLOOD_GROUPS }, allow_blank: true, :on => :update
   validates_format_of [:github_handle, :twitter_handle], without: URI.regexp(['http', 'https']), allow_blank: true
   validates_format_of [:facebook_url, :linkedin_url], with: URI.regexp(['http', 'https']), allow_blank: true
+  validates_presence_of :first_name, :last_name, on: :update
 
   before_save do
     #We need to manually set the slug because user does not have field 'name' in its model and delegated to public_profile

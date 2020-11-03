@@ -32,7 +32,7 @@
             .well
               = ff.input :email, email: true, required: true, class: "contact-email"
               = ff.input :name
-              = ff.input :phone_no, label: "Mobile Number"
+              = ff.input :phone_no, label: "Mobile Number", input_html: { maxlength: 10 }
               = ff.input :role, collection: CONTACT_ROLE, prompt: "Select Role"
               .text-center
                 = ff.link_to_remove " Remove", class: "icon-trash"

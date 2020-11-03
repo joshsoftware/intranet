@@ -34,13 +34,13 @@
         %td
           = r.input :relation, placeholder: 'e.g Father, Mother, Brother etc'
           = r.input :name
-          = r.input :phone_no
+          = r.input :phone_no, input_html: { maxlength: 10}
   %table{style: "width:100%;"}
     %tr
       = pri.simple_fields_for :addresses do |a|
         %td
           - if a.object.type_of_address == ADDRESSES[1]
-            = a.label 'Same as permenent'
+            = a.label 'Same as permanent'
             .make-switch#address_button{"data-on" => "success", "data-off" => "warning", "data-on-label"=>"Yes", "data-off-label"=> "NO"}
               = a.check_box :same_as_permanent_address, {}, 'true', 'false'
           %div{class: "#{a.object.type_of_address.downcase}"}
@@ -52,7 +52,7 @@
             = a.input :city, disabled: disable                  
             = a.input :pin_code, disabled: disable
             = a.input :state, disabled: disable                
-            = a.input :landline_no, disabled: disable, label: 'Landline/Mobile No' 
+            = a.input :landline_no, disabled: disable, label: 'Landline/Mobile No', input_html: { maxlength: 10 }
   %br
   %center
     = pri.submit "Update Profile", class: 'btn'
