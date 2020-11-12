@@ -1,11 +1,11 @@
 class UserMailer < ActionMailer::Base
-  default :from => 'intranet@joshsoftware.com',
-          :reply_to => 'hr@joshsoftware.com'
+  default from: 'intranet@joshsoftware.com',
+          reply_to: 'hr@joshsoftware.com'
 
   def invitation(sender_id, receiver_id)
     @sender = User.where(id: sender_id).first
     @receiver = User.where(id: receiver_id).first
-    mail(from: @sender.email, to: @receiver.email, subject: "Invitation to join Josh Intranet")
+    mail(from: @sender.email, to: @receiver.email, subject: 'Invitation to join Josh Intranet')
   end
 
   def verification(updated_user_id)
@@ -62,12 +62,12 @@ class UserMailer < ActionMailer::Base
     @birthday_user = User.find(user_id)
     url = @birthday_user.public_profile.image.medium.path || "#{Rails.root}/app/assets/images/default_photo.gif"
     attachments.inline['user.jpg'] = File.read(url)
-    mail(to: "all@joshsoftware.com", subject: "Happy Birthday #{@birthday_user.name}")
+    mail(to: 'all@joshsoftware.com', subject: "Happy Birthday #{@birthday_user.name}")
   end
 
   def year_of_completion_wish(user_hash)
     @user_hash = user_hash
-    mail(to: "all@joshsoftware.com", subject: "Congratulations #{@user_hash.collect{|k, v| v }.flatten.join(", ")}")
+    mail(to: 'all@joshsoftware.com', subject: "Congratulations #{@user_hash.collect{|k, v| v }.flatten.join(', ')}")
   end
 
   def leaves_reminder(leaves)
@@ -77,7 +77,7 @@ class UserMailer < ActionMailer::Base
       leave.sanctioning_manager = User.where(id: leave.processed_by).first.try(:name)
     end
     @leaves = leaves
-    mail(to: @receiver_emails, subject: "Employees on leave tomorrow.") if leaves.present?
+    mail(to: @receiver_emails, subject: 'Employees on leave tomorrow.') if leaves.present?
   end
 
   def invalid_blog_url(user_id)
@@ -98,7 +98,7 @@ class UserMailer < ActionMailer::Base
 
   def new_policy_notification(policy_id)
     @policy = Policy.find(policy_id)
-    mail(subject: "New policy has been added",to: 'all@joshsoftware.com' )
+    mail(subject: 'New policy has been added',to: 'all@joshsoftware.com' )
   end
 
   def database_backup(path, file_name)

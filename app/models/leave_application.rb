@@ -37,7 +37,7 @@ class LeaveApplication
   validate :validate_date, on: [:create, :update]
 
   after_save :deduct_available_leave_send_mail
-  after_update :update_available_leave_send_mail, if: "pending?"
+  after_update :update_available_leave_send_mail, if: 'pending?'
 
   scope :pending, ->{where(leave_status: PENDING)}
   scope :processed, ->{where(:leave_status.ne => PENDING)}
@@ -91,7 +91,7 @@ class LeaveApplication
   def send_leave_notification
     if start_at >= Date.today && leave_request?
       emails = get_team_members
-      UserMailer.send_accept_leave_notification(id, emails).deliver_now!
+      UserMailer.send_accept_leave_notification(id, emails).deliver_now! if emails.present?
     end
   end
 
@@ -116,7 +116,7 @@ class LeaveApplication
         leave_application.send(call_function)
         return {type: :notice, text: "#{leave_status} Successfully"}
       else
-        return {type: :error, text: leave_application.errors.full_messages.join(" ")}
+        return {type: :error, text: leave_application.errors.full_messages.join(' ')}
       end
     else
       return {type: :error, text: "#{leave_application.leave_type} is already #{leave_status}"}
@@ -204,7 +204,7 @@ class LeaveApplication
       # While updating leave application do not consider self..
       leave_applications = self.user.leave_applications.unrejected.ne(id: self.id)
       leave_applications.each do |leave_application|
-        errors.add(:base, "Already applied for LEAVE/WFH on same date") and return if self.start_at.between?(leave_application.start_at, leave_application.end_at) or
+        errors.add(:base, 'Already applied for LEAVE/WFH on same date') and return if self.start_at.between?(leave_application.start_at, leave_application.end_at) or
           self.end_at.between?(leave_application.start_at, leave_application.end_at) or
           leave_application.start_at.between?(self.start_at, self.end_at) or
           leave_application.end_at.between?(self.start_at, self.end_at)
