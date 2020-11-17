@@ -6,14 +6,16 @@ class PublicProfile
 
   mount_uploader :image, FileUploader
 
+  MAX_CORE_SKILL_COUNT = 3
+
   field :first_name, default: ''
   field :last_name, default: ''
   field :gender
   field :mobile_number
   field :blood_group
-  field :date_of_birth, :type => Date
+  field :date_of_birth, type: Date
   field :skills
-  field :technical_skills, type: Array
+  field :technical_skills, type: Array, default: []
   field :skype_id
   field :pivotal_tracker_id
   field :github_handle
@@ -31,11 +33,16 @@ class PublicProfile
   embedded_in :user
 
   #validates_presence_of :first_name, :last_name, :gender, :mobile_number, :date_of_birth, :blood_group, :on => :update
-  validates :gender, inclusion: { in: GENDER }, allow_blank: true, :on => :update
-  validates :blood_group, inclusion: { in: BLOOD_GROUPS }, allow_blank: true, :on => :update
+  validates :technical_skills, length: { maximum: 3 , message: 'Atmost 3 core skills can be selected'}
+  validates :gender, inclusion: { in: GENDER }, allow_blank: true, on: :update
+  validates :blood_group, inclusion: { in: BLOOD_GROUPS }, allow_blank: true, on: :update
   validates_format_of [:github_handle, :twitter_handle], without: URI.regexp(['http', 'https']), allow_blank: true
   validates_format_of [:facebook_url, :linkedin_url], with: URI.regexp(['http', 'https']), allow_blank: true
   validates_presence_of :first_name, :last_name, on: :update
+
+  before_validation do
+    self.technical_skills.try(:reject!, &:blank?) if technical_skills_changed?
+  end
 
   before_save do
     #We need to manually set the slug because user does not have field 'name' in its model and delegated to public_profile

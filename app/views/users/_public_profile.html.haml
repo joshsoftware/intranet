@@ -20,11 +20,12 @@
 
   = pub.input :blood_group, collection: BLOOD_GROUPS, prompt: 'Select'
   = pub.input :date_of_birth, input_html: { type: 'date', class: 'date-picker', value: @public_profile.date_of_birth.try(:strftime, "%Y-%m-%d")}
-  = pub.input :technical_skills, collection: (LANGUAGE + FRAMEWORK + OTHER).sort, input_html: {class: 'technical_skills', multiple: true, style: "width:240px;", "data-placeholder" => "Add your technical skills"}, label: "Technical Skills",include_blank: false, include_hidden: false
+  = pub.input :technical_skills, collection: (LANGUAGE + FRAMEWORK + OTHER).sort, input_html: {class: 'technical_skills', multiple: true, style: 'width:240px;', 'data-placeholder': 'Add your technical skills'}, label: 'Core Technical Skills', include_blank: false
+  = pub.hint '(Note: Mention only 3 Core Technical Skills here)', class: 'skill'
   = pub.input :skills, as: :text
-  = pub.hint '(Note: Mention your skills which are not covered in technical skills)', :class => 'skill'
-  = pub.input :skype_id, label: "Skype Id"
-  = pub.input :pivotal_tracker_id, label: "Pivotal Tracker Id"
+  = pub.hint '(Note: Mention your skills which are not covered in technical skills)', class: 'skill'
+  = pub.input :skype_id, label: 'Skype Id'
+  = pub.input :pivotal_tracker_id, label: 'Pivotal Tracker Id'
   = pub.input :github_handle
   = pub.hint '(Note: Mention only github-handle not url)', class: 'skill'
   = pub.input :twitter_handle, :wrapper_html => {class: 'input-prepend'} do
