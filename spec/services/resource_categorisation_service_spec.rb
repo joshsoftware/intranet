@@ -1,12 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe ResourceCategorisationService do
-  context 'Resource Categorisation Report - ' do 
+  context 'Resource Categorisation Report - ' do
     before(:each) do
       @emp_one = FactoryGirl.create(:user, status: STATUS[2])
       @emp_two = FactoryGirl.create(:user, status: STATUS[2])
 
       @active_project = FactoryGirl.create(:project, name: 'Brand Scope')
+      @active_project_two = FactoryGirl.create(:project, name: 'Quick Insure')
+      @devops_project = FactoryGirl.create(:project, name: 'DevOps Work')
       @free_project = FactoryGirl.create(
         :project,
         name: 'Intranet',
@@ -24,15 +26,15 @@ RSpec.describe ResourceCategorisationService do
         project: @active_project,
         allocation: 80
       )
-      
+
       @user_project_two = FactoryGirl.create(
         :user_project,
         active: true,
         billable: false,
         allocation: 100,
         user: @emp_two,
-        project: @active_project
-      )  
+        project: @active_project_two
+      )
 
       @service = ResourceCategorisationService.new(@emp_one.email)
     end
@@ -64,7 +66,7 @@ RSpec.describe ResourceCategorisationService do
       expect(response).to eq(150)
     end
 
-    it 'Investment Allocation - should return total allocation of investment projects' do   
+    it 'Investment Allocation - should return total allocation of investment projects' do
       FactoryGirl.create(
         :user_project,
         user: @emp_one,
@@ -78,39 +80,92 @@ RSpec.describe ResourceCategorisationService do
     end
 
     it 'should generate resource report as expected' do
-      project_name_one = @emp_one.project_details.map { |i| i.values[1] }.join(', ')
-      project_name_two = @emp_two.project_details.map { |i| i.values[1] }.join(', ')
-      technical_skills_one = @emp_one.public_profile.technical_skills.join(', ') if @emp_one.public_profile.technical_skills.present?
-      technical_skills_two = @emp_two.public_profile.technical_skills.join(', ') if @emp_two.public_profile.technical_skills.present?
+      @emp_three = FactoryGirl.create(:user, status: STATUS[2])
+      @user_project_three = FactoryGirl.create(
+        :user_project,
+        active: true,
+        allocation: 160,
+        user: @emp_three,
+        project: @devops_project
+      )
+      project_name_one = @emp_one.project_details.map { |i| i.values[1] }
+      project_name_two = @emp_two.project_details.map { |i| i.values[1] }
+      project_name_three = @emp_three.project_details.map { |i| i.values[1] }
+      technical_skills_one = @emp_one.public_profile.try('technical_skills').slice(0,3)
+      technical_skills_two = @emp_two.public_profile.try('technical_skills').slice(0,3)
+      technical_skills_three = @emp_three.public_profile.try('technical_skills').slice(0,3)
       report = [
-        { name: @emp_one.name, location: @emp_one.location, total_allocation: 80,
-          billable: @user_project_one.allocation, non_billable: 0, investment: 0, bench: 80,
-          technical_skills: technical_skills_one, projects: project_name_one },
-        { name: @emp_two.name, location: @emp_two.location, total_allocation: 100,
-          billable: 0, non_billable: @user_project_two.allocation, investment: 0, bench: 60,
-          technical_skills: technical_skills_one, projects: project_name_two }
+        {
+          name: @emp_one.name,
+          location: @emp_one.location,
+          designation: @emp_one.designation.try(:name),
+          total_allocation: 80,
+          billable: @user_project_one.allocation,
+          non_billable: 0,
+          investment: 0,
+          bench: 80,
+          technical_skills: technical_skills_one,
+          projects: project_name_one
+        },
+        {
+          name: @emp_two.name,
+          location: @emp_two.location,
+          designation: @emp_two.designation.try(:name),
+          total_allocation: 100,
+          billable: 0,
+          non_billable: @user_project_two.allocation,
+          investment: 0,
+          bench: 60,
+          technical_skills: technical_skills_two,
+          projects: project_name_two
+        }
       ]
       report = report.sort_by { |k| k[:name] }
+      report << {
+        name: @emp_three.name,
+        location: @emp_three.location,
+        designation: @emp_three.designation.try(:name),
+        total_allocation: 160,
+        billable: 0,
+        non_billable: @user_project_three.allocation,
+        investment: 0,
+        bench: 0,
+        technical_skills: technical_skills_three,
+        projects: project_name_three
+      }
+
       response = @service.generate_resource_report
       expect(response[:resource_report]).to eq(report)
-    end    
+    end
 
     it 'should generate project wise resource report as expected' do
       project_name_one = @emp_one.project_details.map { |i| i.values[1] }.join(', ')
       project_name_two = @emp_two.project_details.map { |i| i.values[1] }.join(', ')
-      technical_skills_one = @emp_one.public_profile.technical_skills.join(', ') if @emp_one.public_profile.technical_skills.present?
-      technical_skills_two = @emp_two.public_profile.technical_skills.join(', ') if @emp_two.public_profile.technical_skills.present?
 
       report = [
-        { name: @emp_one.name, location: @emp_one.location, designation: @emp_one.designation.try(:name),
-          billable: @user_project_one.allocation, non_billable: 0, investment: 0, project: project_name_one },
-        { name: @emp_two.name, location: @emp_two.location, designation: @emp_one.designation.try(:name),
-          billable: 0, non_billable: @user_project_two.allocation, investment: 0, project: project_name_two }
+        {
+          name: @emp_one.name,
+          location: @emp_one.location,
+          designation: @emp_one.designation.try(:name),
+          billable: @user_project_one.allocation,
+          non_billable: 0,
+          investment: 0,
+          project: project_name_one
+        },
+        {
+          name: @emp_two.name,
+          location: @emp_two.location,
+          designation: @emp_two.designation.try(:name),
+          billable: 0,
+          non_billable: @user_project_two.allocation,
+          investment: 0,
+          project: project_name_two
+        }
       ]
-      report = report.sort_by { |k| k[:name] }
+      report = report.sort_by { |k| k[:project] }
       response = @service.generate_resource_report
       expect(response[:project_wise_resource_report]).to eq(report)
-    end 
+    end
 
     it 'should send mail' do
       ActionMailer::Base.deliveries = []

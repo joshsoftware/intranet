@@ -6,6 +6,8 @@ class PublicProfile
 
   mount_uploader :image, FileUploader
 
+  MAX_CORE_SKILL_COUNT = 3
+
   field :first_name, default: ''
   field :last_name, default: ''
   field :gender
@@ -13,7 +15,7 @@ class PublicProfile
   field :blood_group
   field :date_of_birth, :type => Date
   field :skills
-  field :technical_skills, type: Array
+  field :technical_skills, type: Array, default: []
   field :skype_id
   field :pivotal_tracker_id
   field :github_handle
