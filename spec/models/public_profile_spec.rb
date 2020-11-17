@@ -2,17 +2,17 @@ require 'spec_helper'
 
 describe PublicProfile do
   it { should have_fields(
-                            :first_name,
-                            :last_name,
-                            :gender,
-                            :mobile_number,
-                            :blood_group,
-                            :date_of_birth,
-                            :skills,
-                            :github_handle,
-                            :twitter_handle,
-                            :blog_url
-                         )
+        :first_name,
+        :last_name,
+        :gender,
+        :mobile_number,
+        :blood_group,
+        :date_of_birth,
+        :skills,
+        :github_handle,
+        :twitter_handle,
+        :blog_url
+      )
      }
   it { should have_field(:date_of_birth).of_type(Date) }
   it { should be_embedded_in(:user) }
@@ -25,6 +25,12 @@ describe PublicProfile do
   it { should validate_presence_of(:date_of_birth).on(:update) }
   it { should validate_presence_of(:blood_group).on(:update) }
 =end
+  it 'should allow maximum 3 values for technical skills' do
+    technical_skills = ['ReactJs', 'Angular', 'Flutter', 'UX']
+    employee = FactoryGirl.build(:user, role: 'Intern', public_profile: {technical_skills: technical_skills})
+    employee.valid?
+    expect(employee.public_profile.errors[:technical_skills]).to include('Atmost 3 core skills can be selected')
+  end
   it { should validate_inclusion_of(:gender).to_allow(GENDER).on(:update) }
   it { should validate_inclusion_of(:blood_group).
         to_allow(BLOOD_GROUPS).on(:update)

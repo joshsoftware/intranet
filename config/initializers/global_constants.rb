@@ -5,9 +5,9 @@ STATUS = ['created', 'pending', 'approved']
 LEAVE_STATUS = ['Pending', 'Approved', 'Rejected']
 INVALID_REDIRECTIONS = ["/users/sign_in", "/users/sign_up", "/users/password"]
 TSHIRT_SIZE = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
-OTHER = [ 'Delivery Management', 'Design', 'DevOps', 'QA-Automation', 'QA-Manual', 'UI', 'UX']
-LANGUAGE = ['Go', 'Python', 'Ruby', 'Java', 'Javascript', 'PHP', 'Android', 'NodeJs', 'React', 'iOS', 'C#']
-FRAMEWORK = ['Django', 'Rails', 'Spring Boot', 'Hibernet', 'Laravel', 'Angular', 'Flutter', 'Ionic', '.Net']
+OTHER = ['DevOps', 'QA-Automation', 'QA-Manual', 'UI/UX']
+LANGUAGE = ['Go', 'Python', 'Ruby', 'Java', 'PHP', 'Android', 'iOS']
+FRAMEWORK = ['ReactJs', 'Angular', 'Flutter', '.Net', 'NodeJs']
 PENDING = 'Pending'
 APPROVED = 'Approved'
 REJECTED = 'Rejected'
@@ -19,6 +19,7 @@ CityCountryMapping = [
   { city: 'Plano', country: 'USA'}
 ]
 
+UI_UX_DESIGNATION = ['UI/UX Lead', 'UI/UX Designer', 'Senior UI/UX Designer']
 ORGANIZATION_DOMAIN = 'joshsoftware.com'
 ORGANIZATION_NAME = 'Josh Software'
 
