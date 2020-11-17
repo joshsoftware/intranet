@@ -260,14 +260,14 @@ class User
   end
 
   def get_managers_emails_for_timesheet
-    managers_emails = []
-    user_projects.where(time_sheet: true).each do |user_project|
-      user_project.project.managers.each do |manager|
-        next if managers_emails.include?(manager.email)
-        managers_emails << manager.email
-      end
-    end
-    managers_emails
+    project_ids = user_projects.where(
+      active: true,
+      end_date: nil,
+      time_sheet: true
+    ).pluck(:project_id)
+    
+    manager_ids = Project.in(id: project_ids).pluck(:manager_ids).flatten.uniq
+    User.in(id: manager_ids, status: 'approved').pluck(:email)
   end
 
   def get_managers_names
