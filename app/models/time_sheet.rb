@@ -913,7 +913,7 @@ class TimeSheet
   end
 
   def self.time_sheet_present_for_reminder?(user)
-    unless user.time_sheets.present?
+    unless user.time_sheets.present? || user_on_leave?(user, Date.yesterday)
       slack_uuid = user.public_profile.slack_handle
       message = "You haven't filled the timesheet for yesterday. Go ahead and fill it now. You can fill your timesheet <a href='#{'https://' + ENV['DOMAIN_NAME'] + '/time_sheets'}' target='_blank'> here </a> for past 7 days. If it exceeds 7 days then contact your manager."
       text_for_slack = "*#{message}*"
