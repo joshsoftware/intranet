@@ -1,0 +1,31 @@
+= simple_form_for @future_team, :html => {class: "form-horizontal", multipart: true} do |f|
+  .control-group
+    .row
+      .col-md-6
+        .close-form
+          = f.input :customer, required: true, class: 'pull-left'
+          = label_tag :years_of_experience, nil, class: 'control-label'
+          .controls
+            = f.number_field :years_of_experience, required: true
+          %br
+          = f.input :skills, collection: FutureTeam::TECHNICAL_SKILLS, input_html: {class: 'select2', style: "width:240px;", multiple: true, "data-placeholder" => "Add required skills"}, label: "Technical Skills", include_blank: false, include_hidden: false, required: true, name: "future_team[skills][]"
+          = label_tag :number_of_open_positions, nil, class: 'control-label'
+          .controls
+            = f.number_field :number_of_open_positions, required: true
+          %br
+          = f.label "Is Proposed"
+          .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "True", "data-off-label" => "False"}
+            = f.check_box :current_status, {}, 'Proposed', 'Open'
+          = f.input :requirement_received_on, input_html: {class: :datepicker}, value: f.object.requirement_received_on.try(:strftime, '%d-%m-%Y')
+          = f.input :required_by_date, input_html: {class: :datepicker}, value: f.object.required_by_date.try(:strftime, '%d-%m-%Y')
+          -if params[:action] == 'close'
+            %script
+              $('.close-form :input').prop('disabled', true);
+            = f.hidden_field :current_status, value: 'Closed', name: 'future_team[current_status]'
+        = f.input :proposed_candidates, collection: User.where(:role.nin => ['HR','Finance'], :status => STATUS[2]), input_html: {class: 'select2', style: "width:240px;", multiple: true, "data-placeholder" => "Add proposed candidates"}, label: "Proposed Candidates", include_hidden: false, required: true, name: "future_team[proposed_candidates][]"
+        %br
+        = f.submit :Save, class: 'btn controls btn-info'
+
+
+:javascript
+  $('.select2').select2();

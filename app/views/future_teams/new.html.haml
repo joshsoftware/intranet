@@ -1,0 +1,9 @@
+.form-heading.row
+  %h2.row
+    .span
+      New Team Requirement
+    .align.align-right
+      = link_to '', future_teams_path, "data-toggle" => "tooltip", title: "All Requirements",
+                   class: "icon-th-list"
+
+= render 'form'

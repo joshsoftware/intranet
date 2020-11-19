@@ -85,6 +85,9 @@ Rails.application.routes.draw do
     get 'get_repo_issues', as: :get_repo_issues, on: :collection
   end
 
+  resources :future_teams
+  get 'future_teams/close/:id', to: 'future_teams#close', as: 'close_future_team'
+
   resources :companies do
     resources :projects, only: [:new, :create, :edit, :update]
   end

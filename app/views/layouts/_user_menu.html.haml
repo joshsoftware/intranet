@@ -28,6 +28,8 @@
   - if ["HR", "Admin", "Super Admin"].include?(current_user.role)
     %li
       = link_to "Newsletter", main_app.light_path
+    %li
+      = link_to "Future Team Requirements", future_teams_path
   - if can? :manage, Designation
     %li= link_to 'Manage Designations', main_app.designations_path
   %li

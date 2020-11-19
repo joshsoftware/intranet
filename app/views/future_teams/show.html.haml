@@ -1,0 +1,35 @@
+.form-horizontal.row
+  %h3
+    = @future_team.customer
+    .offset4{style: "float: right;"}
+      = link_to '', edit_future_team_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Edit Project",
+                 class: "icon-edit"
+      |
+      = link_to '', future_teams_path, "data-toggle" => "tooltip", title: "All Requirements",
+                   class: "icon-th-list"
+  %div
+    %table.table.table-hover.table-striped
+      %tr
+        %th Customer
+        %td= @future_team.customer
+      %tr
+        %th Years of Exp
+        %td= @future_team.years_of_experience
+      %tr
+        %th Skills
+        %td= @future_team.skills.join(' | ')
+      %tr
+        %th No. of open positions
+        %td= @future_team.number_of_open_positions
+      %tr
+        %th Requirement recieved on
+        %td= @future_team.requirement_received_on
+      %tr
+        %th Required by
+        %td= @future_team.required_by_date
+      %tr
+        %th Current status
+        %td= @future_team.current_status
+      %tr
+        %th Proposed candidates
+        %td= @future_team.get_proposed_candidates

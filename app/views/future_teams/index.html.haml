@@ -1,0 +1,26 @@
+.form-heading
+  %h2.row
+    Future Requirements
+    .align.align-right.row
+      - if can? :new, FutureTeam
+        = link_to '', new_future_team_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Add Project",
+                     class: "icon-plus"
+        |
+      = link_to "", future_teams_path(format: "csv"), class: 'icon-download-alt'
+.form-horizontal#requirements_list
+  %ul.Tab.nav.nav-tabs
+    %li.active
+      %a#pending_link{data:{toggle: 'tab'}, href: '#pending'}
+        Pending
+    %li
+      %a#closed_link{data:{toggle: "tab"}, href: '#closed'}
+        Closed
+
+  .leave_application_tab_content.tab-content
+    #closed.tab-pane.fade
+      = render 'requirements_list', future_teams: @future_teams.closed, pending: false
+    #pending.tab-pane.fade.in.active
+      = render 'requirements_list', future_teams: @future_teams.pending, pending: true
+
+:css
+  .table td{ vertical-align: middle; }

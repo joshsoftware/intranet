@@ -21,7 +21,7 @@ class Ability
       can :manage, LeaveApplication
       can :resource_list, User
       can :manage, EntryPass
-
+      can :manage, FutureTeam
       # TODO remove later after snowflake changes
       can :manage, Designation
     elsif user.role? 'Employee'
@@ -44,6 +44,7 @@ class Ability
     can :manage, Designation
     can :resource_list, User
     can :manage, EntryPass
+    can :manage, FutureTeam
   end
 
   def intern_abilities(user_id)

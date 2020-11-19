@@ -1,0 +1,37 @@
+%table.table.table-hover.requirements_table
+  %thead
+    %tr
+      %th #
+      %th Customer
+      %th Years of Exp
+      %th Skills
+      %th No. of open positions
+      %th Requirement recieved on
+      %th Required by
+      %th Current status
+      %th Proposed candidates
+      - if pending
+        %th Action
+  %tbody
+    - future_teams.each_with_index do |team, i|
+      %tr.item{"data-item-id" => team[:id]}
+        %td= i+1
+        %td= link_to team.customer, future_team_path(team[:id])
+        %td= team.years_of_experience
+        %td= team.skills.join(' | ')
+        %td= team.number_of_open_positions
+        %td= team.requirement_received_on
+        %td= team.required_by_date
+        %td= team.current_status
+        %td= team.get_proposed_candidates
+        - if pending
+          %td
+            - if team[:current_status] != "Closed"
+              = link_to '', edit_future_team_path(team[:id]), class: "icon-edit", data: {'no-turbolink' =>  true}
+              |
+              = link_to '', future_team_path(team[:id]), method: :delete, "data-confirm" => "Are you sure?", class: "icon-trash"
+              |
+              = link_to 'X', close_future_team_path(team[:id]), data: {'no-turbolink' =>  true}
+
+:coffeescript
+  $('.requirements_table').dataTable()
