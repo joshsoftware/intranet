@@ -40,7 +40,7 @@ class TimeSheet
     450 => '7 hours 30 mins', 480 => '8 hours',
     510 => '8 hours 30 mins', 540 => '9 hours',
     570 => '9 hours 30 mins', 600 => '10 hours',
-    630 => '10 hours 30 mins', 660 => '11 hours', 
+    630 => '10 hours 30 mins', 660 => '11 hours',
     690 => '11 hours 30 mins', 720 => '12 hours'
   }
   MAX_TIMESHEET_COMMAND_LENGTH = 5
@@ -533,7 +533,7 @@ class TimeSheet
                                                    i.date.to_s,
                                                    formatted_duration(i.duration),
                                                    i.description] }
-        end 
+        end
       end
     end
     if weekend_report.present?
@@ -565,7 +565,7 @@ class TimeSheet
     if reports.present?
       headers = ['Date', 'Employee Name', 'Project Name', 'Total time spent']
       csv = generate_report_in_csv_format(headers, reports)
-      WeeklyTimesheetReportMailer.send_employees_working_hour_report(csv, dates.first).deliver_now!  
+      WeeklyTimesheetReportMailer.send_employees_working_hour_report(csv, dates.first).deliver_now!
     end
   end
 
@@ -714,7 +714,7 @@ class TimeSheet
   end
 
   def self.send_report_through_mail(weekly_report, email, unfilled_time_sheet_report)
-    headers = ['Employee name', 'Project name', 'No of days worked', 'Leaves', 'Holidays'] 
+    headers = ['Employee name', 'Project name', 'No of days worked', 'Leaves', 'Holidays']
     csv = generate_report_in_csv_format(headers, weekly_report)
     WeeklyTimesheetReportMailer.send_weekly_timesheet_report(csv, email, unfilled_time_sheet_report).deliver_now!
   end
@@ -913,7 +913,8 @@ class TimeSheet
   end
 
   def self.time_sheet_present_for_reminder?(user)
-    unless user.time_sheets.present? || user_on_leave?(user, Date.yesterday)
+    unless user.time_sheets.present?
+      return false if user_on_leave?(user, Date.yesterday)
       slack_uuid = user.public_profile.slack_handle
       message = "You haven't filled the timesheet for yesterday. Go ahead and fill it now. You can fill your timesheet <a href='#{'https://' + ENV['DOMAIN_NAME'] + '/time_sheets'}' target='_blank'> here </a> for past 7 days. If it exceeds 7 days then contact your manager."
       text_for_slack = "*#{message}*"
