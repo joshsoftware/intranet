@@ -102,7 +102,7 @@ GIT
 
 GIT
   remote: git@github.com:joshsoftware/screamout.git
-  revision: d2ad2ca1ea2f6034d5e1c78c0a9b13b9d6c50238
+  revision: 5eee7058b0634b0fa0323023f7dcf6c7fba200b3
   branch: engine
   specs:
     screamout (0.0.1)
