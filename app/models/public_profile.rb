@@ -13,7 +13,7 @@ class PublicProfile
   field :gender
   field :mobile_number
   field :blood_group
-  field :date_of_birth, :type => Date
+  field :date_of_birth, type: Date
   field :skills
   field :technical_skills, type: Array, default: []
   field :skype_id
@@ -33,8 +33,9 @@ class PublicProfile
   embedded_in :user
 
   #validates_presence_of :first_name, :last_name, :gender, :mobile_number, :date_of_birth, :blood_group, :on => :update
-  validates :gender, inclusion: { in: GENDER }, allow_blank: true, :on => :update
-  validates :blood_group, inclusion: { in: BLOOD_GROUPS }, allow_blank: true, :on => :update
+  validates :technical_skills, length: { maximum: 3 , message: 'Atmost 3 core skills can be selected'}
+  validates :gender, inclusion: { in: GENDER }, allow_blank: true, on: :update
+  validates :blood_group, inclusion: { in: BLOOD_GROUPS }, allow_blank: true, on: :update
   validates_format_of [:github_handle, :twitter_handle], without: URI.regexp(['http', 'https']), allow_blank: true
   validates_format_of [:facebook_url, :linkedin_url], with: URI.regexp(['http', 'https']), allow_blank: true
 
