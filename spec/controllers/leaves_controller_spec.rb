@@ -485,6 +485,50 @@ describe LeaveApplicationsController do
     end
   end
 
+  context 'Leave type - WFH' do
+    before(:each) do
+      @admin = FactoryGirl.create(:admin)
+      @user = FactoryGirl.create(:user, status: 'approved')
+      @leave = FactoryGirl.build(
+        :leave_application,
+        leave_type: 'WFH',
+        user: @user
+      )
+    end
+
+    it 'should not deduct leave count while submitting form' do
+      sign_in @user
+      
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(flash[:success]).to eq('Your request has been submitted successfully.' +
+        ' Please wait for the approval.')
+      expect(@user.leave_applications.last.leave_status).to eq('Pending')
+      expect(leave_count).to eq(24)
+    end
+
+    it 'should not deduct leave count after approving the WFH request' do
+      sign_in @admin
+      @leave.save
+      params = {
+        id: @leave.id,
+        leave_application: @leave.attributes.merge(leave_status: 'Approved')
+      }
+      put :update, params
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(flash[:success]).to eq('Your request has been updated successfully.' +
+        ' Please wait for the approval.')
+      expect(@leave.reload.leave_status).to eq('Approved')
+      expect(leave_count).to eq(24)
+    end
+  end
+
   context "Leave history search querying user_ids" do
     before(:each) do
       @employee_one = FactoryGirl.create(:user, status: STATUS[2])

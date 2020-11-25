@@ -32,7 +32,7 @@ class LeaveApplication
   validates :start_at, :end_at, :contact_number, :reason, :number_of_days, :user_id, :leave_type, presence: true
   validates :leave_type, inclusion: { in: LEAVE_TYPES }
   validates :contact_number, numericality: {only_integer: true}, length: {is: 10}
-  validate :validate_available_leaves, on: [:create, :update]
+  validate :validate_available_leaves, on: [:create, :update], if: :leave_request?
   validate :end_date_less_than_start_date, if: 'start_at.present?'
   validate :validate_date, on: [:create, :update]
 

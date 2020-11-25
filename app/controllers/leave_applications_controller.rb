@@ -16,7 +16,7 @@ class LeaveApplicationsController < ApplicationController
   def create
     @leave_application = LeaveApplication.new(strong_params)
     if @leave_application.save
-      flash[:error] = "Leave applied successfully. Please wait for leave to be approved!!!"
+      flash[:success] = 'Your request has been submitted successfully. Please wait for the approval.'
     else
       @available_leaves = current_user.employee_detail.try(:available_leaves)
       flash[:error] = @leave_application.errors.full_messages.join("\n")
@@ -32,7 +32,7 @@ class LeaveApplicationsController < ApplicationController
 
   def update
     if @leave_application.update_attributes(strong_params)
-      flash[:error] = "Leave has been updated successfully. Please wait for leave to be approved!!!"
+      flash[:success] = 'Your request has been updated successfully. Please wait for the approval.'
     else
       @available_leaves = current_user.employee_detail.available_leaves
       flash[:error] = @leave_application.errors.full_messages.join("\n")
