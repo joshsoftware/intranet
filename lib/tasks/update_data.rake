@@ -9,4 +9,12 @@ namespace :update_data do
   task :update_leave_type_field => :environment do
     LeaveApplication.update_all(leave_type: LeaveApplication::LEAVE)
   end
+
+  desc 'Update notification emails column for users having notification emails value as nil'
+  task update_notification_emails: :environment do
+    User.where('employee_detail.notification_emails': nil).each do |user|
+      puts "Changing notification_emails of user.email #{user.email}"
+      user.employee_detail.set(notification_emails: [])
+    end
+  end
 end
