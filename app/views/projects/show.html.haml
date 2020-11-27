@@ -38,5 +38,5 @@
       %th Logo
       %td= image_tag @project.logo.try(:url, :thumb)
 
-%div.team-member-list
+%div.team-member-list.team-popover
   = render 'users'

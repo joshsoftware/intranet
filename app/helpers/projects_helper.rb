@@ -6,4 +6,8 @@ module ProjectsHelper
     all_project   = Project.all_active.not_in(:_id => project_ids).pluck(:name, :id)
     (user_projects + all_project)
   end
+
+  def get_users_projects(user)
+    user.user_projects.where(active: true).nin(project: @project.id)
+  end
 end

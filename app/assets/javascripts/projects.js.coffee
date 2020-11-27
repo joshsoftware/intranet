@@ -2,6 +2,7 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 $(document).ready ->
+  $('[data-toggle="popover"]').popover()
   $("#add-members").select2();
   $('#image-upload').on 'change', ->
     readURL this, '#project-image'
@@ -70,4 +71,3 @@ readURL = (input, src_id) ->
 
     reader.readAsDataURL input.files[0]
   return
-
