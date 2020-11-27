@@ -93,10 +93,11 @@
 .teamForm {
   .make-switch {
     margin-left: 4px;
-    margin-right: 15px;
+    margin-right: 10px;
   }
   .row, .span2 {
     margin-left: 5px;
+    width: 100%;
   }
   .headers {
     text-align: center;
@@ -105,7 +106,7 @@
     margin-left: 0px !important;
   }
   .controls .string {
-    width: 80%;
+    width: 100%;
   }
   .string.allotment {
     width: 140px;
@@ -118,6 +119,8 @@
   }
   .width15 {
     width: 15%;
+    margin-left: 10px;
+    margin-right: 10px;
   }
   .width18 {
     width: 18%;
@@ -125,6 +128,17 @@
   .width20 {
     width: 20%;
   }
+  .user_select {
+    padding-right: 10px;
+  }
+  .icon-info {
+    margin-left: 10px;
+  }
+}
+
+.team-popover {
+  .popover {max-width: 600px;}
+  .btn-circle {border-radius: 50%;}
 }
 
 .techForm {

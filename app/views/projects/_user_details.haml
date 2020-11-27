@@ -1,0 +1,25 @@
+%table.table.table-borderless
+  %tbody
+    %tr
+      %th Total Experience:
+      %td= convert_months_to_years_and_months(user.experience_as_of_today)
+    %tr
+      %th Technical Skills:
+      %td= user.public_profile.try(:technical_skills).try(:join,', ')
+    - user_projects = get_users_projects(user)
+    - if user_projects.present?
+      %tr
+        %td{style: 'font-weight: bold'} Other Projects:
+        %td
+          %table.table.table-borderless
+            %thead
+              %tr
+                %th Project Name
+                %th Billable
+                %th Allocation(hrs/month)
+            %tbody
+              - user_projects.each do |user_project|
+                %tr
+                  %td= user_project.project.name
+                  %td= user_project.billable
+                  %td= user_project.allocation
