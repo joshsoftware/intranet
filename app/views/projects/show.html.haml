@@ -28,9 +28,6 @@
           %th Project Description
           %td= @project.description
         %tr
-          %th Code climate snippet
-          %td=raw @project.code_climate_snippet
-        %tr
           %th Company
           %td= link_to @project.company.try(:name), @project.company
   %table.table.table-hover.table-stripe

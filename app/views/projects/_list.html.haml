@@ -4,7 +4,6 @@
       %th #
       %th Project Name
       %th Manager Name
-      %th Project Benchmark
       %th Active
       %th Current Team Size
       %th Billing Frequency
@@ -21,9 +20,6 @@
           %td= project.managers.approved.collect(&:name).join(', ')
         - else
           %td= "NA"
-        %td
-          =raw project.code_climate_snippet
-          =raw project.code_climate_coverage_snippet
         %td
           - status_class = project.is_active ? 'label-success' : 'label-warning'
           .label{class: status_class}

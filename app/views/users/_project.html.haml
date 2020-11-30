@@ -5,8 +5,6 @@
         = link_to project.name, project_path(id: project.id)
       - else
         = project.name
-    %td= raw project.code_climate_snippet
-    %td= raw project.code_climate_coverage_snippet
 
 :css
   /* .table{ margin-top: 30px; } */

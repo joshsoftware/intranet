@@ -28,9 +28,7 @@
         = f.input :end_date, input_html: {class: :datepicker}, value: f.object.end_date.try(:strftime, '%d-%m-%Y')
         = label_tag "Case Study", nil, class: 'control-label'
         = f.file_field :case_study, required: true, class: 'case_study_upload', accept: "application/pdf"
-        = f.input :code_climate_id, label: "Code climate id"
-        = f.input :code_climate_snippet
-        = f.input :code_climate_coverage_snippet
+        %br
         = f.label 'Visible On Website'
         .make-switch{"data-on" => "success", "data-off" => "warning", "data-on-label" => "Yes", "data-off-label" => "No"}
           = f.check_box :visible_on_website, {}, 'true', 'false'
