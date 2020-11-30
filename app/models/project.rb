@@ -12,9 +12,6 @@ class Project
   TYPE_OF_PROJECTS = ['T&M', 'Fixbid', 'Free', 'Investment'].freeze
 
   field :name
-  field :code_climate_id
-  field :code_climate_snippet
-  field :code_climate_coverage_snippet
   field :is_active, type: Boolean, default: true
   field :start_date, type: Date
   field :end_date, type: Date
@@ -174,10 +171,9 @@ class Project
   end
 
   def self.to_csv(options = {})
-    column_names = ['name', 'code_climate_id', 'code_climate_snippet',
-      'code_climate_coverage_snippet','is_active', 'start_date', 'end_date',
-      'manager_name', 'number_of_employees', 'allocated_employees', 'employee_names',
-      'ruby_version', 'rails_version', 'database', 'database_version', 'deployment_server',
+    column_names = ['name', 'is_active', 'start_date', 'end_date', 'manager_name',
+      'number_of_employees', 'allocated_employees', 'employee_names', 'ruby_version',
+      'rails_version', 'database', 'database_version', 'deployment_server',
       'deployment_script', 'web_server', 'app_server', 'payment_gateway', 'image_store',
       'index_server', 'background_jobs', 'sms_gateway', 'other_frameworks', 'other_details']
     CSV.generate(options) do |csv|
