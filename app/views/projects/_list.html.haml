@@ -4,6 +4,7 @@
       %th #
       %th Project Name
       %th Manager Name
+      %th Batch Name
       %th Active
       %th Current Team Size
       %th Billing Frequency
@@ -13,26 +14,27 @@
   %tbody
     - @projects.each_with_index do |project, i|
       - users = project.users
-      %tr.item{"data-item-id" => project.id}
+      %tr.item{'data-item-id': project.id}
         %td= i+1
         %td=link_to project.name, project_path(project)
         - if project.managers.approved.present?
           %td= project.managers.approved.collect(&:name).join(', ')
         - else
-          %td= "NA"
+          %td= 'NA'
+        %td= project.try(:batch_name) || 'NA'
         %td
           - status_class = project.is_active ? 'label-success' : 'label-warning'
           .label{class: status_class}
             = project.is_active
-        %td= link_to users.count, 'javascript:void(0)', 'data-toggle' => "popover", 'title' => "Team Members", "data-placement" => "top",
-          "data-html" => "true", "data-content" => "#{users.collect(&:name).sort.join(', ')}", class: "usersList", "tabindex"=>"0"
+        %td= link_to users.count, 'javascript:void(0)', 'data-toggle': 'popover', 'title': 'Team Members', 'data-placement': 'top',
+          'data-html': 'true', 'data-content': "#{users.collect(&:name).sort.join(', ')}", class: 'usersList', 'tabindex': '0'
         %td= project.billing_frequency
         %td= project.type_of_project
         - if can? :manage, Project
           %td
-            =link_to '', edit_project_path(project), class: "icon-edit", data: {'no-turbolink' =>  true}
+            =link_to '', edit_project_path(project), class: 'icon-edit', data: {'no-turbolink': true}
             |
-            =link_to '', project_path(project), method: :delete, "data-confirm" => "Are you sure? If you are deleting project, it's associated timesheets will be deleted.", class: "icon-trash"
+            =link_to '', project_path(project), method: :delete, 'data-confirm': 'Are you sure? If you are deleting project, its associated timesheets will be deleted.', class: 'icon-trash'
 
 :javascript
   $('.usersList').popover();

@@ -7,6 +7,7 @@
           .controls
             = select_tag :company_id, options_for_select(Company.pluck(:name, :id), f.object.try(:company).try(:id)), {:prompt => "-- Select Company --", class: "members", name: "project[company_id]", style: "width: 340px"}
         = f.input :name, required: false, class: 'pull-left'
+        = f.input :batch_name, collection: Project::TYPE_OF_BATCHES, prompt: 'Select Batch', label: 'Batch Name'
         = f.input :display_name, required: false
         = f.input :description, as: :text, input_html: {class: "text-description"}
         = f.input :url

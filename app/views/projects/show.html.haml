@@ -30,6 +30,9 @@
         %tr
           %th Company
           %td= link_to @project.company.try(:name), @project.company
+        %tr
+          %th Batch Name
+          %td= @project.batch_name
   %table.table.table-hover.table-stripe
     %tr
       %th Logo

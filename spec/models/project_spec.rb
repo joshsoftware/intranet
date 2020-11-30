@@ -8,6 +8,7 @@ describe Project do
     it { is_expected.to validate_presence_of(:type_of_project) }
     it { is_expected.to validate_inclusion_of(:billing_frequency).to_allow(Project::BILLING_FREQUENCY_TYPES) }
     it { is_expected.to validate_inclusion_of(:type_of_project).to_allow(Project::TYPE_OF_PROJECTS) }
+    it { is_expected.to validate_inclusion_of(:batch_name).to_allow(Project::TYPE_OF_BATCHES) }
   end
   # it {should accept_nested_attributes_for(:users)}
 
@@ -15,7 +16,6 @@ describe Project do
     project = FactoryGirl.create(:project)
     expect(project.tags.count).to eq(4)
   end
-
 
   it "should use existing product code of company" do
     company = FactoryGirl.create(:company)
@@ -352,7 +352,7 @@ describe Project do
   end
 
   context 'Trigger - should call code monitor service' do
-    before(:each) do 
+    before(:each) do
       @project = build(:project)
       stub_request(:get, "http://localhost?event_type=Project%20Active&project_id=#{@project.id}").
         with(
