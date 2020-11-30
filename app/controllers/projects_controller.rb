@@ -96,7 +96,7 @@ class ProjectsController < ApplicationController
 
   private
   def safe_params
-    params.require(:project).permit(:name, :display_name, :start_date, :end_date, :is_active, :timesheet_mandatory, :ruby_version,
+    params.require(:project).permit(:name, :batch_name, :display_name, :start_date, :end_date, :is_active, :timesheet_mandatory, :ruby_version,
     :rails_version, :database, :database_version, :deployment_server, :deployment_script, :web_server, :app_server, :payment_gateway,
     :image_store, :index_server, :background_jobs, :sms_gateway, :other_frameworks,:other_details, :image, :url, :description,
     :case_study,:logo, :visible_on_website, :website_sequence_number, :code, :number_of_employees, :invoice_date, :company_id,

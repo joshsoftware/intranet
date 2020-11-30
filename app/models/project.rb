@@ -10,8 +10,10 @@ class Project
 
   BILLING_FREQUENCY_TYPES = ['Monthly', 'Bi-weekly', 'Adhoc', 'NA'].freeze
   TYPE_OF_PROJECTS = ['T&M', 'Fixbid', 'Free', 'Investment'].freeze
+  TYPE_OF_BATCHES = ['Alpha', 'Bravo'].freeze
 
   field :name
+  field :batch_name, type: String
   field :is_active, type: Boolean, default: true
   field :start_date, type: Date
   field :end_date, type: Date
@@ -76,6 +78,7 @@ class Project
   validates_presence_of :end_date, unless: -> { is_active? }
   validates :billing_frequency, inclusion: { in: BILLING_FREQUENCY_TYPES, allow_nil: true }
   validates :type_of_project, inclusion: { in: TYPE_OF_PROJECTS, allow_nil: true }
+  validates :batch_name, inclusion: { in: TYPE_OF_BATCHES, allow_nil: true }
   validate :start_date_less_than_end_date, if: 'end_date.present?'
 
   def start_date_less_than_end_date
