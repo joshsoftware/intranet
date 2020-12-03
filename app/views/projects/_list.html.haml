@@ -32,9 +32,7 @@
         %td= project.type_of_project
         - if can? :manage, Project
           %td
-            =link_to '', edit_project_path(project), class: 'icon-edit', data: {'no-turbolink': true}
-            |
-            =link_to '', project_path(project), method: :delete, 'data-confirm': 'Are you sure? If you are deleting project, its associated timesheets will be deleted.', class: 'icon-trash'
+            =link_to '', edit_project_path(project), class: "icon-edit", data: {'no-turbolink' =>  true}
 
 :javascript
   $('.usersList').popover();

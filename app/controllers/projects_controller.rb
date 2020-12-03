@@ -52,15 +52,6 @@ class ProjectsController < ApplicationController
     @team_members = @project.users - @managers
   end
 
-  def destroy
-    if @project.destroy
-     flash[:notice] = "Project deleted Successfully"
-    else
-     flash[:notice] = "Error in deleting project"
-    end
-     redirect_to projects_path
-  end
-
   def update_sequence_number
     @project.move(to: params[:position].to_i)
     render nothing: true

@@ -70,7 +70,7 @@ describe ProjectsController do
       project_attributes.merge!(manager_ids: [manager.id.to_s], company_id: create(:company).id,
       user_projects_attributes: [{user_id: employees.first.to_s, start_date: Date.current},
                                  {user_id: employees.last.to_s, start_date: Date.current}])
-      
+
       post :create, { project: project_attributes }
       expect(Project.count).to eq(1)
       expect(assigns[:project].manager_ids).to eq([manager.id])
@@ -256,59 +256,6 @@ describe ProjectsController do
     end
   end
 
-  context 'Delete timesheet if project deleted' do
-    let!(:user) { FactoryGirl.create(:user) }
-    let!(:project_one) { FactoryGirl.create(:project) }
-    let!(:project_two) { FactoryGirl.create(:project) }
-
-    it 'Should delete timesheet' do
-      UserProject.create(user_id: user.id,
-        project_id: project_one.id,
-        start_date: Date.today - 5
-      )
-      UserProject.create(user_id: user.id,
-        project_id: project_two.id,
-        start_date: Date.today - 5
-      )
-      TimeSheet.create(user_id: user.id,
-        project_id: project_two.id,
-        date: Date.today - 1,
-        from_time: DateTime.now - 1,
-        to_time: DateTime.now - 1 + 1.hours
-      )
-      TimeSheet.create(user_id: user.id,
-        project_id: project_one.id,
-        date: Date.today - 1,
-        from_time: DateTime.now - 1,
-        to_time: DateTime.now - 1 + 1.hours
-      )
-      TimeSheet.create(user_id: user.id,
-        project_id: project_one.id,
-        date: Date.today - 2,
-        from_time: DateTime.now - 2,
-        to_time: DateTime.now - 2 + 1.hours
-      )
-      TimeSheet.create(user_id: user.id,
-        project_id: project_one.id,
-        date: Date.today - 3,
-        from_time: DateTime.now - 3,
-        to_time: DateTime.now - 3 + 1.hours
-      )
-      TimeSheet.create(user_id: user.id,
-        project_id: project_one.id,
-        date: Date.today - 4,
-        from_time: DateTime.now - 4,
-        to_time: DateTime.now - 4 + 1.hours
-      )
-      project_one_id = project_one.id
-      project_name = project_one.name
-      delete :destroy, id: project_one.id
-
-      expect(Project.all.pluck(:name).include?(project_name)).to eq(false)
-      expect(TimeSheet.all.pluck(:project_id).include?(project_one_id)).
-        to eq(false)
-    end
-  end
 
   describe 'Update team details' do
     it 'should add valid team member' do
@@ -321,7 +268,7 @@ describe ProjectsController do
       params = {:project=>
         {:user_projects_attributes=>
           {
-            "0" => 
+            "0" =>
             {
               :active => "true",
               :user_id => user_three.id,
@@ -351,7 +298,7 @@ describe ProjectsController do
       params = {:project=>
         {:user_projects_attributes=>
           {
-            "0" => 
+            "0" =>
             {
               :active => "false",
               :user_id => user_three.id,
@@ -381,7 +328,7 @@ describe ProjectsController do
       params = {:project=>
         {:user_projects_attributes=>
           {
-            "0" => 
+            "0" =>
             {
               :id => user_project_two.id,
               :active => "true",
@@ -413,7 +360,7 @@ describe ProjectsController do
       params = {:project=>
         {:user_projects_attributes=>
           {
-            "0" => 
+            "0" =>
             {
               :id => user_project_two.id,
               :active => "false",
