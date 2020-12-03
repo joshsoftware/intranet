@@ -8,7 +8,7 @@ class Ability
     elsif user.role? 'Admin'
       admin_abilities
     elsif user.role? 'HR'
-      hr_abilities
+      hr_abilities(user.id)
     elsif user.role? 'Finance'
       can [:public_profile, :private_profile, :edit, :apply_leave], User
     elsif user.role? 'Manager'
@@ -77,9 +77,11 @@ class Ability
     can :manage, EntryPass
   end
 
-  def hr_abilities
+  def hr_abilities(user_id)
     common_admin_hr
     can [:public_profile, :private_profile, :edit, :apply_leave], User
-    cannot :update, LeaveApplication
+    cannot :manage, LeaveApplication
+    can [:new, :create], LeaveApplication, user_id: user_id
+    can [:edit, :update], LeaveApplication, leave_status: 'Pending', user_id: user_id
   end
 end

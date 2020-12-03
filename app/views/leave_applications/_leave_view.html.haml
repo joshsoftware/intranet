@@ -13,7 +13,7 @@
         - else
           %th Status
         %th Type
-        - if (leave_data.present? and !leave_data.first.pending?) or can? :manage, LeaveApplication
+        - if (leave_data.present? and !leave_data.first.pending?) or can? :manage, LeaveApplication or current_user.role == "HR"
           %th Note
         - if (leave_data.present? and leave_data.first.pending?) or can? :manage, LeaveApplication
           %th Action
@@ -33,7 +33,7 @@
           - else
             %td.status= appr_leave.leave_status
           %td= appr_leave.leave_type
-          - if (!pending_leave) or can? :manage, LeaveApplication
+          - if (!pending_leave) or can? :manage, LeaveApplication or current_user.role == "HR"
             %td
               %a.reason{class: 'reason_'+ leave_id, id: "#{leave_id}"}
               %br
