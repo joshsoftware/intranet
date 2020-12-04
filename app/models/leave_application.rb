@@ -124,7 +124,11 @@ class LeaveApplication
   end
 
   def self.get_leaves_for_sending_reminder(date)
-    LeaveApplication.where(start_at: date, leave_status: APPROVED)
+    LeaveApplication.where(
+      start_at: date,
+      leave_status: APPROVED,
+      leave_type: LEAVE
+    )
   end
 
   def self.get_users_past_leaves(user_id)
