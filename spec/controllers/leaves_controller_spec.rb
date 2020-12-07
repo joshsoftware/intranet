@@ -366,6 +366,42 @@ describe LeaveApplicationsController do
       expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
     end
 
+    it 'it should not send mail to all teammates on leave rejection if employees leave was pending first' do
+      leave_application = FactoryGirl.create(:leave_application, user: @user)
+      project = FactoryGirl.create(:project)
+      teammate1 = FactoryGirl.create(:user)
+      FactoryGirl.build(:user_project, project_id: project.id, user_id: @user.id)
+      FactoryGirl.build(:user_project, project_id: project.id, user_id: teammate1.id)
+      expect(leave_application.leave_status).to eq(PENDING)
+      ActionMailer::Base.deliveries = []
+      xhr :get, :process_leave, {
+        id: leave_application.id,
+        leave_action: :reject
+      }
+      expect(leave_application.reload.leave_status).to eq(REJECTED)
+      expect(ActionMailer::Base.deliveries.count).to eq(0)
+    end
+
+    it 'it should send mail to all teammates on leave rejection iff employees leave was accepted first' do
+      leave_application = FactoryGirl.create(:leave_application, user: @user)
+      project = FactoryGirl.create(:project)
+      teammate1 = FactoryGirl.create(:user)
+      FactoryGirl.build(:user_project, project_id: project.id, user_id: @user.id)
+      FactoryGirl.build(:user_project, project_id: project.id, user_id: teammate1.id)
+      expect(leave_application.leave_status).to eq(PENDING)
+      xhr :get, :process_leave, {
+        id: leave_application.id,
+        leave_action: :approve
+      }
+      ActionMailer::Base.deliveries = []
+      xhr :get, :process_leave, {
+        id: leave_application.id,
+        leave_action: :reject
+      }
+      expect(leave_application.reload.leave_status).to eq(REJECTED)
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+    end
+
     it "should not deduct leaves if rejected already rejected leave" do
       available_leaves = @user.employee_detail.available_leaves
       number_of_days = 2
@@ -498,7 +534,7 @@ describe LeaveApplicationsController do
 
     it 'should not deduct leave count while submitting form' do
       sign_in @user
-      
+
       params = {
         user_id: @user.id,
         leave_application: @leave.attributes
@@ -539,7 +575,7 @@ describe LeaveApplicationsController do
       @leave_app_two_one = FactoryGirl.create(:leave_application, user: @employee_two, start_at: Date.today + 13, end_at: Date.today + 16)
       @project = FactoryGirl.create(:project)
       @user_project_one = FactoryGirl.create(:user_project, user: @employee_one, project: @project)
-      @user_project_two = FactoryGirl.create(:user_project, user: @employee_two, project: @project)  
+      @user_project_two = FactoryGirl.create(:user_project, user: @employee_two, project: @project)
     end
 
     it "should query only active user_projects when NO filter/default" do
@@ -549,7 +585,7 @@ describe LeaveApplicationsController do
       controller.params = ActionController::Parameters.new({project_id: @project.id}) # No filter param
       expect(controller.send(:user_ids)).to eq(@user_ids_active)
     end
-    
+
     it "should query only active user_projects when active filter selected in params" do
       @user_ids = UserProject.where(project: @project).pluck(:user_id)
       @user_ids_active = (@user_ids - [@employee_two.id]) # Removing one team member

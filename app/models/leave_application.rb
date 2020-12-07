@@ -36,7 +36,10 @@ class LeaveApplication
   validate :end_date_less_than_start_date, if: 'start_at.present?'
   validate :validate_date, on: [:create, :update]
 
-  after_save :deduct_available_leave_send_mail
+  after_save do
+    deduct_available_leave_send_mail
+    send_leave_notification
+  end
   after_update :update_available_leave_send_mail, if: 'pending?'
 
   scope :pending, ->{where(leave_status: PENDING)}
@@ -89,13 +92,18 @@ class LeaveApplication
 
   def process_accept_application
     UserMailer.delay.accept_leave(self.id)
-    send_leave_notification
   end
 
   def send_leave_notification
     if start_at >= Date.today && leave_request?
       emails = get_team_members
-      UserMailer.send_accept_leave_notification(id, emails).deliver_now! if emails.present?
+      if emails.present?
+        if approved?
+          UserMailer.send_accept_leave_notification(id, emails).deliver_now!
+        elsif leave_status_changed? && leave_status_was == APPROVED && leave_status == REJECTED
+          UserMailer.send_reject_leave_notification(id, emails).deliver_now!
+        end
+      end
     end
   end
 
