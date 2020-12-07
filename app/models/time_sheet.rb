@@ -1221,7 +1221,7 @@ class TimeSheet
       {
         "$match" => {
           "total_duration" => {
-            "$gte" => duration
+            "$gt" => duration
           }
         }
       }
