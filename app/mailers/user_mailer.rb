@@ -45,6 +45,13 @@ class UserMailer < ActionMailer::Base
     mail(to: emails, subject: "Approved Leave Application - #{@user.name}")
   end
 
+  def send_reject_leave_notification(leave_id, emails)
+    get_leave(leave_id)
+    message = get_leave_message
+    @leave_message = ['tomorrow.','today.'].include?(message) ? 'for ' + message : message
+    mail(to: emails, subject: "Leave Application Cancelled - #{@user.name}")
+  end
+
   def send_approved_leave_notification(leave_id, emails)
     get_leave(leave_id)
     @leave_message = get_leave_message
@@ -174,9 +181,9 @@ class UserMailer < ActionMailer::Base
     elsif leave_count == 1 && start_date == Date.today
       'today.'
     elsif leave_count == 1
-      "on #{start_date}."
+      "for #{start_date}."
     else
-      "from #{start_date} to #{end_date}." 
+      "from #{start_date} to #{end_date}."
     end
   end
 end
