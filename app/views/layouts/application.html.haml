@@ -60,14 +60,20 @@
     #spinner-wrapper
       #spinnerDiv
     - flash.each do |key, msg|
-      %div{class: flash_class(key), style: "margin-top: 15px;"}
+      %div{class: "#{flash_class(key)} alert-dismissible", style: "margin-top: 15px;"}
         = msg
+        .close{'data-dismiss' => 'alert'} ×
     - flash.clear
     = yield
   #footer.pull-right
     = link_to "Privacy Policy", '/pdf/Intranet_Privacy_Policy.pdf'
 
   :javascript
+    window.setTimeout(function(){
+      $(".alert").fadeTo(1000, 0).slideUp(1000, function(){
+        $(this).remove();
+      });
+    }, 10000);
     window.fwSettings = {
       'widget_id': 24000000212
     };
