@@ -1061,12 +1061,11 @@ class TimeSheet
   end
 
   def self.approved_leaves_count(user, from_date, to_date)
-    leaves_count = 0
-    leave_applications = user.leave_applications.where(
-      "$and" => [{start_at: {"$gte" => from_date, "$lte" => to_date}},
-                {leave_status: LEAVE_STATUS[1]}]
-    )
-    leave_applications.sum(:number_of_days)
+    user.leave_applications.where(
+      start_at: {'$gte': from_date, '$lte': to_date},
+      leave_status: LEAVE_STATUS[1],
+      leave_type: LeaveApplication::LEAVE
+    ).sum(:number_of_days)
   end
 
   def self.get_time_sheet_between_range(user, project_id, from_date, to_date)
