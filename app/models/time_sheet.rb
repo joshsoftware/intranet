@@ -1095,18 +1095,18 @@ class TimeSheet
 
   def self.get_users_and_timesheet_who_have_filled_timesheet_for_different_project
     activity_ids = Project.where(is_activity: true).pluck(:id)
-    User.approved.each do | user |
+    User.approved.where('employee_detail.skip_unassigned_project_ts_mail': false).each do | user |
       user_timesheet = []
       date           = Date.yesterday
       time_sheets    = user.time_sheets.where(
-        :created_at => date.beginning_of_day..date.end_of_day,
+        created_at: date.beginning_of_day..date.end_of_day,
         :project_id.nin => activity_ids
       )
       next if time_sheets.empty?
       time_sheets.each do|time_sheet|
         time_sheet_data = {}
         next if user.user_projects.where(project_id: time_sheet.project_id).exists?
-        duration = DURATION_HASH[time_sheet.duration].nil? ? time_sheet.duration.to_s + "mins" : DURATION_HASH[time_sheet.duration]
+        duration = DURATION_HASH[time_sheet.duration].nil? ? time_sheet.duration.to_s + 'mins' : DURATION_HASH[time_sheet.duration]
         time_sheet_data = {
           project_name: time_sheet.project.name,
           date:         time_sheet.date,

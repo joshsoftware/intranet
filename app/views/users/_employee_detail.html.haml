@@ -7,10 +7,17 @@
     = e.input :description, as: :text, input_html: {class: 'text-description'}
     = e.input :date_of_relieving, input_html: { type: 'date', class: 'date-picker', value: @user.employee_detail.date_of_relieving.try(:strftime, "%Y-%m-%d")}
     = e.input :notification_emails, collection: @emails, input_html: {class: 'notification_emails', multiple: true, style: "width:300px;", "data-placeholder" => "You can add multiple emails"}
-    = e.label "Is Billable"
-    .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "Yes", "data-off-label": "No"}
+    = e.label 'Is Billable'
+    .make-switch{ tabindex: 0, 'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'Yes', 'data-off-label': 'No'}
       = e.check_box :is_billable, {}, 'Yes', 'No'
-  = f.input :project_ids, collection: @projects, input_html: {class: 'project_ids', multiple: true, style: "width:300px;", tabindex: 0, "data-placeholder" => "Add projects"}, label: "Projects", disabled: true
+    %br
+    %br
+    = e.label 'Skip Unassigned Project Timesheet Mail'
+    .make-switch{'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'Yes', 'data-off-label': 'No'}
+      = e.check_box :skip_unassigned_project_ts_mail, {}, 'Yes', 'No'
+    %br
+    %br
+  = f.input :project_ids, collection: @projects, input_html: {class: 'project_ids', multiple: true, style: 'width:300px;', tabindex: 0, 'data-placeholder': 'Add projects'}, label: 'Projects', disabled: true
   = f.submit :save, class: "btn controls"
 - if @notify_users
   %h4 Current Notification to
