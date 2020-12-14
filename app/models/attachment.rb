@@ -25,8 +25,6 @@ class Attachment
       elsif document.content_type == 'application/pdf' && document.size > 5.megabytes
         errors[:pdf] << name + ' should be less than 5MB'
       end
-    else
-      errors[:document] << 'should be present'
     end
   end
 end
