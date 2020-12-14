@@ -81,6 +81,7 @@ class Ability
     common_admin_hr
     can [:public_profile, :private_profile, :edit, :apply_leave], User
     cannot :manage, LeaveApplication
+    can :index, LeaveApplication
     can [:new, :create], LeaveApplication, user_id: user_id
     can [:edit, :update], LeaveApplication, leave_status: 'Pending', user_id: user_id
   end
