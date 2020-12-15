@@ -9,7 +9,11 @@ class TimeSheetsController < ApplicationController
   def new
     @from_date = params[:from_date] || Date.today.beginning_of_month.to_s
     @to_date = params[:to_date] || Date.today.to_s
-    @user = User.find_by(id: params[:user_id]) if params[:user_id].present?
+    if params[:user_id].present? 
+      @user = User.where(id: params[:user_id]).first
+    else
+      @user = current_user
+    end
     @time_sheets = @user.time_sheets.build
   end
 
