@@ -1,6 +1,12 @@
 .search-form
 {
   margin-top: 5px;
+  #project_id, #user_id {
+    width: 190px;
+  }
+  .date-picker, label, .btn {
+    margin-left: 5px;
+  }
 }
 
 .search-form input[type='text']
