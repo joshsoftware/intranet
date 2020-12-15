@@ -35,9 +35,11 @@
           %td= appr_leave.leave_type
           - if (!pending_leave) or can? :manage, LeaveApplication or current_user.role == "HR"
             %td
-              %a.reason{class: 'reason_'+ leave_id, id: "#{leave_id}"}
-              %br
+              - if current_user.is_management?
+                %a.reason{class: 'reason_'+ leave_id, id: "#{leave_id}"}
+                %br
               .prev_reason #{appr_leave.reject_reason + ';' if appr_leave.reject_reason.present?}
+              
           - if (pending_leave) or can? :manage, LeaveApplication
             %td.action_style.action{id: "#{appr_leave.id}"}
               - if pending_leave and can? :edit, appr_leave
