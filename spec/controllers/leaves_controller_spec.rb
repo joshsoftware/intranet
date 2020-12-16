@@ -635,6 +635,93 @@ describe LeaveApplicationsController do
     end
   end
 
+  context 'Overlapping Leave Request' do
+    before(:each) do
+      @user = FactoryGirl.create(:user, status: 'approved')
+      @leave = FactoryGirl.build(:leave_application, user: @user)
+      @start_date = Date.yesterday
+      @end_date = Date.today + 7
+      ActionMailer::Base.deliveries = []
+      sign_in @user
+    end
+
+    it 'should be able to apply leave if overlapping WFH request is present' do
+      FactoryGirl.create(:leave_application,
+        start_at: @start_date,
+        end_at: @end_date,
+        leave_status: APPROVED,
+        leave_type: LeaveApplication::WFH,
+        user: @user
+      )
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+
+      expect(flash[:success]).to eq('Your request has been submitted successfully.' +
+        ' Please wait for the approval.')
+      expect(@user.reload.leave_applications.pending.count).to eq(1)
+      expect(@user.leave_applications.processed.count).to eq(1)
+    end
+
+    it 'should not be able to apply WFH request if overlapping Leave request is present' do
+      FactoryGirl.create(:leave_application,
+        start_at: @start_date,
+        end_at: @end_date,
+        leave_status: APPROVED,
+        leave_type: LeaveApplication::LEAVE,
+        user: @user
+      )
+      @leave.update_attributes(leave_type: LeaveApplication::WFH)
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+      expect(flash[:error]).to eq('Already applied for LEAVE on same date')
+      expect(@user.reload.leave_applications.pending.count).to eq(0)
+      expect(@user.leave_applications.processed.count).to eq(1)
+    end
+
+    it 'should not be able to apply WFH request if overlapping WFH request is present' do
+      FactoryGirl.create(:leave_application,
+        start_at: @start_date,
+        end_at: @end_date,
+        leave_status: APPROVED,
+        leave_type: LeaveApplication::WFH,
+        user: @user
+      )
+      @leave.update_attributes(leave_type: LeaveApplication::WFH)
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+      expect(flash[:error]).to eq('Already applied for WFH on same date')
+      expect(@user.reload.leave_applications.pending.count).to eq(0)
+      expect(@user.leave_applications.processed.count).to eq(1)
+    end
+
+    it 'should not be able to apply leave request if overlapping Leave request is present' do
+      FactoryGirl.create(:leave_application,
+        start_at: @start_date,
+        end_at: @end_date,
+        leave_status: APPROVED,
+        leave_type: LeaveApplication::LEAVE,
+        user: @user
+      )
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+      expect(flash[:error]).to eq('Already applied for LEAVE on same date')
+      expect(@user.reload.leave_applications.pending.count).to eq(0)
+      expect(@user.leave_applications.processed.count).to eq(1)
+    end
+  end
+
   context 'Optional Leave' do
     before(:each) do
       @user = FactoryGirl.create(:user, status: 'approved')

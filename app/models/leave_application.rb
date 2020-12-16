@@ -268,12 +268,19 @@ class LeaveApplication
   def validate_date
     if self.start_at_changed? or self.end_at_changed?
       # While updating leave application do not consider self..
-      leave_applications = self.user.leave_applications.unrejected.ne(id: self.id)
-      leave_applications.each do |leave_application|
-        errors.add(:base, 'Already applied for LEAVE/WFH on same date') and return if self.start_at.between?(leave_application.start_at, leave_application.end_at) or
-          self.end_at.between?(leave_application.start_at, leave_application.end_at) or
-          leave_application.start_at.between?(self.start_at, self.end_at) or
-          leave_application.end_at.between?(self.start_at, self.end_at)
+      leave_applications = LeaveApplication.where(
+        :start_at.gte => self.start_at.beginning_of_year,
+        :leave_status.ne => REJECTED,
+        user_id: self.user
+      ).ne(id: self.id)
+
+      leave_applications.each do |leave|
+        if self.start_at.between?(leave.start_at, leave.end_at) or
+           self.end_at.between?(leave.start_at, leave.end_at)
+          unless self.leave_request? && leave.leave_type == WFH
+            errors.add(:base, "Already applied for #{leave.leave_type} on same date") and return
+          end
+        end
       end
     end
   end
