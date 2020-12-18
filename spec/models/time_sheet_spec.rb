@@ -702,25 +702,41 @@ RSpec.describe TimeSheet, type: :model do
 
     it 'Should count only leaves in user leaves count' do
       admin = FactoryGirl.create(:admin)
-      FactoryGirl.create(:leave_application,
+      FactoryGirl.create(
+        :leave_application,
         user: user,
+        start_at: Date.today + 1,
+        end_at: Date.today + 2,
+        number_of_days: 2,
         leave_status: APPROVED,
         processed_by: admin.id
       )
-      FactoryGirl.create(:leave_application,
+      FactoryGirl.create(
+        :leave_application,
         user: user,
-        start_at: Date.today + 1,
-        end_at: Date.today + 1,
+        start_at: Date.today + 3,
+        end_at: Date.today + 3,
+        number_of_days: 1,
         leave_status: APPROVED,
         leave_type: LeaveApplication::WFH,
+        processed_by: admin.id
+      )
+      FactoryGirl.create(
+        :leave_application,
+        user: user,
+        start_at: Date.today + 4,
+        end_at: Date.today + 4,
+        number_of_days: 1,
+        leave_status: APPROVED,
+        leave_type: LeaveApplication::LWP,
         processed_by: admin.id
       )
 
       expect(TimeSheet.approved_leaves_count(
         user,
-        Date.today + 1,
-        Date.today + 3
-      )).to eq(2)
+        Date.today,
+        Date.today + 4
+      )).to eq(3)
     end
 
     it 'Should return true because from date is less than to date' do
