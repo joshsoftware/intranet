@@ -336,14 +336,11 @@ class User
     if role?(ROLE[:consultant])
       employee_ids = employee_id_array.select{ |id| id > 10000 }
       emp_id = employee_ids.empty? ? 10000 : employee_ids.max
-    elsif self.employee_detail.try(:location) == 'Bengaluru'
-      employee_ids = employee_id_array.select{ |id| id > 8000 && id < 9000 }
-      emp_id = employee_ids.empty? ? 8000 : employee_ids.max
-    elsif self.employee_detail.try(:location) == 'Plano'
+    elsif self.employee_detail.try(:location) == LOCATIONS[1]
       usa_employee_ids = employee_id_array.select{ |id| id > 9000 && id < 10000}
       emp_id = usa_employee_ids.empty? ? 9000 : usa_employee_ids.max
     else
-      pune_employee_ids = employee_id_array.select { |id| id <= 8000}
+      pune_employee_ids = employee_id_array.select { |id| id <= 9000}
       emp_id = pune_employee_ids.empty? ? 0 : pune_employee_ids.max
     end
     emp_id = emp_id + 1

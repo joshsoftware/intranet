@@ -29,4 +29,22 @@ namespace :update_data do
       end
     end
   end
+
+  desc 'Update employee ids of Bengaluru employees'
+  task update_bengaluru_employee_ids: :environment do
+    puts "Email \t | Previous EmpId | Current EmpId"
+    User.where('employee_detail.location': LOCATIONS[0]).each do |user|
+      if user.employee_detail.employee_id.to_i > 8000
+        emp_id = calculate_emp_id + 1
+        puts "#{user.email} | #{user.employee_detail.employee_id} | #{emp_id}"
+        user.employee_detail.set(employee_id: emp_id)
+      end
+    end
+  end
+end
+
+def calculate_emp_id
+  employee_id_array = User.distinct('employee_detail.employee_id').map!(&:to_i)
+  employee_ids = employee_id_array.select { |id| id <= 8000}
+  employee_ids.empty? ? 0 : employee_ids.max
 end
