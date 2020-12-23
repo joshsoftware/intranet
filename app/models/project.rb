@@ -301,7 +301,7 @@ class Project
   end
 
   def self.approved_manager_and_admin
-    User.where("$and" => [status: STATUS[2], "$or" => [{role: MANERIAL_ROLE[0]}, {role: MANERIAL_ROLE[1]}]])
+    User.where('$and': [status: STATUS[:approved], '$or': [{role: MANERIAL_ROLE[0]}, {role: MANERIAL_ROLE[1]}]])
   end
 
   def users
@@ -381,7 +381,7 @@ class Project
         ]
       }
     ]).pluck(:user_id).uniq
-    User.in(id: user_ids).where(status: STATUS[2])
+    User.in(id: user_ids).where(status: STATUS[:approved])
   end
 
   private

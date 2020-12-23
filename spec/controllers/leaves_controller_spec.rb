@@ -6,7 +6,7 @@ describe LeaveApplicationsController do
     before(:each) do
       @admin = FactoryGirl.create(:admin)
       hr = FactoryGirl.create(:hr)
-      @user = FactoryGirl.create(:user, status: 'approved')
+      @user = FactoryGirl.create(:user, status: STATUS[:approved])
       @manager = FactoryGirl.create(:manager)
       sign_in @user
       @leave_application = FactoryGirl.build(:leave_application, user: @user)
@@ -30,7 +30,7 @@ describe LeaveApplicationsController do
           user_id: @user.id,
           leave_application: @leave_application.attributes
         }
-        user2 = FactoryGirl.create(:user, status: 'approved')
+        user2 = FactoryGirl.create(:user, status: STATUS[:approved])
         user2.build_private_profile(
           FactoryGirl.build(:private_profile).attributes
         )
@@ -191,7 +191,7 @@ describe LeaveApplicationsController do
 
   context "While accepting leaves" do
     before(:each) do
-      @admin = FactoryGirl.create(:admin, status: 'approved')
+      @admin = FactoryGirl.create(:admin, status: STATUS[:approved])
       @hr = FactoryGirl.create(:hr)
       @user = FactoryGirl.create(:user)
       user1 = FactoryGirl.create(:user)
@@ -311,7 +311,7 @@ describe LeaveApplicationsController do
   context "Rejecting leaves" do
 
     before(:each) do
-      @admin = FactoryGirl.create(:admin, status: 'approved')
+      @admin = FactoryGirl.create(:admin, status: STATUS[:approved])
       @hr = FactoryGirl.create(:hr)
       @user = FactoryGirl.create(:user)
       user1 = FactoryGirl.create(:user)
@@ -524,7 +524,7 @@ describe LeaveApplicationsController do
   context 'Leave type - WFH' do
     before(:each) do
       @admin = FactoryGirl.create(:admin)
-      @user = FactoryGirl.create(:user, status: 'approved')
+      @user = FactoryGirl.create(:user, status: STATUS[:approved])
       @leave = FactoryGirl.build(
         :leave_application,
         leave_type: 'WFH',
@@ -585,22 +585,22 @@ describe LeaveApplicationsController do
       @leave.save
       params = {
         id: @leave.id,
-        leave_application: @leave.attributes.merge(leave_status: 'Approved')
+        leave_application: @leave.attributes.merge(leave_status: APPROVED)
       }
       put :update, params
 
       leave_count = @user.reload.employee_detail.available_leaves
       expect(flash[:success]).to eq('Your request has been updated successfully.' +
         ' Please wait for the approval.')
-      expect(@leave.reload.leave_status).to eq('Approved')
+      expect(@leave.reload.leave_status).to eq(APPROVED)
       expect(leave_count).to eq(24)
     end
   end
 
   context "Leave history search querying user_ids" do
     before(:each) do
-      @employee_one = FactoryGirl.create(:user, status: STATUS[2])
-      @employee_two = FactoryGirl.create(:user, status: STATUS[2])
+      @employee_one = FactoryGirl.create(:user, status: STATUS[:approved])
+      @employee_two = FactoryGirl.create(:user, status: STATUS[:approved])
       @leave_app_one_one = FactoryGirl.create(:leave_application, user: @employee_one, start_at: Date.today + 1, end_at: Date.today + 4)
       @leave_app_one_two = FactoryGirl.create(:leave_application, user: @employee_one, start_at: Date.today + 5, end_at: Date.today + 8)
       @leave_app_two_one = FactoryGirl.create(:leave_application, user: @employee_two, start_at: Date.today + 9, end_at: Date.today + 12)
@@ -637,7 +637,7 @@ describe LeaveApplicationsController do
 
   context 'Overlapping Leave Request' do
     before(:each) do
-      @user = FactoryGirl.create(:user, status: 'approved')
+      @user = FactoryGirl.create(:user, status: STATUS[:approved])
       @leave = FactoryGirl.build(:leave_application, user: @user)
       @start_date = Date.yesterday
       @end_date = Date.today + 7
@@ -724,7 +724,7 @@ describe LeaveApplicationsController do
 
   context 'Optional Leave' do
     before(:each) do
-      @user = FactoryGirl.create(:user, status: 'approved')
+      @user = FactoryGirl.create(:user, status: STATUS[:approved])
       @leave = FactoryGirl.build(:leave_application,
         leave_type: LeaveApplication::OPTIONAL,
         user: @user
@@ -772,7 +772,7 @@ describe LeaveApplicationsController do
     end
 
     it 'should not deduct leave count after approving the Optional request' do
-      admin = FactoryGirl.create(:admin, status: 'approved')
+      admin = FactoryGirl.create(:admin, status: STATUS[:approved])
       sign_in admin
       @leave.save
       params = {
@@ -788,7 +788,7 @@ describe LeaveApplicationsController do
     end
 
     it 'should not add or deduct leave count after reject the Optional request' do
-      admin = FactoryGirl.create(:admin, status: 'approved')
+      admin = FactoryGirl.create(:admin, status: STATUS[:approved])
       sign_in admin
       @leave.save
       params = {

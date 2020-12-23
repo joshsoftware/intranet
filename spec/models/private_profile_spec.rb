@@ -26,7 +26,7 @@ describe PrivateProfile do
     let!(:user) { FactoryGirl.create(:user) }
 
     before do
-      user.status = 'approved'
+      user.status = STATUS[:approved]
       private_profile = user.private_profile
       private_profile.date_of_joining = ''
     end
@@ -34,7 +34,7 @@ describe PrivateProfile do
     after do
       expect(user.save).to eq(false)
       expect(user.generate_errors_message).to eq(
-        "Private profile is invalid  Date of joining can't be blank  "
+        "Date of joining can't be blank"
       )
     end
 
@@ -93,8 +93,8 @@ describe PrivateProfile do
   end
 
   context 'probation period notification' do
-    let!(:user) { FactoryGirl.create(:user, status: 'approved') }
-    let!(:hr_user) { FactoryGirl.create(:user, role: 'HR', status: 'approved')}
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+    let!(:hr_user) { FactoryGirl.create(:user, role: ROLE[:HR], status: STATUS[:approved])}
     before do
       ActionMailer::Base.deliveries = []
     end

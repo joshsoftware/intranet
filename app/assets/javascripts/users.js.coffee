@@ -1,4 +1,13 @@
 $(document).ready ->
+  if ($('#user_status option:selected').val() == 'resigned')
+    $("#reason_of_resignation").show()
+  else
+    $("#reason_of_resignation").hide()
+
+  $("#user_status").on 'change', ->
+    if ($("#user_status option:selected").val() == 'resigned')
+      $("#reason_of_resignation").fadeIn()
+
   table = $('.resource').dataTable
     ordering : false
     dom: 'frtlp'

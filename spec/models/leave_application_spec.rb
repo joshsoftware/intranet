@@ -100,7 +100,7 @@ describe LeaveApplication do
       before do
         @user = FactoryGirl.create(:user)
         @user1 = FactoryGirl.create(:user)
-        @admin = FactoryGirl.create(:admin, status: 'approved')
+        @admin = FactoryGirl.create(:admin, status: STATUS[:approved])
 
         project = FactoryGirl.create(:project, manager_ids: [@admin.id])
         FactoryGirl.create(:user_project, user_id: @user.id, project_id: project.id)
@@ -243,7 +243,7 @@ describe LeaveApplication do
 
       context 'Leave reminder mail' do
         let!(:user) { FactoryGirl.create(:user) }
-        let!(:admin) { FactoryGirl.create(:admin, status: 'approved') }
+        let!(:admin) { FactoryGirl.create(:admin, status: STATUS[:approved]) }
         let!(:project) { FactoryGirl.create(:project, manager_ids: [admin.id])}
         let!(:user_project) { FactoryGirl.create(:user_project, user: user, project: project)}
 

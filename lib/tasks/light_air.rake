@@ -14,7 +14,7 @@ namespace :light_air do
                         date_format(u.unsubscribed_at) ]
     end
     
-    hr_emails = User.where(role: 'HR', status: 'approved').map(&:email)
+    hr_emails = User.where(role: ROLE[:HR], status: STATUS[:approved]).pluck(:email)
     user_reports_csv = generate_csv(user_reports)
 
     LightAirUserMailer.send_opt_out_users_report(user_reports_csv, hr_emails).deliver_now!

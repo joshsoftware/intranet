@@ -81,13 +81,13 @@ RSpec.describe HolidayListsController, type: :controller do
     end
 
     it 'render holiday list by location and leave type (Optional)' do
-      holiday = FactoryGirl.create(:holiday, holiday_type: HolidayList::OPTIONAL, country: 'USA')
+      holiday = FactoryGirl.create(:holiday, holiday_type: HolidayList::OPTIONAL, country: COUNTRIES[1])
       params = {
-        location: LOCATIONS[0],
+        location: COUNTRIES[1],
         leave_type: HolidayList::OPTIONAL
       }
-      get :holiday_list
-      
+      get :holiday_list, params
+
       holiday_list = JSON.parse response.body
       expect(response).to have_http_status(:success)
       expect(holiday_list.first['country']).to eq('USA')
