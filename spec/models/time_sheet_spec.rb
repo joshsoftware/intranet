@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe TimeSheet, type: :model do
   context 'Validation' do
-    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project) }
     let!(:user_project) { FactoryGirl.create(:user_project,
         user: user,
@@ -395,8 +395,8 @@ RSpec.describe TimeSheet, type: :model do
 
   context 'Summary report' do
     it 'should create all employee summary' do
-      user1 = FactoryGirl.create(:user, status: 'approved')
-      user2 = FactoryGirl.create(:user, status: 'approved')
+      user1 = FactoryGirl.create(:user, status: STATUS[:approved])
+      user2 = FactoryGirl.create(:user, status: STATUS[:approved])
       project1 = FactoryGirl.create(:project)
       project2 = FactoryGirl.create(:project)
       FactoryGirl.create(:user_project, user: user1, project: project1)
@@ -499,7 +499,7 @@ RSpec.describe TimeSheet, type: :model do
       it 'Should return true because user is on leave' do
         FactoryGirl.create(:leave_application,
           user: user,
-          leave_status: LEAVE_STATUS[1]
+          leave_status: APPROVED
         )
         expect(TimeSheet.user_on_leave?(user, Date.today + 2)).to eq(true)
       end
@@ -507,7 +507,7 @@ RSpec.describe TimeSheet, type: :model do
       it 'Should return false because user is not on leave' do
         FactoryGirl.create(:leave_application,
           user: user,
-          leave_status: LEAVE_STATUS[1]
+          leave_status: APPROVED
         )
         expect(TimeSheet.user_on_leave?(user, Date.today + 4)).to eq(false)
       end
@@ -690,16 +690,19 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it 'Should count only leaves in user leaves count' do
+      admin = FactoryGirl.create(:admin)
       FactoryGirl.create(:leave_application,
         user: user,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED,
+        processed_by: admin.id
       )
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: Date.today + 1,
         end_at: Date.today + 1,
-        leave_status: LEAVE_STATUS[1],
-        leave_type: LeaveApplication::WFH
+        leave_status: APPROVED,
+        leave_type: LeaveApplication::WFH,
+        processed_by: admin.id
       )
 
       expect(TimeSheet.approved_leaves_count(
@@ -845,7 +848,7 @@ RSpec.describe TimeSheet, type: :model do
 
 
   context 'Get allocated hours should calculate allocated hours' do
-    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project) }
 
     context "between 'from date' and 'to date'" do
@@ -977,10 +980,10 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     context 'in above all scenario' do
-      let!(:user_one) { FactoryGirl.create(:user, status: STATUS[2]) }
-      let!(:user_two) { FactoryGirl.create(:user, status: STATUS[2]) }
-      let!(:user_three) { FactoryGirl.create(:user, status: STATUS[2]) }
-      let!(:user_four) { FactoryGirl.create(:user, status: STATUS[2]) }
+      let!(:user_one) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+      let!(:user_two) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+      let!(:user_three) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+      let!(:user_four) { FactoryGirl.create(:user, status: STATUS[:approved]) }
 
       it 'should calculate correct allocated hours' do
         FactoryGirl.create(:user_project,
@@ -1017,7 +1020,7 @@ RSpec.describe TimeSheet, type: :model do
   end
 
   context 'get leaves count should calculate leaves' do
-    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project) }
 
     it "between 'from date' and 'to date'" do
@@ -1031,7 +1034,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '14/09/2018',
         end_at: '14/09/2018',
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       from_date = '01/09/2018'.to_date
       to_date = '20/09/2018'.to_date
@@ -1051,14 +1054,14 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '14/09/2018',
         end_at: '14/09/2018',
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: '13/09/2018',
         end_at: '13/09/2018',
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       from_date = '01/09/2018'.to_date
       to_date = '20/09/2018'.to_date
@@ -1079,14 +1082,14 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '14/09/2018',
         end_at: '14/09/2018',
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: '13/09/2018',
         end_at: '13/09/2018',
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       leave_count = TimeSheet.get_leaves(project, from_date, to_date)
       expect(leave_count).to eq(2)
@@ -1106,14 +1109,14 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '03/09/2018',
         end_at: '03/09/2018',
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: '13/09/2018',
         end_at: '13/09/2018',
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       leave_count = TimeSheet.get_leaves(project, from_date, to_date)
       expect(leave_count).to eq(1)
@@ -1121,7 +1124,7 @@ RSpec.describe TimeSheet, type: :model do
   end
 
   context 'Project report' do
-    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project) }
 
     it 'Should give expected project report' do
@@ -1145,7 +1148,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: Date.today - 2,
         end_at: Date.today - 2,
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       from_date = Date.today - 20
       to_date = Date.today
@@ -1202,8 +1205,8 @@ RSpec.describe TimeSheet, type: :model do
 
     #'create_projects_report_in_json_format' does not return users_without_timesheet
     # it 'Should give users without timesheet' do
-    #   user_two = FactoryGirl.create(:user, status: STATUS[2])
-    #   user_three = FactoryGirl.create(:user, status: STATUS[2])
+    #   user_two = FactoryGirl.create(:user, status: STATUS[:approved])
+    #   user_three = FactoryGirl.create(:user, status: STATUS[:approved])
 
     #   FactoryGirl.create(:user_project,
     #     user: user,
@@ -1244,9 +1247,9 @@ RSpec.describe TimeSheet, type: :model do
   end
 
   context 'Individual project report' do
-    let!(:user_one) { FactoryGirl.create(:user, status: STATUS[2]) }
-    let!(:user_two) { FactoryGirl.create(:user, status: STATUS[2]) }
-    let!(:user_three) { FactoryGirl.create(:user, status: STATUS[2]) }
+    let!(:user_one) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+    let!(:user_two) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+    let!(:user_three) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project) }
 
     it 'Should give the expected project report' do
@@ -1298,7 +1301,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: Date.today - 10,
         end_at: Date.today - 7,
         number_of_days: 3,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       FactoryGirl.create(:time_sheet,
         user: user_two,
@@ -1319,7 +1322,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '12/09/2018',
         end_at: '13/09/2018',
         number_of_days: 2,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
 
       params = { from_date: Date.today - 20, to_date: Date.today }
@@ -1423,7 +1426,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: Date.today - 1,
         end_at: Date.today- 1,
         number_of_days: 1,
-        leave_status: LEAVE_STATUS[1]
+        leave_status: APPROVED
       )
       from_date = Date.today - 3
       to_date = Date.today + 3
@@ -2086,7 +2089,7 @@ RSpec.describe TimeSheet, type: :model do
   # end
 
   context 'Timesheet mail' do
-    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 5) }
 
     before do
@@ -2129,8 +2132,8 @@ RSpec.describe TimeSheet, type: :model do
   end
 
   context "Employee's weekend work" do
-    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
-    let!(:user_hr) { FactoryGirl.create(:user, role: 'HR', status: STATUS[2]) }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+    let!(:user_hr) { FactoryGirl.create(:user, role: ROLE[:HR], status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project, timesheet_mandatory: true) }
 
     before do
@@ -2169,8 +2172,8 @@ RSpec.describe TimeSheet, type: :model do
   end
 
   context "Employees Working Hour Report" do
-    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
-    let!(:user_hr) { FactoryGirl.create(:user, role: 'HR', status: STATUS[2]) }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+    let!(:user_hr) { FactoryGirl.create(:user, role: ROLE[:HR], status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project, timesheet_mandatory: true) }
 
     before do
@@ -2236,8 +2239,8 @@ RSpec.describe TimeSheet, type: :model do
   end
 
   context "User without time_sheet" do
-    let!(:user) { FactoryGirl.create(:user, status: STATUS[2]) }
-    let!(:userhr) { FactoryGirl.create(:user, role:"HR", status: STATUS[2]) }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
+    let!(:userhr) { FactoryGirl.create(:user, role: ROLE[:HR], status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project, :timesheet_mandatory => true) }
     before do
       ActionMailer::Base.deliveries = []
@@ -2270,7 +2273,7 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:time_sheet, :date => Date.today - 3,
         :user => user, :project => project )
       leave = FactoryGirl.create(:leave_application, start_at: Date.today - 2, end_at: Date.today,
-        user: user, leave_status: LEAVE_STATUS[1])
+        user: user, leave_status: APPROVED)
       from_date = Date.today - 3
       to_date   = Date.today
       TimeSheet.get_users_who_not_filled_timesheet(from_date, to_date)

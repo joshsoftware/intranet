@@ -15,7 +15,7 @@
         %td
           = user.role
         %td
-          = link_to user.employee_detail.try(:available_leaves),'#', {class: 'available_leaves', id: "leave_#{user.try(:id)}", data:{pk: user.id, url: update_available_leave_path(id: user.id)}} if user.status.eql?(STATUS[2])
+          = link_to user.employee_detail.try(:available_leaves),'#', {class: 'available_leaves', id: "leave_#{user.try(:id)}", data:{pk: user.id, url: update_available_leave_path(id: user.id)}} if user.status.eql?(STATUS[:approved])
 
 :javascript
   $.fn.editable.defaults.ajaxOptions = {type: "PUT"}; 

@@ -13,12 +13,12 @@ resource "Website Apis" do
       header 'Referer', "http://#{ORGANIZATION_DOMAIN}"
       leaders = FactoryGirl.create_list(:admin_with_designation,
         2,
-        status: 'approved',
+        status: STATUS[:approved],
         visible_on_website:  true
       )
       members = FactoryGirl.create_list(:user_with_designation,
         3,
-        status: 'approved',
+        status: STATUS[:approved],
         visible_on_website:  true
       )
       user = FactoryGirl.create(:user, email: "emp0@#{ORGANIZATION_DOMAIN}", visible_on_website: false)

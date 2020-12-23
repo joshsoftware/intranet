@@ -18,7 +18,7 @@ module LeaveAvailable
 
   def set_leave_details_per_year
     leave_count = is_consultant? ? 0 : PER_MONTH_LEAVE*12
-    self.employee_detail.set(:available_leaves, leave_count)
+    self.employee_detail.set(available_leaves: leave_count)
   end
   
   def eligible_for_leave?

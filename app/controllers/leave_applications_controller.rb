@@ -10,7 +10,10 @@ class LeaveApplicationsController < ApplicationController
   end
 
   def index
-    @users = User.employees.not_in(role: ['Admin'])
+    @users = User.employees.where(
+      :status.ne => STATUS[:resigned],
+      :role.ne => ROLE[:admin]
+    )
   end
 
   def create

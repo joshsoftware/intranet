@@ -12,32 +12,32 @@ class User
   ROLES = ['Super Admin', 'Admin', 'Manager', 'HR', 'Employee', INTERN_ROLE, 'Finance', 'Consultant']
 
   ## Database authenticatable
-  field :email,               :type => String, :default => ""
-  field :encrypted_password,  :type => String, :default => ""
-  field :role,                :type => String, :default => "Employee"
-  field :uid,                 :type => String
-  field :provider,            :type => String
-  field :status,              :type => String, :default => STATUS[0]
+  field :email,               type: String, default: ''
+  field :encrypted_password,  type: String, default: ''
+  field :role,                type: String, default: ROLE[:employee]
+  field :uid,                 type: String
+  field :provider,            type: String
+  field :status,              type: String, default: STATUS[:created]
 
   ## Rememberable
-  field :remember_created_at, :type => Time
+  field :remember_created_at, type: Time
   field :reset_password_token, type: String
   field :reset_password_sent_at, type: String
 
 
 
   ## Trackable
-  field :sign_in_count,      :type => Integer, :default => 0
-  field :current_sign_in_at, :type => Time
-  field :last_sign_in_at,    :type => Time
-  field :current_sign_in_ip, :type => String
-  field :last_sign_in_ip,    :type => String
-  field :access_token,       :type => String
-  field :expires_at,         :type => Integer
-  field :refresh_token,      :type => String
-  field :visible_on_website, :type => Boolean, :default => false
-  field :website_sequence_number, :type => Integer
-  field :allow_backdated_timesheet_entry, :type => Boolean, :default => false
+  field :sign_in_count,      type: Integer, default: 0
+  field :current_sign_in_at, type: Time
+  field :last_sign_in_at,    type: Time
+  field :current_sign_in_ip, type: String
+  field :last_sign_in_ip,    type: String
+  field :access_token,       type: String
+  field :expires_at,         type: Integer
+  field :refresh_token,      type: String
+  field :visible_on_website, type: Boolean, default: false
+  field :website_sequence_number, type: Integer
+  field :allow_backdated_timesheet_entry, type: Boolean, default: false
 
   has_many :leave_applications
   has_many :attachments
@@ -50,7 +50,9 @@ class User
   before_create :associate_employee_id
   after_update do
     associate_employee_id_if_role_changed
-    call_monitor_service if status_changed? && status_was == 'approved' && status == 'pending'
+    call_monitor_service if status_changed? &&
+                            status_was == STATUS[:approved] &&
+                            status == STATUS[:pending]
   end
 
   has_many :entry_passes
@@ -62,14 +64,14 @@ class User
   validates :email, format: {with: /\A.+@#{ORGANIZATION_DOMAIN}/, message: "Only #{ORGANIZATION_NAME} email-id is allowed."}
   validates :role, :email, presence: true
   validates_associated :employee_detail
-  scope :project_engineers, ->{where(:role.nin => ['HR','Finance'], :status => STATUS[2]).asc("public_profile.first_name")}
+  scope :project_engineers, ->{where(:role.nin => [ROLE[:HR], ROLE[:finance]], status: STATUS[:approved]).asc('public_profile.first_name')}
   scope :get_employees, -> (country) {where( :'employee_detail.location'.in => User.get_cities(country))}
-  scope :employees, ->{all.asc("public_profile.first_name")}
-  scope :approved, ->{where(status: 'approved')}
+  scope :employees, ->{all.asc('public_profile.first_name')}
+  scope :approved, ->{where(status: STATUS[:approved])}
   scope :visible_on_website, -> {where(visible_on_website: true)}
-  scope :interviewers, ->{where(:role.ne => 'Intern')}
-  scope :get_approved_users_to_send_reminder, ->{where('$and' => ['$or' => [{ role: 'Intern' }, { role: 'Employee' }], status: STATUS[2]])}
-  scope :management_team, ->{ approved.any_of({role: "HR"},{role: "Manager"},{role: "Admin"}) }
+  scope :interviewers, ->{where(:role.ne => ROLE[:intern])}
+  scope :get_approved_users_to_send_reminder, ->{where('$and': ['$or': [{ role: ROLE[:intern] }, { role: ROLE[:employee] }], status: STATUS[:approved]])}
+  scope :management_team, ->{ approved.any_of({role: ROLE[:HR]}, {role: ROLE[:manager]}, {role: ROLE[:admin]}) }
   #Public profile will be nil when admin invite user for sign in with only email address
   delegate :name, to: :public_profile, :allow_nil => true
   delegate :designation, to: :employee_detail, :allow_nil => true
@@ -93,6 +95,15 @@ class User
                                     [ ROLE[:employee], ROLE[:consultant] ].include?(self.role)
   end
 
+  after_update do
+    if (status_changed? && status == STATUS[:resigned])
+      reject_future_leaves 
+      set_user_project_entries_inactive
+      remove_from_manager_ids
+      remove_from_notification_emails
+    end
+  end
+
   slug :name
   # Hack for Devise as specified in https://github.com/plataformatec/devise/issues/2949#issuecomment-40520236
   def self.serialize_into_session(record)
@@ -100,7 +111,10 @@ class User
   end
 
   def set_user_project_entries_inactive
-    UserProject.where(user_id: self.id, active: true).update_all(active: false, end_date: Date.today)
+    UserProject.where(user_id: self.id, active: true).update_all(
+      active: false,
+      end_date: self.employee_detail.date_of_relieving
+    )
   end
 
   def remove_from_manager_ids
@@ -194,7 +208,7 @@ class User
   end
 
   def is_approved?
-    self.status == 'approved'
+    self.status == STATUS[:approved]
   end
 
   def is_intern?(role)
@@ -202,7 +216,7 @@ class User
   end
 
   def allow_in_listing?
-    return true if self.status == 'approved'
+    return true if self.status == STATUS[:approved]
     return false
   end
 
@@ -219,23 +233,30 @@ class User
 
   def generate_errors_message
     error_msg = []
-    error_msg.push(errors.full_messages,
-                   public_profile.errors.full_messages,
-                   private_profile.errors.full_messages,
-                   employee_detail.try(:errors).try(:full_messages),
-                   attachments_errors)
-    error_msg.join(' ')
+    profiles = [:employee_detail, :private_profile, :public_profile, :attachments] & errors.keys
+
+    profiles.each do |profile|
+      if profile == :attachments
+        error_msg.push attachments_errors
+      else
+        error_msg.push self.try(profile).try(:errors).try(:full_messages)
+      end
+      errors.delete(profile)
+    end
+    
+    error_msg.push self.errors.full_messages
+    error_msg.flatten.join(' ')
   end
 
   def reject_future_leaves
-    return if self.status == 'approved'
-    LeaveApplication.where(:start_at.gte => Date.today, user: self).each do |leave_application|
-      leave_application.update(leave_status: 'Rejected')
+    LeaveApplication.where(:start_at.gte => Date.today, user: self).each do |leave|
+      leave.update(leave_status: REJECTED, reject_reason: 'User Resigned')
     end
   end
 
   def attachments_errors
-    self.attachments.map { |i| i.errors.full_messages }.join(', ')
+    error_msg = self.attachments.map { |i| i.errors.full_messages }
+    error_msg.flatten!.empty? ? error_msg : error_msg.join(', ')
   end
 
   def add_or_remove_projects(params)
@@ -275,7 +296,7 @@ class User
 
   def get_managers_emails
     manager_ids = projects.pluck(:manager_ids).flatten.uniq
-    User.in(id: manager_ids, status: 'approved').collect(&:email)
+    User.in(id: manager_ids, status: STATUS[:approved]).pluck(:email)
   end
 
   def get_managers_emails_for_timesheet
@@ -286,12 +307,12 @@ class User
     ).pluck(:project_id)
     
     manager_ids = Project.in(id: project_ids).pluck(:manager_ids).flatten.uniq
-    User.in(id: manager_ids, status: 'approved').pluck(:email)
+    User.in(id: manager_ids, status: STATUS[:approved]).pluck(:email)
   end
 
   def get_managers_names
     manager_ids = projects.pluck(:manager_ids).flatten.uniq
-    User.in(id: manager_ids, status: 'approved').collect(&:name)
+    User.in(id: manager_ids, status: STATUS[:approved]).collect(&:name)
   end
 
   def self.get_hr_emails

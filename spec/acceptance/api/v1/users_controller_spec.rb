@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'rspec_api_documentation/dsl'
 
 resource 'Users Apis' do
-  let!(:employee) { FactoryGirl.create(:user_with_designation, status: 'approved') }
+  let!(:employee) { FactoryGirl.create(:user_with_designation, status: STATUS[:approved]) }
 
   get '/api/v1/users' do
     example 'Get all User details' do

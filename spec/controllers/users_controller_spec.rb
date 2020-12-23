@@ -239,8 +239,8 @@ describe UsersController do
 
   context "#resource_list_download" do
     it 'should send Resource List csv' do
-      user1 = FactoryGirl.create(:user, role: "Employee", status: 'approved')
-      user2 = FactoryGirl.create(:user, role: "Employee", status: 'approved')
+      user1 = FactoryGirl.create(:user, role: ROLE[:employee], status: STATUS[:approved])
+      user2 = FactoryGirl.create(:user, role: ROLE[:employee], status: STATUS[:approved])
       sign_in user1
       get :resource_list_download
       expect(response).to have_http_status(:success)
@@ -277,7 +277,7 @@ describe UsersController do
 
   ##Code is changed for downloading excel sheet, searching & pagination
   # context 'download excel sheet of Employee' do
-  #   let!(:userlist) { FactoryGirl.create_list(:user, 4, status: 'approved') }
+  #   let!(:userlist) { FactoryGirl.create_list(:user, 4, status: STATUS[:approved]) }
   #   before(:each) do
   #     @user = FactoryGirl.create(:user)
   #     sign_in @user

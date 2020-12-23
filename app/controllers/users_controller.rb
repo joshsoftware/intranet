@@ -144,8 +144,9 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:status, :role, :visible_on_website, :website_sequence_number,
-      :allow_backdated_timesheet_entry, employee_detail_attributes: [:id, :employee_id, :location, :date_of_relieving,
-      :designation, :description, :is_billable, :skip_unassigned_project_ts_mail, :designation_track, :notification_emails => [] ],
+      :allow_backdated_timesheet_entry, employee_detail_attributes: [:id, :employee_id, :location,
+      :date_of_relieving, :reason_of_resignation, :designation, :description, :is_billable,
+      :skip_unassigned_project_ts_mail, :designation_track, :notification_emails => [] ],
       attachments_attributes: [:id, :name, :document, :_destroy]
     )
   end
