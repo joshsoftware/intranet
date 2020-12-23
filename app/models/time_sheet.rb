@@ -867,7 +867,7 @@ class TimeSheet
   def self.get_project_without_timesheet(project_names, from_date, to_date)
     unfilled_timesheet_projects = []
     projects = Project.not_in(name: project_names)
-    projects.where("$or" => [{end_date: nil}, {end_date: {"$gte" => from_date, "$lte" => to_date}}]).each do |project|
+    projects.where('$or': [{end_date: nil}, {end_date: {'$gte': from_date, '$lte': to_date}}]).each do |project|
       project_detail = {}
       project_detail['project_id'] = project.id
       project_detail['project_name'] = project.name
@@ -878,9 +878,9 @@ class TimeSheet
 
   def self.get_users_without_timesheet(from_date, to_date, current_user)
     return if [ ROLE[:employee], ROLE[:intern], ROLE[:consultant] ].include?(current_user.role)
-    user_ids = TimeSheet.where(date: {"$gte" => from_date, "$lte" => to_date}).distinct(:user_id)
+    user_ids = TimeSheet.where(date: {'$gte': from_date, '$lte': to_date}).distinct(:user_id)
     users = User.not_in(id: user_ids)
-    users.where(status: STATUS[2], "$or" => [{role: ROLE[:employee]}, {role: ROLE[:intern]}]).order("public_profile.first_name" => :asc)
+    users.where(status: STATUS[:approved], '$or': [{role: ROLE[:employee]}, {role: ROLE[:intern]}]).order('public_profile.first_name': :asc)
   end
 
   def self.get_users_who_not_filled_timesheet(from_date, to_date)
@@ -937,7 +937,7 @@ class TimeSheet
   def self.user_on_leave?(user, date)
     return false unless user.leave_applications.present?
     leave_applications = user.leave_applications.order("end_at asc").where(:end_at.gte => date,
-                         leave_status: LEAVE_STATUS[1])
+                         leave_status: PENDING)
     leave_applications.each do |leave_application|
       return true if date.between?(leave_application.start_at, leave_application.end_at)
     end
@@ -1071,7 +1071,7 @@ class TimeSheet
   def self.approved_leaves_count(user, from_date, to_date)
     user.leave_applications.where(
       start_at: {'$gte': from_date, '$lte': to_date},
-      leave_status: LEAVE_STATUS[1],
+      leave_status: PENDING,
       leave_type: LeaveApplication::LEAVE
     ).sum(:number_of_days)
   end

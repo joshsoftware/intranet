@@ -144,7 +144,7 @@ describe ProjectsController do
     end
 
     it 'Should equal to managers' do
-      user = FactoryGirl.create(:manager, status: 'approved')
+      user = FactoryGirl.create(:manager, status: STATUS[:approved])
       project = FactoryGirl.create(:project)
       project.managers << user
       get :show, id: project.id

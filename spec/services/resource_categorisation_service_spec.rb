@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe ResourceCategorisationService do
   context 'Resource Categorisation Report - ' do
     before(:each) do
-      @emp_one = FactoryGirl.create(:user, status: STATUS[2])
-      @emp_two = FactoryGirl.create(:user, status: STATUS[2])
+      @emp_one = FactoryGirl.create(:user, status: STATUS[:approved])
+      @emp_two = FactoryGirl.create(:user, status: STATUS[:approved])
 
       @active_project = FactoryGirl.create(:project, name: 'Brand Scope')
       @active_project_two = FactoryGirl.create(:project, name: 'Quick Insure')
@@ -80,7 +80,7 @@ RSpec.describe ResourceCategorisationService do
     end
 
     it 'should generate resource report as expected' do
-      @emp_three = FactoryGirl.create(:user, status: STATUS[2])
+      @emp_three = FactoryGirl.create(:user, status: STATUS[:approved])
       @user_project_three = FactoryGirl.create(
         :user_project,
         active: true,

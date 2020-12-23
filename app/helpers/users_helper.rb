@@ -34,4 +34,17 @@ module UsersHelper
     projects.each { |i| details << [ i[:name], edit_project_url(i[:id]) ]}
     details
   end
+
+  def user_status_class(status)
+    case status
+    when STATUS[:approved]
+      'label-success'
+    when STATUS[:created]
+      'label-default'
+    when STATUS[:resigned]
+      'label-danger danger-red'
+    else
+      'label-warning'
+    end
+  end
 end

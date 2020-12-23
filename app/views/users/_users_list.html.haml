@@ -24,9 +24,8 @@
         - if can? :edit, User
           %td= user.role
           %td
-            - status_class = (user.status == 'approved') ? 'label-success' : 'label-warning'
-            .label{class: status_class}
-              = user.status
+            .label{class: user_status_class(user.status)}
+              = user.status.titleize
           %td= link_to '', public_profile_user_path(user), class: 'icon-edit', data: {'no-turbolink' =>  true}
 :coffeescript
   $('#user_table').dataTable('order':[[2, "asc"]], 'columnDefs': [{'targets': [1,3,4,-1,-2], 'orderable': false}])

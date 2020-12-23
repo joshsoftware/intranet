@@ -12,7 +12,7 @@ describe User do
                          )
      }
   it { should have_field(:status).of_type(String).
-        with_default_value_of(STATUS[0])
+        with_default_value_of(STATUS[:created])
      }
   it { should embed_one :public_profile }
   it { should embed_one :private_profile }
@@ -56,6 +56,18 @@ describe User do
     user.set_leave_details_per_year
     user.reload
     expect(user.employee_detail.available_leaves).to eq(PER_MONTH_LEAVE*12)
+  end
+
+  context '#reject_future_leaves' do
+    it 'should reject future leaves if employee resigns' do
+      user = FactoryGirl.create(:user, status: STATUS[:approved])
+      user.employee_detail.set(date_of_relieving: Date.today)
+      leave_application1 = FactoryGirl.create(:leave_application, user: user)
+      leave_application2 = FactoryGirl.create(:leave_application, user: user, start_at: Date.today + 4, end_at: Date.today + 7)
+      user.update(status: STATUS[:resigned])
+      expect(leave_application1.reload.leave_status).to eq(REJECTED)
+      expect(leave_application2.reload.leave_status).to eq(REJECTED)
+    end
   end
 
   context "sent mail for approval" do
@@ -211,8 +223,8 @@ describe User do
 
     it 'Should give the managers emails of particular user' do
       project = FactoryGirl.create(:project)
-      manager_one = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
-      manager_two = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
+      manager_one = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
+      manager_two = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
       user_project = FactoryGirl.create(:user_project,
         user: user,
         project: project,
@@ -230,8 +242,8 @@ describe User do
        ' is mandatory for particular Employee' do
       project_1 = FactoryGirl.create(:project)
       project_2 = FactoryGirl.create(:project, timesheet_mandatory: false)
-      manager_1 = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
-      manager_2 = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
+      manager_1 = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
+      manager_2 = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
       user_project_1 = FactoryGirl.create(:user_project,
         user: user,
         project: project_1,
@@ -263,7 +275,7 @@ describe User do
         project: project_two,
         start_date: Date.today - 2
       )
-      manager = FactoryGirl.create(:user, role: 'Manager', status: 'approved')
+      manager = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
       project_one.managers << manager
       project_two.managers << manager
       managers_emails = user.get_managers_emails

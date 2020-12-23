@@ -106,7 +106,7 @@ describe Project do
               [1, 2, 3, 4, 5, 6, 7, 8].each do |n|
                 @users << FactoryGirl.create(:user,
                   email: "user#{n}@#{ORGANIZATION_DOMAIN}",
-                  status: STATUS[2])
+                  status: STATUS[:approved])
               end
            }
     let!(:project) { FactoryGirl.create(:project) }
@@ -490,7 +490,7 @@ describe Project do
   # end
 
   context '#team_data_to_csv' do
-    let!(:user) { FactoryGirl.create(:user, status: 'approved') }
+    let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project) }
 
     it 'Should return valid csv' do
