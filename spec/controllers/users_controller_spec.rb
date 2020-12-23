@@ -250,13 +250,48 @@ describe UsersController do
   context '#download_document' do
     before(:each) do
       @user = FactoryGirl.create(:user)
+      @user_doc = FactoryGirl.create(:attachment, is_visible_to_all: true, user: @user)
       sign_in @user
     end
+
     it 'should download documents' do
-      attachment = FactoryGirl.create(:attachment, user: @user)
-      params = { id: attachment.id}
-      get :download_document, params
+      get :download_document, {id: @user_doc.id}
       expect(response).to have_http_status(:success)
+    end
+
+    it 'should send notification mail if user downloads his document and user is not HR or Admin' do
+      Sidekiq::Testing.inline! do
+        ActionMailer::Base.deliveries = []
+        get :download_document, {id: @user_doc.id}
+        expect(response).to be_success
+        expect(DOCUMENT_MANAGEMENT.include?(@user.role)).to be_falsy
+        expect(ActionMailer::Base.deliveries.count).to eq(1)
+      end
+    end
+
+    it 'should allow HR and Admin to download any employees documents' do
+      hr = FactoryGirl.create(:user, role: ROLE[:HR])
+      sign_in hr
+      Sidekiq::Testing.inline! do
+        ActionMailer::Base.deliveries = []
+        get :download_document, {id: @user_doc.id}
+        expect(response).to be_success
+        expect(DOCUMENT_MANAGEMENT.include?(hr.role)).to eq(true)
+        expect(ActionMailer::Base.deliveries.count).to eq(0)
+      end
+    end
+
+    it 'should not allow Manager or Finance to download any employees documents' do
+      manager = FactoryGirl.create(:user, role: ROLE[:manager])
+      sign_in manager
+      Sidekiq::Testing.inline! do
+        ActionMailer::Base.deliveries = []
+        get :download_document, {id: @user_doc.id}
+        expect(response).to_not be_success
+        expect(DOCUMENT_MANAGEMENT.include?(manager.role)).to eq(false)
+        expect(flash[:error]).to eq('You are not authorize to perform this action')
+        expect(ActionMailer::Base.deliveries.count).to eq(0)
+      end
     end
   end
 

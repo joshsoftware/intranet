@@ -180,12 +180,16 @@ class UsersController < ApplicationController
   def authorize_document_download
     @attachment = Attachment.where(id: params[:id]).first
     @document = @attachment.document
-    message = "You are not authorize to perform this action"
-    (current_user.can_download_document?(@user, @attachment)) || (flash[:error] = message; redirect_to root_url)
+    message = 'You are not authorize to perform this action'
+    (current_user.can_download_document?(@user, @attachment)) ||
+    (flash[:error] = message; redirect_to root_url)
   end
 
   def notify_document_download
-    UserMailer.delay.download_notification(current_user.id, @attachment.name)
+    UserMailer.delay.download_notification(
+      current_user.id,
+      @attachment.name
+    ) unless DOCUMENT_MANAGEMENT.include?(current_user.role)
   end
 
   def get_bonusly_messages

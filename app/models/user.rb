@@ -176,7 +176,8 @@ class User
 
   def can_download_document?(user, attachment)
     user = user.nil? ? self : user
-    (["Admin", "Finance", "Manager", "Super Admin"].include?(self.role)) || attachment.user_id == user.id
+    (DOCUMENT_MANAGEMENT.include?(self.role)) ||
+    attachment.user_id == user.id
   end
 
   def can_change_role_and_status?(user)
@@ -305,7 +306,7 @@ class User
       end_date: nil,
       time_sheet: true
     ).pluck(:project_id)
-    
+
     manager_ids = Project.in(id: project_ids).pluck(:manager_ids).flatten.uniq
     User.in(id: manager_ids, status: STATUS[:approved]).pluck(:email)
   end
