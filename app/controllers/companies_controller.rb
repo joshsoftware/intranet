@@ -3,14 +3,14 @@ class CompaniesController < ApplicationController
 
   load_and_authorize_resource
   skip_load_and_authorize_resource only: :create
-  before_action :set_company, only: [:edit, :show, :update, :destroy]
+  before_action :set_company, only: [:edit, :show, :update]
 
   def index
     @offset = params[:offset] || 0
     @companies = Company.skip(@offset).limit(10)
     respond_to do |format|
       format.html
-      format.json { render json: @companies.to_json(only:[:_slugs, :name, :gstno, :website])}
+      format.json { render json: @companies.to_json(only:[:_slugs, :name, :active, :gstno, :invoice_code, :website])}
       format.csv do
         send_data Company.to_csv, filename: "Compaines - #{Date.today}.csv"
       end
@@ -64,19 +64,10 @@ class CompaniesController < ApplicationController
     end
   end
 
-  def destroy
-    if @company.destroy
-      flash[:notice] = "Company deleted Successfully"
-    else
-      flash[:notice] = "Error in deleting Company"
-    end
-    redirect_to companies_path
-  end
-
   private
 
   def company_params
-    params.require(:company).permit(:name, :gstno, :logo, :website,
+    params.require(:company).permit(:name, :gstno, :invoice_code, :logo, :website, :active,
       contact_persons_attributes: [:id, :role, :name, :phone_no, :email, :_destroy],
       addresses_attributes: [:id, :type_of_address, :address, :city, :state, :landline_no, :pin_code, :_destroy])
   end

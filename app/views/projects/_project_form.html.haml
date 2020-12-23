@@ -18,7 +18,7 @@
           .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
             = f.check_box :is_active, {}, 'true', 'false'
         %div.control-group
-          = f.label "Is Activity" 
+          = f.label 'Is Activity'
           .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
             = f.check_box :is_activity, {}, 'true', 'false'
         %div.control-group
@@ -57,7 +57,7 @@
         = image_tag f.object.image, size: "200x200", id: 'project-image'
         = f.file_field :image, required: true,' aria-required': true, id: 'image-upload'
   = f.hidden_field :update_project, value: "update_project"
-  - if (@project.persisted? && @project.is_active) || @project.new_record?
+  - if (@project.persisted? && @project.is_active) || @project.new_record? || @project.errors.present?
     = f.submit :Save, class: 'btn controls btn-info'
 
 :javascript

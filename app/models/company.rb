@@ -6,8 +6,10 @@ class Company
 
   field :name, type: String
   field :gstno, type: String
+  field :invoice_code, type: String
   field :logo, type: String
   field :website, type: String
+  field :active, type: Boolean, default: true
 
   has_many :projects, dependent: :destroy
   embeds_many :contact_persons
@@ -19,7 +21,12 @@ class Company
   slug :name
 
   validates :name, uniqueness: true, presence: true
+  validates :invoice_code, uniqueness: true, length: {maximum: 3}, allow_blank: true
   validate :website_url
+
+  after_save do
+    update_projects_end_date unless active
+  end
 
   def website_url
     return true if website.nil? || website.empty?
@@ -42,6 +49,12 @@ class Company
         contact_email = company.contact_persons.map(&:email).join(" \n")
         csv << [company.name, company.try(:gstno), company.try(:website), contact_name, contact_email, project]
       end
+    end
+  end
+
+  def update_projects_end_date
+    projects.where(is_active: true).each do |project|
+      project.update_attributes(end_date: Date.today, is_active: false)
     end
   end
 end

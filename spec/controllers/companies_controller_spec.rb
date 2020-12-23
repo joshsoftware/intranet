@@ -111,13 +111,4 @@ RSpec.describe CompaniesController, type: :controller do
       expect(company.reload.addresses.count).to eq(1)
     end
   end
-
-  describe '#destroy' do
-    it 'should delete company record' do
-      company = FactoryGirl.create(:company)
-      delete :destroy, id: company.id
-      expect(Company.count).to eq(0)
-      expect(response).to redirect_to(companies_path)
-    end
-  end
 end

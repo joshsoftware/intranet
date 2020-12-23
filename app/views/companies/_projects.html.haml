@@ -19,5 +19,3 @@
         %td
           - if can? :manage, Project
             =link_to '', edit_company_project_path(@company, project), class: "icon-edit", data: {'no-turbolink' =>  true}
-            |
-            =link_to '', company_project_path(@company, project), method: :delete, "data-confirm" => "Are you sure?", class: "icon-trash"

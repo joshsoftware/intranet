@@ -10,6 +10,11 @@
         %th Company Name
         %td= @company.name
       %tr
+        %th Active
+        %td
+          .label{'class': @company.active ? 'label-success' : 'label-warning'}
+            = @company.active ? 'Active' : 'Inactive'
+      %tr
         %th Address
         %td
           - @company.addresses.each do |address|
@@ -18,6 +23,9 @@
       %tr
         %th GST number
         %td= @company.gstno
+      %tr
+        %th Invoice Code
+        %td= @company.invoice_code
       %tr
         %th Website
         %td= link_to @company.website

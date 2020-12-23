@@ -13,6 +13,7 @@ class Ability
       can [:public_profile, :private_profile, :edit, :apply_leave], User
       can :read, :dashboard
       can :index, HolidayList
+      can :manage, Company
     elsif user.role? 'Manager'
       employee_abilities(user.id)
       can :manage, Project

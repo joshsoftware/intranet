@@ -11,7 +11,9 @@
       %tr
         %th #
         %th Company Name
+        %th Active
         %th GST number
+        %th Invoice Code
         %th Website
         %th Actions
     %tbody
@@ -23,14 +25,23 @@
           %td
             %a{href: "/companies/{{record._slugs}}" } {{name}}
           %td
+            {{#active}}
+            .label{ 'class': 'label-success' } Active
+            {{/active}}
+            {{^active}}
+            .label{ 'class': 'label-warning' } Inactive
+            {{/active}}
+          %td
             {{gstno}}
+          %td
+            {{invoice_code}}
           %td
             {{website}}
           %td
-            = link_to " ", "/companies/{{record._slugs}}/edit", data: { "no-turbolink": true }, class: "icon-edit"
-            = link_to " ", "/companies/{{record._slugs}}", data: { "no-turbolink": true, method: "delete", confirm: "Are you sure?" }, class: "icon-trash"
-            = link_to "Add New Project", "/companies/{{record._slugs}}/projects/new", data: { "no-turbolink": true }
+            = link_to '', "/companies/{{record._slugs}}/edit", data: {'no-turbolink': true}, class: 'icon-edit'
+            - if can? :manage, Project
+              = link_to 'Add New Project', "/companies/{{record._slugs}}/projects/new", data: {'no-turbolink': true}
           {{/record}}
 
 :coffeescript
-  @data = #{@companies.to_json(only: [:_slugs, :name, :gstno, :website])}
+  @data = #{@companies.to_json(only: [:_slugs, :name, :active, :gstno, :invoice_code, :website])}

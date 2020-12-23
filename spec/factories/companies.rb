@@ -2,6 +2,7 @@ FactoryGirl.define do
   factory :company do
     name { Faker::Company.name }
     gstno { Faker::Bank.swift_bic }
+    invoice_code { Faker::Lorem.characters(3) }
     website { Faker::Internet.url }
     logo nil
   end
@@ -9,6 +10,7 @@ FactoryGirl.define do
   factory :company_with_contact_person, class: Company do
     name { Faker::Company.name }
     gstno { Faker::Bank.swift_bic }
+    invoice_code { Faker::Lorem.characters(3) }
     website { Faker::Internet.url }
     logo nil
     contact_persons_attributes {
