@@ -387,7 +387,9 @@ class Project
   private
 
   def update_user_projects
-    user_projects.each { |user_project| user_project.update_attributes(end_date: end_date) }
+    user_projects.where(active: true).each do |user_project|
+      user_project.update_attributes(end_date: end_date, active: false)
+    end
   end
 
   def technology_details_record_is_blank?(attributes)

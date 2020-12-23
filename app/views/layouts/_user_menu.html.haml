@@ -14,43 +14,44 @@
     %li
       = link_to 'Projects', main_app.projects_path, role: 'menuitem'
 
-  - if can? :invite_user, User
+  - if can? :manage, Company
     %li
       = link_to 'Company', main_app.companies_path, role: 'menuitem'
+  - if can? :invite_user, User
     %li
       = link_to 'Invite Employee', main_app.invite_user_path, role: 'menuitem'
   %li
     = link_to 'Profile', main_app.public_profile_user_path(current_user), data: {'no-turbolink' =>  true}
-  
+
   - unless can_access?('Documents')
     %li
       = link_to 'Documents', main_app.attachments_path, data: {'no-turbolink' =>  true}
-  
+
   - unless can_access?('Events')
     %li
       = link_to 'Events', "https://intranet.joshsoftware.com/functions", 'target' => '_blank'
-  
+
   - if can_access?('Newsletter')
     %li
       = link_to 'Newsletter', main_app.light_path, role: 'menuitem'
-  
+
   - if can? :manage, Designation
     %li= link_to 'Manage Designations', main_app.designations_path, role: 'menuitem'
-  
+
   %li
     = link_to 'Leave Applications', main_app.view_leaves_path
-  
+
   - if can_access?('Contacts')
     %li
       = link_to 'Contacts', main_app.site_contacts_path, data: { 'no-turbolink' => true }, role: 'menuitem'
-  
+
   - if can_access?('Manage Leave')
     %li
       = link_to 'Manage Leave', main_app.leave_applications_path, role: 'menuitem'
-  
+
   %li.hide
     = link_to 'Calendar', main_app.calendar_path, role: 'menuitem'
-  
+
   %li.dropdown-submenu.pull-left
     %a.test{:href => '#', role: 'menuitem', 'aria-haspopup': true }
       Timesheets
@@ -62,19 +63,19 @@
             = link_to 'Projects', main_app.projects_report_time_sheets_path, class: 'menu-font', role: 'menuitem'
           %li
             = link_to 'Export Reports', main_app.export_project_report_time_sheets_path, class: 'menu-font'
-  
+
   - unless can_access?('Assessments')
     %li
       = link_to 'Assessments', ENV['snowflake_url']
-  
+
   - if can? :manage, EntryPass
     %li
       = link_to 'Office Entry Pass', '/entry_passes'
 
-  - if can_access?('Repositories') 
+  - if can_access?('Repositories')
     %li
       = link_to 'Repositories', main_app.overview_index_repositories_path, data: {'no-turbolink' =>  true}
-  
+
   %li.divider
 
   %li

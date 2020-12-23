@@ -9,7 +9,11 @@
     .row
       .col-md-6
         = f.input :name
-        = f.input :gstno, label: "GST Number"
+        = f.label 'Active'
+        .make-switch{ tabindex: 0, 'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'True', 'data-off-label': 'False'}
+          = f.check_box :active, {}, 'true', 'false'
+        = f.input :gstno, label: 'GST Number'
+        = f.input :invoice_code, label: 'Invoice Code', input_html: {maxlength: 3}
         = f.input :website
         .control-group
           = label_tag 'Logo', nil, class: 'control-label'

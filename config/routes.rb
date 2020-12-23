@@ -85,7 +85,7 @@ Rails.application.routes.draw do
     get 'get_repo_issues', as: :get_repo_issues, on: :collection
   end
 
-  resources :companies do
+  resources :companies, except: [:destroy] do
     resources :projects, only: [:new, :create, :edit, :update]
   end
 
