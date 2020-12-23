@@ -6,28 +6,29 @@
 %div.tabbable
   %ul.nav.nav-tabs
     %li.active.public-tab
-      %a{data: {toggle: 'tab'}, href: "#public"} 
+      %a{data: {toggle: 'tab'}, href: '#public'}
         Public Profile
     %li.private-tab
-      %a{data: {toggle: "tab"}, href: "#private"} 
+      %a{data: {toggle: 'tab'}, href: '#private'}
         Personal Details
     - if can? :edit, User
       %li.emp-details-tab
-        %a{data: {toggle: "tab"}, href: "#emp-details"}
+        %a{data: {toggle: 'tab'}, href: '#emp-details'}
           Employee details
-    %li.document-tab
-      %a{data: {toggle: "tab"}, href: "#document"}
-        Documents
-  
+    - if DOCUMENT_MANAGEMENT.include?(current_user.role) || current_user == @user
+      %li.document-tab
+        %a{data: {toggle: 'tab'}, href: '#document'}
+          Documents
+
   .tab-content
     .tab-pane.active#public
-      = render partial: "public_profile"
+      = render partial: 'public_profile'
     .tab-pane#private
-      = render partial: "private_profile"
+      = render partial: 'private_profile'
     .tab-pane#emp-details
-      = render partial: "employee_detail"
+      = render partial: 'employee_detail'
     .tab-pane#document
-      = render partial: "document"
+      = render partial: 'document'
 
 :javascript
   error = #{!@private_profile.errors.full_messages.empty?}

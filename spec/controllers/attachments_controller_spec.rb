@@ -41,8 +41,17 @@ describe AttachmentsController do
   describe '#download_document' do
     context 'document is visible to all' do
       it 'should return the document' do
-        get :download_document, { id: public_doc.id }
+        get :download_document, {id: public_doc.id}
         expect(response).to be_success
+      end
+    end
+
+    it 'should not send notification mail if user downloads company document' do
+      Sidekiq::Testing.inline! do
+        ActionMailer::Base.deliveries = []
+        get :download_document, {id: public_doc.id}
+        expect(response).to be_success
+        expect(ActionMailer::Base.deliveries.count).to eq(0)
       end
     end
   end
