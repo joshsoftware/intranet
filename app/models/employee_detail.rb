@@ -15,6 +15,7 @@ class EmployeeDetail
   field :skip_unassigned_project_ts_mail, type: Boolean, default: false
   field :designation_track, type: String, default: DESIGNATION_TRACKS.first
   field :location
+  field :source, type: String
 
   belongs_to :designation
 
