@@ -20,10 +20,13 @@ namespace :resigned_employees do
   desc 'Change status of resigned employees from pending to resigned'
   task change_status_of_resigned_employees: :environment do
     puts 'Following employees status has been changed from pending to resigned'
-    User.where(status: STATUS[:approved]).each do |user|
-      dor = user.employee_detail.date_of_relieving
-      if dor.present?
-        puts user.email
+    users = User.employees.where(
+      'employee_detail.date_of_relieving': {'$ne': nil, '$lt': Date.today}
+    )
+    
+    users.each do |user|
+      if user.employee_detail.date_of_relieving.present?
+        puts "Email: #{user.email} DOR: #{user.employee_detail.date_of_relieving}"
         user.set(status: STATUS[:resigned])
         user.set_user_project_entries_inactive
       end
