@@ -258,7 +258,7 @@ class User
 
   def attachments_errors
     error_msg = self.attachments.map { |i| i.errors.full_messages }
-    error_msg.flatten!.empty? ? error_msg : error_msg.join(', ')
+    error_msg.flatten!.empty? ? error_msg : error_msg.uniq.join(', ')
   end
 
   def add_or_remove_projects(params)
