@@ -293,6 +293,14 @@ describe UsersController do
         expect(ActionMailer::Base.deliveries.count).to eq(0)
       end
     end
+
+    it 'should fail as document is not present' do
+      attachment = FactoryGirl.build(:attachment, user: @user, document: nil)
+      attachment.save(validate: false)
+      get :download_document, {id: attachment.id}
+      expect(response).to redirect_to(public_profile_user_path(@user))
+      expect(flash[:error]).to eq('You are trying to download invalid document')
+    end
   end
 
   context '#update_available_leave' do

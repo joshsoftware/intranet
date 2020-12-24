@@ -1,18 +1,22 @@
 class AttachmentsController < ApplicationController
-  load_and_authorize_resource 
+  load_and_authorize_resource
   skip_load_and_authorize_resource :only => [:create, :show]
   before_action :load_attachment, except: [:index, :create]
   before_action :authenticate_user!
- 
+
   def index
-    @company_docs = Attachment.company_documents  
+    @company_docs = Attachment.company_documents
     @attachment = Attachment.new
     @policies = Policy.all
   end
-  
+
   def create
     @attachment = Attachment.new(attachment_params)
-    flash[:notice] = @attachment.save ? "Document saved successfully" : @attachment.errors.full_messages
+    if @attachment.save
+      flash[:notice] = 'Document saved successfully'
+    else
+      flash[:error] = @attachment.errors.full_messages.try(:join, ', ')
+    end
     redirect_to attachments_path
   end
 
@@ -29,7 +33,7 @@ class AttachmentsController < ApplicationController
     flash[:notice] = @attachment.destroy ? "Document deleted Successfully" : "Error in deleting document"
     redirect_to attachments_path
   end
-  
+
   def download_document
     document = @attachment.document
     document_type = MIME::Types.type_for(document.url).first.content_type

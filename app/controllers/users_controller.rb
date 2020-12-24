@@ -36,19 +36,18 @@ class UsersController < ApplicationController
     @user.attributes =  user_params
     return_value_of_add_project, return_value_of_remove_project = @user.add_or_remove_projects(params) if params[:user][:project_ids].present?
     if return_value_of_add_project && return_value_of_remove_project
+      tab = params[:user][:attachments_attributes].present? ? 'Documents': 'Employee details'
       if @user.save
-        flash.notice = if params[:user][:attachments_attributes].present?
-                        'Documents uploaded Successfully'
-                       else
-                        'Profile updated Successfully'
-                       end
+        flash.notice = "#{tab} updated Successfully"
+        redirect_to public_profile_user_path(@user)
       else
-        flash[:error] = "Error #{@user.generate_errors_message}"
+        flash[:error] = "#{tab}: Error #{@user.generate_errors_message}"
+        render 'public_profile'
       end
     else
-      flash[:error] = "Error unable to add or remove project"
+      flash[:error] = 'Error unable to add or remove project'
+      redirect_to public_profile_user_path(@user)
     end
-    redirect_to public_profile_user_path(@user)
   end
 
   def public_profile
@@ -184,6 +183,11 @@ class UsersController < ApplicationController
   def authorize_document_download
     @attachment = Attachment.where(id: params[:id]).first
     @document = @attachment.document
+    unless @attachment.document.present?
+      message = 'You are trying to download invalid document'
+      flash[:error] = message
+      redirect_to public_profile_user_path(@attachment.user)
+    end
     message = 'You are not authorize to perform this action'
     (current_user.can_download_document?(@user, @attachment)) ||
     (flash[:error] = message; redirect_to root_url)
