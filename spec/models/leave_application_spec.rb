@@ -106,7 +106,7 @@ describe LeaveApplication do
         FactoryGirl.create(:user_project, user_id: @user.id, project_id: project.id)
         FactoryGirl.create(:user_project, user_id: @user1.id, project_id: project.id)
 
-        
+
         @available_leaves = @user.employee_detail.available_leaves
         @number_of_days = 2
       end
@@ -278,28 +278,58 @@ describe LeaveApplication do
       before do
         @user = FactoryGirl.create(:user)
         #Past leave
-        FactoryGirl.create(:leave_application, start_at: Date.today - 2.months, end_at: Date.today - 2.months, number_of_days: 1, leave_status: PENDING, user: @user)
-        FactoryGirl.create(:leave_application, start_at: Date.today - 2.months - 1, end_at: Date.today - 2.months - 1, number_of_days: 1, leave_status: APPROVED, user: @user)
-        FactoryGirl.create(:leave_application, start_at: Date.today - 6.months - 1, end_at: Date.today - 6.months - 1, number_of_days: 1, leave_status: APPROVED, user: @user)
-        FactoryGirl.create(:leave_application, start_at: Date.today - 2.months - 2, end_at: Date.today - 2.months - 2, number_of_days: 1, leave_status: REJECTED, user: @user)
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today - 2.months, end_at: Date.today - 2.months,
+          number_of_days: 1, leave_status: PENDING, user: @user
+        )
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today - 2.months - 1, end_at: Date.today - 2.months - 1,
+          number_of_days: 1, leave_status: APPROVED, user: @user
+        )
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today - 6.months - 1, end_at: Date.today - 6.months - 1,
+          number_of_days: 1, leave_status: APPROVED, user: @user
+        )
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today - 2.months - 2, end_at: Date.today - 2.months - 2,
+          number_of_days: 1, leave_status: APPROVED, leave_type: LeaveApplication::WFH, user: @user
+        )
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today - 2.months - 2, end_at: Date.today - 2.months - 2,
+          number_of_days: 1, leave_status: REJECTED, user: @user
+        )
         #Upcoming leave
-        FactoryGirl.create(:leave_application, start_at: Date.today + 2.months, end_at: Date.today + 2.months, number_of_days: 1, leave_status: PENDING, user: @user)
-        FactoryGirl.create(:leave_application, start_at: Date.today + 2.months + 1, end_at: Date.today + 2.months + 1, number_of_days: 1, leave_status: APPROVED, user: @user)
-        FactoryGirl.create(:leave_application, start_at: Date.today + 6.months + 1, end_at: Date.today + 6.months + 1, number_of_days: 1, leave_status: APPROVED, user: @user)
-        FactoryGirl.create(:leave_application, start_at: Date.today + 2.months + 2, end_at: Date.today + 2.months + 2, number_of_days: 1, leave_status: REJECTED, user: @user)
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today + 2.months, end_at: Date.today + 2.months,
+          number_of_days: 1, leave_status: PENDING, user: @user
+        )
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today + 2.months + 1, end_at: Date.today + 2.months + 1,
+          number_of_days: 1, leave_status: APPROVED, user: @user
+        )
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today + 6.months + 1, end_at: Date.today + 6.months + 1,
+          number_of_days: 1, leave_status: APPROVED, leave_type: LeaveApplication::WFH, user: @user
+        )
+        FactoryGirl.create(
+          :leave_application, start_at: Date.today + 2.months + 2, end_at: Date.today + 2.months + 2,
+          number_of_days: 1, leave_status: REJECTED, user: @user
+        )
       end
 
       context 'self.get_users_past_leaves' do
-        it 'should give past 6 month approved leaves only' do
+        it 'should give past 6 month approved leaves only' +
+           ' and should not count WFH leaves in them' do
           past_leaves = LeaveApplication.get_users_past_leaves(@user.id)
           expect(past_leaves.count).to eq(1)
         end
       end
 
       context 'self.get_users_upcoming_leaves' do
-        it 'should give upcoming unrejected leaves only' do
+        it 'should give upcoming unrejected leaves only' +
+           ' and should not count WHF leaves in them' do
           past_leaves = LeaveApplication.get_users_upcoming_leaves(@user.id)
-          expect(past_leaves.count).to eq(3)
+          expect(past_leaves.count).to eq(2)
         end
       end
     end
@@ -330,6 +360,24 @@ describe LeaveApplication do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
         leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LeaveApplication::WFH)
+        expect(employee_detail.available_leaves).to eq(available_leaves)
+      end
+    end
+
+    context 'when request is for LWP' do
+      it 'should not deduct leave from available leave' do
+        employee_detail = user.employee_detail
+        available_leaves = employee_detail.available_leaves
+        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LeaveApplication::LWP)
+        expect(employee_detail.available_leaves).to eq(available_leaves)
+      end
+
+      it 'rejected leave should not be added to available leaves' do
+        employee_detail = user.employee_detail
+        available_leaves = employee_detail.available_leaves
+        wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LeaveApplication::LWP)
+        expect(employee_detail.available_leaves).to eq(available_leaves)
+        wfh_application.process_reject_application
         expect(employee_detail.available_leaves).to eq(available_leaves)
       end
     end

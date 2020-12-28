@@ -511,6 +511,17 @@ RSpec.describe TimeSheet, type: :model do
         )
         expect(TimeSheet.user_on_leave?(user, Date.today + 4)).to eq(false)
       end
+
+      it 'Should return false as leave type is WFH' do
+        FactoryGirl.create(:leave_application,
+          user: user,
+          start_at: Date.today + 3,
+          end_at:Date.today + 5,
+          leave_type: LeaveApplication::WFH,
+          leave_status: APPROVED
+        )
+        expect(TimeSheet.user_on_leave?(user, Date.today + 4)).to eq(false)
+      end
     end
   end
 

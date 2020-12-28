@@ -7,10 +7,11 @@ class LeaveApplication
   #has_one :address
 
   LEAVE = 'LEAVE'
+  LWP = 'LWP'
   WFH = 'WFH'
   OPTIONAL = 'OPTIONAL'
 
-  LEAVE_TYPES = [LEAVE, WFH, OPTIONAL]
+  LEAVE_TYPES = [LEAVE, WFH, OPTIONAL, LWP]
 
   field :start_at,        type: Date
   field :end_at,          type: Date
@@ -49,6 +50,7 @@ class LeaveApplication
   scope :pending, ->{where(leave_status: PENDING)}
   scope :processed, ->{where(:leave_status.ne => PENDING)}
   scope :unrejected, -> { where(:leave_status.ne => REJECTED )}
+  scope :leaves, -> { where(:leave_type.in => [LEAVE, OPTIONAL, LWP]) }
 
   attr_accessor :sanctioning_manager
 
@@ -58,6 +60,10 @@ class LeaveApplication
 
   def leave?
     leave_request? && self.user.role != ROLE[:consultant]
+  end
+
+  def is_leave?
+    [LEAVE, LWP, OPTIONAL].include?(leave_type)
   end
 
   def leave_count
@@ -77,7 +83,7 @@ class LeaveApplication
       user.employee_detail.deduct_available_leaves(self.number_of_days)
     end
   end
-  
+
   def optional_leave?
     leave_type == OPTIONAL
   end
@@ -136,7 +142,7 @@ class LeaveApplication
   end
 
   def send_leave_notification
-    if start_at >= Date.today && leave_request?
+    if start_at >= Date.today && is_leave?
       emails = get_team_members
       if emails.present?
         if approved?
@@ -177,10 +183,9 @@ class LeaveApplication
   end
 
   def self.get_leaves_for_sending_reminder(date)
-    LeaveApplication.where(
+    LeaveApplication.leaves.where(
       start_at: date,
-      leave_status: APPROVED,
-      leave_type: LEAVE
+      leave_status: APPROVED
     )
   end
 
@@ -193,7 +198,7 @@ class LeaveApplication
   end
 
   def self.get_users_past_leaves(user_id)
-    LeaveApplication.where(
+    LeaveApplication.leaves.where(
       user_id: user_id,
       start_at: Date.today - 6.month...Date.today,
       leave_status: APPROVED
@@ -201,9 +206,9 @@ class LeaveApplication
   end
 
   def self.get_users_upcoming_leaves(user_id)
-    LeaveApplication.where(
+    LeaveApplication.leaves.where(
       user_id: user_id,
-      start_at: {'$gt' => Date.today},
+      :start_at.gt => Date.today,
       :leave_status.ne => REJECTED
     ).order_by(:start_at.asc)
   end
@@ -277,7 +282,7 @@ class LeaveApplication
       leave_applications.each do |leave|
         if self.start_at.between?(leave.start_at, leave.end_at) or
            self.end_at.between?(leave.start_at, leave.end_at)
-          unless self.leave_request? && leave.leave_type == WFH
+          unless self.is_leave? && leave.leave_type == WFH
             errors.add(:base, "Already applied for #{leave.leave_type} on same date") and return
           end
         end

@@ -332,7 +332,9 @@ class TimeSheet
     users.each do |user|
       next if user.projects.where(timesheet_mandatory: true).count.eql?(0)
       next if user.user_projects.or(
-        {end_date: nil}, {:end_date.gt => Date.today}).where(time_sheet: true).count == 0
+        {end_date: nil},
+        {:end_date.gt => Date.today}
+      ).where(time_sheet: true).count == 0
 
       last_filled_time_sheet_date = user.time_sheets.order(date: :asc).last.date + 1 if time_sheet_present_for_reminder?(user)
       next if last_filled_time_sheet_date.nil?
@@ -936,7 +938,7 @@ class TimeSheet
 
   def self.user_on_leave?(user, date)
     return false unless user.leave_applications.present?
-    leave_applications = user.leave_applications.order("end_at asc").where(
+    leave_applications = user.leave_applications.leaves.order('end_at asc').where(
       :end_at.gte => date,
       leave_status: APPROVED
     )
@@ -1074,7 +1076,7 @@ class TimeSheet
     user.leave_applications.where(
       start_at: {'$gte': from_date, '$lte': to_date},
       leave_status: APPROVED,
-      leave_type: LeaveApplication::LEAVE
+      :leave_type.in => [LeaveApplication::LEAVE, LeaveApplication::LWP]
     ).sum(:number_of_days)
   end
 
