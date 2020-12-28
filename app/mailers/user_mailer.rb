@@ -21,8 +21,8 @@ class UserMailer < ActionMailer::Base
     @receivers = receivers
     @notification_names = @user.employee_detail.present? ? @user.employee_detail.get_notification_names : []
     @older_leaves = LeaveApplication.get_users_past_leaves(@user.id)
-    @next_planned_leaves = LeaveApplication.get_users_upcoming_leaves(@user.id).where(
-      :id.ne => leave_application_id
+    @next_planned_leaves = LeaveApplication.get_users_upcoming_leaves(@user.id).nin(
+      id: leave_application_id
     )
     @leave_application = LeaveApplication.where(id: leave_application_id).first
     @leave_type = get_leave_type(@leave_application.leave_type)
@@ -172,7 +172,10 @@ class UserMailer < ActionMailer::Base
     @leave_type = get_leave_type(@leave_application.leave_type)
     @user = @leave_application.user
     @processed_by = User.find(@leave_application.processed_by)
-    @notification_emails = [@user.email, User.leave_notification_emails(@user.id)].flatten.compact.uniq.join(', ')
+    @notification_emails = [
+      @user.email,
+      User.leave_notification_emails(@user.id)
+    ].flatten.compact.uniq.join(', ')
   end
 
   def get_leave_type(leave_type)

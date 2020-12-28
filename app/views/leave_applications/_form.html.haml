@@ -18,7 +18,7 @@
     var location = "#{@location}"
     var end_of_year = "#{@end_of_year}"
     set_number_of_days(location)
-  
+
     if ($('#leave_application_leave_type').val() == 'OPTIONAL'){
       $('#leave_list').html(input_leave_list)
       date = $('#leave_application_leave_list').val()
@@ -28,7 +28,7 @@
       $('#leave_application_start_at').attr('max', end_of_year)
       $('#leave_application_end_at').attr('max', end_of_year)
     }
-    
+
     $('form').submit(function(){
       start_date_div = $('#leave_application_start_at')
       end_date_div = $('#leave_application_end_at')

@@ -79,19 +79,21 @@
                                                       %table{:border => '1px solid black;', :style => 'border-collapse: collapse;', :width => '600'}
                                                         %tr{style: 'text-align: center;'}
                                                           %th{:width => "15%"} Name
-                                                          %th{:width => "15%"} No. of days
+                                                          %th{:width => "10%"} No. of days
                                                           %th{:width => "30%"} Reason
+                                                          %th{:width => "10%"} Request Type
                                                           %th{:width => "10%"} Start Date
                                                           %th{:width => "10%"} End Date
                                                           %th{:width => "20%"} Sanctioning Manager
                                                         -@leaves.each do |leave|
-                                                          %tr
-                                                            %td{style: 'text-align: center;'} #{leave.user.name}
-                                                            %td{class: "center panel", style: "margin-left:10px; text-align: center;"} #{leave.number_of_days}
-                                                            %td #{leave.reason}
+                                                          %tr{style: 'text-align: center;'}
+                                                            %td{style: 'text-align: left;'} #{leave.user.name}
+                                                            %td{class: "center panel", style: "margin-left:10px;"} #{leave.number_of_days}
+                                                            %td{style: 'text-align: left;'} #{leave.reason}
+                                                            %td #{leave.leave_type}
                                                             %td #{leave.start_at}
                                                             %td #{leave.end_at}
-                                                            %td{style: 'text-align: center;'} #{leave.sanctioning_manager}
+                                                            %td{style: 'text-align: left;'} #{leave.sanctioning_manager}
                                                     %p{:style => "margin:0;padding-bottom:0"}
                                                       Regards,
                                                       %br/

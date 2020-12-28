@@ -597,6 +597,46 @@ describe LeaveApplicationsController do
     end
   end
 
+  context 'Leave type - LWP' do
+    before(:each) do
+      @admin = FactoryGirl.create(:admin)
+      @user = FactoryGirl.create(:user, status: APPROVED)
+      @leave = FactoryGirl.build(
+        :leave_application,
+        leave_type: LeaveApplication::LWP,
+        user: @user
+      )
+    end
+
+    it 'should not deduct leave count while submitting form' do
+      sign_in @user
+
+      post :create, {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(flash[:success]).to eq('Your request has been submitted successfully.' +
+        ' Please wait for the approval.')
+      expect(@user.leave_applications.last.leave_status).to eq(PENDING)
+      expect(leave_count).to eq(24)
+    end
+
+    it 'should not deduct leave count after approving the LWP request' do
+      sign_in @admin
+      @leave.save
+      get :process_leave, {
+        id: @leave.id,
+        leave_action: :approve
+      }
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(@leave.reload.leave_status).to eq(APPROVED)
+      expect(leave_count).to eq(24)
+    end
+  end
+
   context "Leave history search querying user_ids" do
     before(:each) do
       @employee_one = FactoryGirl.create(:user, status: STATUS[:approved])
@@ -665,6 +705,33 @@ describe LeaveApplicationsController do
       expect(@user.leave_applications.processed.count).to eq(1)
     end
 
+    it 'should be able to apply LWP if overlapping WFH request is present' do
+      FactoryGirl.create(:leave_application,
+        start_at: @start_date,
+        end_at: @end_date,
+        leave_status: APPROVED,
+        leave_type: LeaveApplication::WFH,
+        user: @user
+      )
+      leave = FactoryGirl.build(
+        :leave_application,
+        start_at: Date.today,
+        end_at: Date.today,
+        user: @user,
+        leave_type: LeaveApplication::LWP
+      )
+      params = {
+        user_id: @user.id,
+        leave_application: leave.attributes
+      }
+      post :create, params
+
+      expect(flash[:success]).to eq('Your request has been submitted successfully.' +
+        ' Please wait for the approval.')
+      expect(@user.reload.leave_applications.pending.count).to eq(1)
+      expect(@user.leave_applications.processed.count).to eq(1)
+    end
+
     it 'should not be able to apply WFH request if overlapping Leave request is present' do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
@@ -680,6 +747,25 @@ describe LeaveApplicationsController do
       }
       post :create, params
       expect(flash[:error]).to eq('Already applied for LEAVE on same date')
+      expect(@user.reload.leave_applications.pending.count).to eq(0)
+      expect(@user.leave_applications.processed.count).to eq(1)
+    end
+
+    it 'should not be able to apply WFH request if overlapping LWP request is present' do
+      FactoryGirl.create(:leave_application,
+        start_at: @start_date,
+        end_at: @end_date,
+        leave_status: APPROVED,
+        leave_type: LeaveApplication::LWP,
+        user: @user
+      )
+      @leave.update_attributes(leave_type: LeaveApplication::WFH)
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+      expect(flash[:error]).to eq('Already applied for LWP on same date')
       expect(@user.reload.leave_applications.pending.count).to eq(0)
       expect(@user.leave_applications.processed.count).to eq(1)
     end
