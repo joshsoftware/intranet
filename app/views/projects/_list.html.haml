@@ -12,6 +12,7 @@
       - if can? :manage, Project
         %th Action
   %tbody
+    - wfo_batch_name = get_wfo_batch_name
     - @projects.each_with_index do |project, i|
       - users = project.users
       %tr.item{'data-item-id': project.id}
@@ -21,7 +22,12 @@
           %td= project.managers.approved.collect(&:name).join(', ')
         - else
           %td= 'NA'
-        %td= project.try(:batch_name) || 'NA'
+        - if project.try(:batch_name) == wfo_batch_name
+          %td
+            .label{class: 'danger-red'}
+              = project.try(:batch_name)
+        - else
+          %td= project.try(:batch_name) || 'NA'
         %td
           - status_class = project.is_active ? 'label-success' : 'label-warning'
           .label{class: status_class}
@@ -32,8 +38,8 @@
         %td= project.type_of_project
         - if can? :manage, Project
           %td
-            =link_to '', edit_project_path(project), class: "icon-edit", data: {'no-turbolink' =>  true}
+            =link_to '', edit_project_path(project), class: 'icon-edit', data: {'no-turbolink': true}
 
 :javascript
   $('.usersList').popover();
-  $('#sortable').dataTable({ "aaSorting": [] });
+  $('#sortable').dataTable({ 'aaSorting': [] });
