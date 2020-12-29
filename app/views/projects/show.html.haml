@@ -1,8 +1,8 @@
 .form-horizontal.row
   %h3
     = @project.name
-    .offset4{style: "float: right;"}
-      = render partial: "layouts/project_menu"
+    .offset4{style: 'float: right;'}
+      = render partial: 'layouts/project_menu'
   - if can? :manage, Project
     %div
       %table.table.table-hover.table-striped
@@ -32,7 +32,12 @@
           %td= link_to @project.company.try(:name), @project.company
         %tr
           %th Batch Name
-          %td= @project.batch_name
+          - if @project.try(:batch_name) == get_wfo_batch_name
+            %td
+              .label{class: 'danger-red'}
+                = @project.try(:batch_name)
+          - else
+            %td= @project.try(:batch_name) || 'NA'
   %table.table.table-hover.table-stripe
     %tr
       %th Logo

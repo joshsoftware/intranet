@@ -11,4 +11,12 @@ module ProjectsHelper
   def get_users_projects(user)
     user.user_projects.where(active: true).nin(project: @project.id)
   end
+
+  def get_wfo_batch_name
+    unless HolidayList.is_weekend?(Date.today)
+      Date.today.day.odd? ? 'Alpha' : 'Bravo'
+    else
+      'NA'
+    end
+  end
 end
