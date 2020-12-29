@@ -22,7 +22,7 @@
             %td
               .project-role manager
             %td
-              %button{class: 'btn btn-circle icon-info', 'aria-label': 'Info', 'data-html': 'true', 'data-placement': 'left', 'data-toggle': 'popover', 'data-trigger': 'hover',
+              %button{class: 'btn btn-circle icon-info', 'aria-label': 'Info', 'data-html': 'true', 'data-placement': 'left', 'data-toggle': 'popover', 'data-trigger': 'hover focus',
               'data-title': "#{manager.name}'s Details", 'data-content': "#{render 'user_details', user: manager}", type: :button}
       - if @team_members.present?
         - @team_members.each do |user|
