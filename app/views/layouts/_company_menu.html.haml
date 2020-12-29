@@ -7,5 +7,5 @@
     = ["show", "edit", 'index'].include?(params[:action]) ? "|" : ''
     = link_to '', companies_path, "data-toggle" => "tooltip", title: "All Companies",
                  class: " icon-th-list" unless params[:action] == "index"
-    = link_to "", companies_path(format: "csv"), class: 'icon-download-alt' if params[:action] == 'index'
+    = link_to '', companies_path(format: 'csv'), class: 'icon-download-alt', title: 'Download Company CSV' if params[:action] == 'index'
 
