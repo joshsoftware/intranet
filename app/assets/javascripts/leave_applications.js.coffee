@@ -84,38 +84,51 @@ removeOptionalHolidayUI = () ->
 @input_leave_list = () ->
   list = JSON.parse(localStorage.optional_items)
   if (list.length != 0)
-    options = list.map (h) -> 
+    options = list.map (h) ->
                 '<option value="'+ h.holiday_date + '">' + h.reason + '</option>'
   else
     options = '<option value="">No Optional Leaves</option>'
-  
+
   return '<div class="control-group select required leave_application_leave_list">' +
             '<label class="select required control-label" for="leave_application_leave_list">' +
               '<abbr title="required">*</abbr> Leave List</label>' +
               '<div class="controls">' +
-                '<select class="select required" id="leave_application_leave_list" aria-invalid="false" onChange="updateOptionalHolidayUI(this.value, this.selectedOptions[0].innerText, 1)">' + options +                             
+                '<select class="select required" id="leave_application_leave_list" aria-invalid="false" onChange="updateOptionalHolidayUI(this.value, this.selectedOptions[0].innerText, 1)">' + options +
                 '</select>' +
               '<div class="help-block">' +
             '</div>' +
           '</div>'
 
+updateUserList = (active_or_all) ->
+  if active_or_all == 'all'
+    $("select option[id*='pending']").prop('hidden', false);
+    $("select option[id*='created']").prop('hidden', false);
+    $("select option[id*='resigned']").prop('hidden', false);
+  else
+    $("select option[id*='pending']").prop('hidden', true);
+    $("select option[id*='created']").prop('hidden', true);
+    $("select option[id*='resigned']").prop('hidden', true);
+
 $(document).ready ->
   $('.leave_table').dataTable 'ordering' : false
   $('#leave-table').dataTable({'pageLength': 50})
-  $("#reset_filter").on 'click', ->
+  $('#reset_filter').on 'click', ->
     $('#project_id').prop('selectedIndex',0);
     $('#user_id').prop('selectedIndex',0)
-    document.getElementById("from").value = "";
-    document.getElementById("to").value = "";
+    $('#active_or_all').prop('selectedIndex',0)
+    $('#leave_search_from_date').val('');
+    $('#leave_search_to_date').val('');
     $('#submit_btn').click();
   $('#project_id').on 'change', ->
-    $('#user_id').attr("disabled", true);
+    $('#user_id').attr('disabled', true);
   $('#user_id').on 'change', ->
-    $('#project_id').attr("disabled", true);
-
+    $('#project_id').attr('disabled', true);
   $('#leave_application_leave_type').on 'change', ->
     if $(this).val() == 'OPTIONAL'
       $('#leave_list').html(input_leave_list)
       $('#leave_application_leave_list').prop('selectedIndex', 0).change()
     else
       removeOptionalHolidayUI()
+  updateUserList($('#active_or_all').val())
+  $('#active_or_all').on 'change', ->
+    updateUserList($('#active_or_all').val())

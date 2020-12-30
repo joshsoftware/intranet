@@ -36,7 +36,7 @@ EMAIL_ADDRESS = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 
 DEFAULT_TIMESHEET_MANAGERS = []
 
-MANAGEMENT = ["Admin", "HR", "Manager", "Finance"]
+MANAGEMENT = ['Admin', 'HR', 'Manager', 'Finance', 'Super Admin']
 TIMESHEET_MANAGEMENT = ['Admin', 'HR', 'Manager']
 
 DOCUMENT_MANAGEMENT = ['Super Admin', 'Admin', 'HR']
