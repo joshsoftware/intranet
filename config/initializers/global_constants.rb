@@ -27,7 +27,7 @@ CONTACT_ROLE =  ["Accountant", "Technical", "Accountant and Technical"]
 
 SLACK_API_TOKEN = ENV['SLACK_API_TOKEN']
 
-ROLE = { admin: 'Admin', employee: 'Employee', HR: 'HR', manager: 'manager',
+ROLE = { admin: 'Admin', employee: 'Employee', HR: 'HR', manager: 'Manager',
          intern: 'Intern', team_member: 'team member', consultant: 'Consultant',
          finance: 'Finance' }
 
