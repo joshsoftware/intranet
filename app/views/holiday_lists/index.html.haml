@@ -1,17 +1,21 @@
-= link_to "", attachments_path, class: "icon-arrow-left", title: "Back"
+= link_to '', attachments_path, class: 'icon-arrow-left', title: 'Back'
 %center
-  .row
-    .col.sm.6
-      = label_tag 'Select Year'
-      = select_year(Date.today, start_year: Date.today.prev_year.year, end_year: Date.today.next_year.year)
-    .col.sm.6
-      - if can? :edit, HolidayList
-        .pull-right
-          = link_to "", new_holiday_list_path, class: "icon-plus add-timesheet-icon", title: 'Add Holiday'
-      - unless @holidays.empty?
-        %center#holiday_list
-          = render 'holiday_list', holidays: @holidays
+  %table
+    %thead
+      %th= 'Select Year'
+      %th= 'Select Country'
+    %tbody
+      %td= select_year(Date.today, start_year: Date.today.prev_year.year, end_year: Date.today.next_year.year)
+      %td= select_tag('country', options_for_select(COUNTRIES, @country))
+    
+    - if can? :edit, HolidayList
+      .pull-right
+        = link_to '', new_holiday_list_path, class: 'icon-plus add-timesheet-icon', title: 'Add Holiday'
 
-      - else
-        %h4 No records found. Please Contact System Admin.
+%center#holiday_list
+  - unless @holidays.empty?
+    = render 'holiday_list', holidays: @holidays
+
+  - else
+    %h4 No records found. Please Contact System Admin.
   

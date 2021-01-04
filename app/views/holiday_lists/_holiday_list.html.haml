@@ -1,23 +1,21 @@
-%h3 Holiday List- #{@year}
+%h3 #{@country} Holiday List- #{@year}
 - unless holidays.empty?
-  - COUNTRIES.each do |country|
-    %h3= country
+  - HolidayList::HOLIDAY_TYPES.each do |type|
+    %h3 #{type.capitalize} Holiday
     %table.table.table-bordered.table-width
       %thead
         %tr
           %th Date
           %th Day
-          %th Type
           %th Reason
           - if can? :edit, HolidayList
             %th Actions
 
       %tbody
-        - holidays.list(country).each do |holiday|
+        - holidays.where(holiday_type: type).each do |holiday|
           %tr
             %td= holiday.holiday_date.strftime('%d-%b-%Y')
             %td= holiday.holiday_date.strftime('%A')
-            %td= holiday.holiday_type.capitalize
             %td= holiday.reason
             - if can? :edit, HolidayList
               %td

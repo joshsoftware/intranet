@@ -2,12 +2,17 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
-$(document).ready ->
-  $('#date_year').on 'change', ->
-    params = $.param({ year: $('#date_year').val() })
-    $.ajax
-      type: 'GET'
-      dataType: 'script'
-      url:'/holiday_lists'+ '?' + params
+update_holiday_list = () ->
+  params = $.param({
+      year: $('#date_year').val(),
+      country: $('#country').val()
+    })
+  $.ajax
+    type: 'GET'
+    dataType: 'script'
+    url:'/holiday_lists'+ '?' + params
 
+$(document).ready ->
+  $('#date_year, #country').on 'change', ->
+    update_holiday_list()
 

@@ -6,9 +6,11 @@ class HolidayListsController < ApplicationController
 
   def index
     @year = params[:year].present? ? params[:year].to_i : Date.today.year
+    @country = params[:country].present? ? params[:country] : current_user.country
     date  = Date.new(@year)
     @holidays = HolidayList.where(
-      holiday_date: date..date.at_end_of_year
+      holiday_date: date..date.at_end_of_year,
+      country: @country
     ).order(holiday_date: :asc)
   end
 
