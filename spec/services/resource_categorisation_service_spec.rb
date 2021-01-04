@@ -129,6 +129,7 @@ RSpec.describe ResourceCategorisationService do
         }
       ]
       report = report.sort_by { |k| k[:name] }
+      report.append({blank_row: true})
       report << {
         name: @emp_three.name,
         location: @emp_three.location,
@@ -142,6 +143,7 @@ RSpec.describe ResourceCategorisationService do
         technical_skills: technical_skills_three,
         projects: @service.get_project_names(@emp_three)
       }
+      report.append({blank_row: true})
 
       @service.load_projects
       response = @service.generate_resource_report
