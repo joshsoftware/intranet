@@ -2,7 +2,7 @@ class PublicProfile
   include Mongoid::Document
   include Mongoid::Slug
   include Mongoid::Timestamps
-  include  UserDetail
+  include UserDetail
 
   mount_uploader :image, FileUploader
 

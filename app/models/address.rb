@@ -15,8 +15,8 @@ class Address
 
 
   def to_line
-    %w(type_of_address address city state landline_no pin_code).map do |line|
+    %w(address city pin_code state landline_no).map do |line|     
       %{ #{self.send(line)} } if self.send(line).present?
-    end.compact.join(",")
+    end.compact.join(',')
   end
 end
