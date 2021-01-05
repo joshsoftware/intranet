@@ -23,7 +23,7 @@ describe Address do
                                   city: 'Pune', state: 'Maharashtra',
                                   landline_no: '1-736-084-7447',
                                   pin_code: '18557-2607')
-    expected_address = " Temporary , Josh Software, iSpace Complex, Bavdhan , Pune , Maharashtra , 1-736-084-7447 , 18557-2607 "
+    expected_address = ' Josh Software, iSpace Complex, Bavdhan , Pune , 18557-2607 , Maharashtra , 1-736-084-7447 '
     expect(address.to_line).to eq(expected_address)
   end
 end
