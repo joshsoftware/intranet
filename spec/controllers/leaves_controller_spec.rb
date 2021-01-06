@@ -646,7 +646,7 @@ describe LeaveApplicationsController do
       @leave_app_two_one = FactoryGirl.create(:leave_application, user: @employee_two, start_at: Date.today + 9, end_at: Date.today + 12)
       @leave_app_two_one = FactoryGirl.create(:leave_application, user: @employee_two, start_at: Date.today + 13, end_at: Date.today + 16)
       @project = FactoryGirl.create(:project)
-      @user_project_one = FactoryGirl.create(:user_project, user: @employee_one, project: @project)
+      @user_project_one = FactoryGirl.create(:user_project, user: @employee_one, project: @project, end_date: @project.end_date)
       @user_project_two = FactoryGirl.create(:user_project, user: @employee_two, project: @project)
     end
 

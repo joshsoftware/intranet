@@ -25,14 +25,17 @@
           =f.label 'Timesheet Mandatory'
           .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
             = f.check_box :timesheet_mandatory, {}, 'true', 'false'
-        = f.input :start_date, required: true, 'aria-required': true, input_html: {type: :date, class: 'date-picker', value: f.object.start_date.try(:strftime, '%Y-%m-%d')}
+        = f.input :start_date, required: true, 'aria-required': true, input_html: {type: :date, class: 'date-picker', value: f.object.start_date.try(:strftime, '%Y-%m-%d') || Date.today.strftime('%Y-%m-%d')}
         = f.input :end_date, input_html: {type: :date, class: 'date-picker', value: f.object.end_date.try(:strftime, '%Y-%m-%d')}
         = label_tag "Case Study", nil, class: 'control-label'
         = f.file_field :case_study, required: true, 'aria-required': true, class: 'case_study_upload', accept: "application/pdf"
         %br
+        %br
         = f.label 'Visible On Website'
         .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "Yes", "data-off-label": "No"}
           = f.check_box :visible_on_website, {}, 'true', 'false'
+        %br
+        %br
         .control-group
           = label_tag "Managed By", nil, class: 'control-label'
           .controls
@@ -59,6 +62,3 @@
   = f.hidden_field :update_project, value: "update_project"
   - if (@project.persisted? && @project.is_active) || @project.new_record? || @project.errors.present?
     = f.submit :Save, class: 'btn controls btn-info'
-
-:javascript
-  $(".members").select2();

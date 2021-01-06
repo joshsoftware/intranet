@@ -67,8 +67,12 @@ class ProjectsController < ApplicationController
       @project.manager_ids.delete(team_member.id)
     else
       team_member = @project.users.find(params[:user_id])
-      user_project = UserProject.where(user_id: team_member.id, project_id: @project.id, end_date: nil).first
-      user_project.update_attributes(end_date: DateTime.now)
+      user_project = UserProject.where(
+        user_id: team_member.id,
+        project_id: @project.id,
+        active: true
+      ).first
+      user_project.update_attributes(end_date: Date.today)
     end
     @project.save
     @users = @project.reload.users

@@ -4,6 +4,7 @@ describe Project do
   context 'Validations' do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:start_date) }
+    it { is_expected.to validate_presence_of(:end_date) }
     it { is_expected.to validate_presence_of(:billing_frequency) }
     it { is_expected.to validate_presence_of(:type_of_project) }
     it { is_expected.to validate_inclusion_of(:billing_frequency).to_allow(Project::BILLING_FREQUENCY_TYPES) }
@@ -17,7 +18,7 @@ describe Project do
     expect(project.tags.count).to eq(4)
   end
 
-  it "should use existing product code of company" do
+  it 'should use existing product code of company' do
     company = FactoryGirl.create(:company)
     project = FactoryGirl.create(:project, company: company)
     new_project = FactoryGirl.build(:project,
@@ -27,11 +28,106 @@ describe Project do
     expect(new_project).to be_valid
   end
 
-  it "should not use existing product code of other company" do
+  it 'should not use existing product code of other company' do
     company = FactoryGirl.create(:company)
     project = FactoryGirl.create(:project, company: company)
     new_project = FactoryGirl.build(:project, code: project.code)
     expect(new_project).to be_invalid
+  end
+
+  context 'validation - end date' do
+    let!(:project) { FactoryGirl.create(:project) }
+
+    it 'Should success' do
+      expect(project.errors.count).to eq(0)
+    end
+
+    it 'should fail because end_date is smaller than start_date' do
+      project.start_date = Date.tomorrow
+      project.end_date = Date.today
+      project.save
+      expect(project.errors[:end_date]).to eq(['should not be less than start date.'])
+    end
+
+    it 'should pass beacause end date is greater than today when project is active' do
+      project.start_date = Date.today-100
+      project.end_date = Date.tomorrow
+      project.save
+
+      expect(project.errors.count).to eq(0)
+    end
+
+    it 'should fail beacause end date is less than today when project is active' do
+      project.start_date = Date.today-100
+      project.end_date = Date.yesterday
+      project.save
+
+      expect(project.errors.full_messages).
+        to eq(['End date should not be less than today. As project is active'])
+      expect(project.errors.count).to eq(1)
+    end
+
+    it 'should pass beacause end date is less than today when project is inactive' do
+      project.start_date = Date.today - 100
+      project.end_date = Date.yesterday
+      project.is_active = false
+      project.save
+
+      expect(project.errors.count).to eq(0)
+    end
+
+    it 'should fail beacause end date is greater than today when project is inactive' do
+      project.update_attributes(start_date: Date.today-100, end_date: Date.tomorrow, is_active: false)
+
+      expect(project.errors.full_messages).
+        to eq(['End date should not be greater than today. As project is inactive'])
+      expect(project.errors.count).to eq(1)
+    end
+  end
+
+  describe '#update_user_projects' do
+    before do
+      @project = FactoryGirl.create(:project)
+      @user = FactoryGirl.create(:user)
+      @user_project = FactoryGirl.create(:user_project, project_id: @project.id, user_id: @user.id)
+    end
+
+    context 'when project set to inactive' do
+      it 'set end date for each developer assigned to that project' do
+        @project.update_attributes(is_active: false, end_date: Date.today)
+
+        @user_project.reload
+        expect(@user_project.end_date).to eq(Date.today)
+      end
+    end
+
+    context 'when project end date is updated' do
+      it 'should set end date of user projects whose end_date ' +
+         'was same old project date' do
+        @project.update_attributes(end_date: Date.tomorrow)
+
+        @user_project.reload
+        expect(@user_project.end_date).to eq(Date.tomorrow)
+      end
+
+      it 'should set end date of user projects whose end_date ' +
+         'is greater than current project end date' do
+        @user_project.update_attributes(end_date: Date.tomorrow)
+        @project.update_attributes(end_date: Date.today)
+
+        @user_project.reload
+        expect(@user_project.end_date).to eq(Date.today)
+      end
+
+      it 'should not set end date of user projects whose end_date ' +
+         'is less then project end date' do
+        @user_project.update_attributes(end_date: Date.today)
+        @project.update_attributes(end_date: Date.tomorrow)
+
+        @user_project.reload
+        expect(@user_project.end_date).to eq(Date.today)
+      end
+    end
   end
 
   context 'validation - display name' do
@@ -88,9 +184,10 @@ describe Project do
 
   context 'Users' do
     let!(:user) { FactoryGirl.create(:user) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 20) }
     it 'Should give users report' do
-      FactoryGirl.create(:user_project,
+      FactoryGirl.create(
+        :user_project,
         user: user,
         project: project,
         start_date: DateTime.now - 2
@@ -109,7 +206,7 @@ describe Project do
                   status: STATUS[:approved])
               end
            }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: '01/08/2018'.to_date, end_date: '01/08/2040'.to_date) }
 
     context 'should give user record' do
       it "between 'from date' and 'to date'" do
@@ -317,37 +414,6 @@ describe Project do
       expect(Repository.count).to eq(1)
       project.destroy
       expect(Repository.count).to eq(0)
-    end
-  end
-
-  context 'check presence of end_date' do
-    it 'when project set to inactive' do
-      project = create(:project)
-      project.is_active = false
-      expect(project.valid?).to eq false
-    end
-  end
-
-  context 'validate end_date' do
-    it 'should validate end_date greater than start_date' do
-      project = FactoryGirl.build(:project, start_date: Date.today, end_date: Date.yesterday)
-      project.save
-      expect(project.errors[:end_date]).to eq(["should not be less than start date."])
-    end
-  end
-
-  describe '#update_user_projects' do
-    context 'when project set to inactive' do
-      let!(:project) { create(:project) }
-      let!(:user_project) { create_list(:user_project, 2, project: project) }
-
-      it 'set end date for each developer assigned to that project ' do
-        project.update_attributes(is_active: false, end_date: Time.zone.today)
-
-        project.reload
-        expect(project.user_projects.collect(&:end_date)).not_to be_nil
-        expect(project.user_projects.collect(&:end_date).uniq).to match_array([Time.zone.today])
-      end
     end
   end
 

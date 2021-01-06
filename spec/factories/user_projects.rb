@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :user_project do
-    start_date { DateTime.now - 1 }
-    end_date { nil }
+    start_date { Date.today }
+    end_date { Date.today + 6.month }
     allocation { 160 }
     active { true }
     user

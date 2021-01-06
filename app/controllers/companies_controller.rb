@@ -40,7 +40,10 @@ class CompaniesController < ApplicationController
     @projects = @company.projects.group_by(&:is_active)
     if(@projects.key?(true))
       @projects[true].each do |project|
-        project.working_employees_count = UserProject.where(project_id: project._id, end_date: nil).count
+        project.working_employees_count = UserProject.where(
+          project_id: project._id,
+          active: true
+        ).count
       end
     end
     if(@projects.key?(false))

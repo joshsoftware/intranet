@@ -70,14 +70,14 @@ resource "Website Apis" do
     end
   end
 
-  get "/api/v1/news" do
-    example "Get all news" do
+  get '/api/v1/news' do
+    example 'Get all news' do
       header 'Referer', "http://#{ORGANIZATION_DOMAIN}"
       news = FactoryGirl.create_list(:news, 5)
       do_request
       res = JSON.parse(response_body)
       expect(status).to eq 200
-      expect(res["news"]["2020"].count).to eq(5)
+      expect(res['news'][Date.today.year.to_s].count).to eq(5)
     end
   end
 
