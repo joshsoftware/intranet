@@ -21,6 +21,8 @@ class ResourceCategorisationService
       :'employee_detail.designation_id'.nin => @exclude_designations_ids
     )
     users.each do |user|
+      get_total_allocation(user)
+
       billable_allocation = billable_projects_allocation(user)
       non_billable_allocation = non_billable_projects_allocation(user)
       investment_allocation = investment_projects_allocation(user)
@@ -122,26 +124,45 @@ class ResourceCategorisationService
   def add_project_wise_details(user, user_projects, allocation_type)
     user_projects.each do |user_project|
       allocation = user_project.allocation
+      bench = 0
+      shared = 0
+
+      if is_shared_resource?(user)
+        shared = 160 - @total_allocation
+        shared = shared < 0 ? 0 : shared
+      else
+        bench = 160 - @total_allocation
+        bench = bench < 0 ? 0 : bench
+      end
+
       next if allocation == 0
       allocation_type = 'non_billable' if user_project.billable == false
       @report[:project_wise_resource_report] << add_project_wise_record(user).merge(
+        code: user_project.project.code,
         "#{allocation_type}": allocation,
-        project: user_project.project.name
+        shared: shared,
+        bench: bench,
+        project: user_project.project.name,
+        type_of_project: user_project.project.type_of_project,
+        billing_frequency: user_project.project.billing_frequency
       )
     end
   end
 
   def add_resource_record(user)
     {
+      id: user.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
       name: get_name(user),
       location: user.location,
       designation: user.designation.try(:name),
+      level: get_level(user),
       total_allocation: 0,
       billable: 0,
       non_billable: 0,
       investment: 0,
       shared: 0,
       bench: 0,
+      exp_in_months: user.experience_as_of_today,
       technical_skills: user.public_profile.try('technical_skills').slice(0,3),
       projects: get_project_names(user)
     }
@@ -149,18 +170,50 @@ class ResourceCategorisationService
 
   def add_project_wise_record(user)
     {
+      code: '',
+      project: '',
+      type_of_project: '',
+      billing_frequency: '',
+      emp_id: user.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
       name: get_name(user),
       location: user.location,
       designation: user.designation.try(:name),
       billable: 0,
       non_billable: 0,
       investment: 0,
-      project: ''
+      shared: 0,
+      bench: 0,
     }
+  end
+
+  def get_level(user)
+    total_experience = user.experience_as_of_today
+    if QA_DESIGNATION.include?(user.designation.try(:name))
+      return total_experience > 36 ? 'Automated QA' : 'Manual QA'
+    end
+
+    case total_experience
+    when 0..36
+      'Jr Dev'
+    when 37..72
+      'Sr Dev'
+    when 73..96
+      'Tech Lead'
+    else
+      'Project Manager'
+    end
   end
 
   def get_name(user)
     user.role == ROLE[:consultant] ? "#{user.name} JC" : user.name
+  end
+
+  def get_total_allocation(user)
+    @total_allocation = user.user_projects.where(
+      :project_id.in => @billable_projects + @non_billable_projects + @investment_projects,
+      active: true,
+      :allocation.ne => nil
+    ).pluck(:allocation).sum
   end
 
   def load_projects
