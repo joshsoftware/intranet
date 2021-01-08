@@ -21,6 +21,7 @@ CityCountryMapping = [
 ]
 
 UI_UX_DESIGNATION = ['UI/UX Lead', 'UI/UX Designer', 'Senior UI/UX Designer']
+QA_DESIGNATION = ['QA Lead', 'Senior QA Engineer', 'QA Engineer']
 ORGANIZATION_DOMAIN = 'joshsoftware.com'
 ORGANIZATION_NAME = 'Josh Software'
 

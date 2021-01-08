@@ -1,19 +1,22 @@
 wb = xlsx_package.workbook
 
 wb.add_worksheet(name: 'Billable Resources') do |sheet|
-  sheet.add_row(['Employee Name', 'Employee Location', 'Employee Designation', 'Allocation (hrs/month)', 'Billable', 'Non Billable', 'Investment', 'Shared', 'Bench', 'Core Skill 1', 'Core Skill 2', 'Core Skill 3', 'Projects' ])
+  sheet.add_row(['Employee ID', 'Employee Name', 'Employee Location', 'Employee Designation', 'Employee Level', 'Allocation (hrs/month)', 'Billable', 'Non Billable', 'Investment', 'Shared', 'Bench', 'Total Experience(In months)', 'Core Skill 1', 'Core Skill 2', 'Core Skill 3', 'Projects' ])
   resource_report.each do | resource |
     next sheet.add_row if resource[:blank_row]
-    sheet.add_row [ resource[:name], resource[:location], resource[:designation],resource[:total_allocation],
-                    resource[:billable],resource[:non_billable], resource[:investment], resource[:shared], resource[:bench],
-                    resource[:technical_skills][0], resource[:technical_skills][1], resource[:technical_skills][2] ] + resource[:projects]
+    sheet.add_row [ resource[:id], resource[:name], resource[:location], resource[:designation], resource[:level], resource[:total_allocation],
+                    resource[:billable], resource[:non_billable], resource[:investment], resource[:shared], resource[:bench], resource[:exp_in_months],
+                    resource[:technical_skills][0], resource[:technical_skills][1], resource[:technical_skills][2] ] + resource[:projects],
+                  types: [:string]
   end
 end
 
 wb.add_worksheet(name: 'Project Wise Billable Resources') do |sheet|
-  sheet.add_row([ 'Project Name', 'Employee Name', 'Employee Location', 'Employee Designation', 'Billable', 'Non Billable', 'Investment' ])
+  sheet.add_row([ 'Project Code', 'Project Name', 'Project Type', 'Billing Frequency', 'Employee Id', 'Employee Name', 'Employee Location', 'Employee Designation', 'Billable', 'Non Billable', 'Investment', 'Shared', 'Bench' ])
   project_wise_resource_report.each do | resource |
-    sheet.add_row [ resource[:project], resource[:name], resource[:location], resource[:designation],
-                    resource[:billable], resource[:non_billable], resource[:investment] ]
+    sheet.add_row [ resource[:code], resource[:project], resource[:type_of_project], resource[:billing_frequency],
+                    resource[:emp_id], resource[:name], resource[:location], resource[:designation], resource[:billable],
+                    resource[:non_billable], resource[:investment], resource[:shared], resource[:bench] ],
+                  types: [:string, :string, :string, :string, :string]
   end
 end

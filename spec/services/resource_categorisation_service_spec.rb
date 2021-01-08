@@ -5,6 +5,7 @@ RSpec.describe ResourceCategorisationService do
     before(:each) do
       @emp_one = FactoryGirl.create(:user, status: STATUS[:approved])
       @emp_two = FactoryGirl.create(:user, status: STATUS[:approved])
+      @emp_three = FactoryGirl.create(:user, status: STATUS[:approved])
 
       @active_project = FactoryGirl.create(:project, name: 'Brand Scope')
       @active_project_two = FactoryGirl.create(:project, name: 'Quick Insure')
@@ -36,6 +37,24 @@ RSpec.describe ResourceCategorisationService do
         project: @active_project_two
       )
 
+      @user_project_three = FactoryGirl.create(
+        :user_project,
+        active: true,
+        billable: false,
+        allocation: 160,
+        user: @emp_three,
+        project: @devops_project
+      )
+
+      @user_project_four = FactoryGirl.create(
+        :user_project,
+        active: true,
+        billable: true,
+        allocation: 20,
+        user: @emp_three,
+        project: @active_project_two
+      )
+
       @service = ResourceCategorisationService.new(@emp_one.email)
     end
 
@@ -46,6 +65,7 @@ RSpec.describe ResourceCategorisationService do
 
     it 'Billable Allocation - should return total allocation of billable projects' do
       total_allocation = @emp_one.user_projects.map(&:allocation).sum
+      @service.get_total_allocation(@emp_one)
       response = @service.billable_projects_allocation(@emp_one)
 
       expect(@active_project.type_of_project).to eq('T&M')
@@ -61,6 +81,7 @@ RSpec.describe ResourceCategorisationService do
         project: @free_project,
         allocation: 50
       )
+      @service.get_total_allocation(@emp_one)
       response = @service.non_billable_projects_allocation(@emp_two)
 
       expect(response).to eq(150)
@@ -73,6 +94,7 @@ RSpec.describe ResourceCategorisationService do
         project: @investment_project,
         allocation: 90
       )
+      @service.get_total_allocation(@emp_one)
       response = @service.investment_projects_allocation(@emp_one)
 
       expect(@investment_project.type_of_project).to eq('Investment')
@@ -80,31 +102,16 @@ RSpec.describe ResourceCategorisationService do
     end
 
     it 'should generate resource report as expected' do
-      @emp_three = FactoryGirl.create(:user, status: STATUS[:approved])
-      @user_project_three = FactoryGirl.create(
-        :user_project,
-        active: true,
-        billable: false,
-        allocation: 0,
-        user: @emp_three,
-        project: @devops_project
-      )
-      @user_project_three = FactoryGirl.create(
-        :user_project,
-        active: true,
-        billable: true,
-        allocation: 20,
-        user: @emp_three,
-        project: @active_project_two
-      )
       technical_skills_one = @emp_one.public_profile.try('technical_skills').slice(0,3)
       technical_skills_two = @emp_two.public_profile.try('technical_skills').slice(0,3)
       technical_skills_three = @emp_three.public_profile.try('technical_skills').slice(0,3)
       report = [
         {
+          id: @emp_one.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
           name: @emp_one.name,
           location: @emp_one.location,
           designation: @emp_one.designation.try(:name),
+          level: @service.get_level(@emp_one),
           total_allocation: 160,
           billable: @user_project_one.allocation,
           non_billable: 0,
@@ -112,18 +119,22 @@ RSpec.describe ResourceCategorisationService do
           shared: 0,
           bench: 80,
           technical_skills: technical_skills_one,
+          exp_in_months: @emp_one.experience_as_of_today,
           projects: @service.get_project_names(@emp_one)
         },
         {
+          id: @emp_two.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
           name: @emp_two.name,
           location: @emp_two.location,
           designation: @emp_two.designation.try(:name),
+          level: @service.get_level(@emp_two),
           total_allocation: 160,
           billable: 0,
           non_billable: @user_project_two.allocation,
           investment: 0,
           shared: 0,
           bench: 60,
+          exp_in_months: @emp_two.experience_as_of_today,
           technical_skills: technical_skills_two,
           projects: @service.get_project_names(@emp_two)
         }
@@ -131,15 +142,18 @@ RSpec.describe ResourceCategorisationService do
       report = report.sort_by { |k| k[:name] }
       report.append({blank_row: true})
       report << {
+        id: @emp_three.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
         name: @emp_three.name,
         location: @emp_three.location,
         designation: @emp_three.designation.try(:name),
-        total_allocation: 160,
+        level: @service.get_level(@emp_three),
+        total_allocation: 180,
         billable: 20,
-        non_billable: 0,
+        non_billable: 160,
         investment: 0,
-        shared: 140,
+        shared: 0,
         bench: 0,
+        exp_in_months: @emp_three.experience_as_of_today,
         technical_skills: technical_skills_three,
         projects: @service.get_project_names(@emp_three)
       }
@@ -151,27 +165,66 @@ RSpec.describe ResourceCategorisationService do
     end
 
     it 'should generate project wise resource report as expected' do
-      project_name_one = @emp_one.project_details.map { |i| i.values[1] }.join(', ')
-      project_name_two = @emp_two.project_details.map { |i| i.values[1] }.join(', ')
-
       report = [
         {
+          code: @active_project.code,
+          project: @active_project.name,
+          type_of_project: @active_project.type_of_project,
+          billing_frequency: @active_project.billing_frequency,
+          emp_id: @emp_one.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
           name: @emp_one.name,
           location: @emp_one.location,
           designation: @emp_one.designation.try(:name),
           billable: @user_project_one.allocation,
           non_billable: 0,
           investment: 0,
-          project: project_name_one
+          shared: 0,
+          bench: 80
         },
         {
+          code: @devops_project.code,
+          project: @devops_project.name,
+          type_of_project: @devops_project.type_of_project,
+          billing_frequency: @devops_project.billing_frequency,
+          emp_id: @emp_three.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
+          name: @emp_three.name,
+          location: @emp_three.location,
+          designation: @emp_three.designation.try(:name),
+          billable: 0,
+          non_billable: @user_project_three.allocation,
+          investment: 0,
+          shared: 0,
+          bench: 0
+        },
+        {
+          code: @active_project_two.code,
+          project: @active_project_two.name,
+          type_of_project: @active_project_two.type_of_project,
+          billing_frequency: @active_project_two.billing_frequency,
+          emp_id: @emp_two.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
           name: @emp_two.name,
           location: @emp_two.location,
           designation: @emp_two.designation.try(:name),
           billable: 0,
           non_billable: @user_project_two.allocation,
           investment: 0,
-          project: project_name_two
+          shared: 0,
+          bench: 60
+        },
+        {
+          code: @active_project_two.code,
+          project: @active_project_two.name,
+          type_of_project: @active_project_two.type_of_project,
+          billing_frequency: @active_project_two.billing_frequency,
+          emp_id: @emp_three.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
+          name: @emp_three.name,
+          location: @emp_three.location,
+          designation: @emp_three.designation.try(:name),
+          billable: @user_project_four.allocation,
+          non_billable: 0,
+          investment: 0,
+          shared: 0,
+          bench: 0
         }
       ]
       report = report.sort_by { |k| k[:project] }
