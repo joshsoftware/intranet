@@ -130,7 +130,7 @@ class LeaveApplication
   end
 
   def process_reject_application
-    if leave?
+    if leave_from_current_year?
       user = self.user
       user.employee_detail.add_rejected_leave(number_of_days)
     end
@@ -240,9 +240,13 @@ class LeaveApplication
     # Deduct on creation and changed from 'Rejected' to 'Approved'
     if (pending? and self.leave_status_was.nil?) or (approved? and self.leave_status_was == REJECTED)
       user = self.user
-      user.employee_detail.deduct_available_leaves(number_of_days) if leave?
+      user.employee_detail.deduct_available_leaves(number_of_days) if leave_from_current_year?
       user.sent_mail_for_approval(self.id) unless self.leave_status_was == REJECTED
     end
+  end
+
+  def leave_from_current_year?
+    leave? && self.start_at.year == Date.current.year
   end
 
   def update_available_leave_send_mail
@@ -271,6 +275,19 @@ class LeaveApplication
   end
 
   def validate_date
+    if self.start_at.year > Date.today.year && Date.today.month < 11
+      errors.add(
+        :base,
+        'You can not apply leave for next year until 1st November of current year'
+      ) and return
+    elsif self.start_at.year != self.end_at.year
+      errors.add(
+        :base,
+        'You can not apply leave for cross year, '+
+        'Kindly apply 2 leaves each with individual year'
+      ) and return
+    end
+
     if self.start_at_changed? or self.end_at_changed?
       # While updating leave application do not consider self..
       leave_applications = LeaveApplication.where(
