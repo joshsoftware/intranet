@@ -34,7 +34,7 @@ ROLE = { admin: 'Admin', employee: 'Employee', HR: 'HR', manager: 'Manager',
 
 EMAIL_ADDRESS = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 
-DEFAULT_TIMESHEET_MANAGERS = []
+DEFAULT_TIMESHEET_MANAGERS = ['pritam.pandit.jc@joshsoftware.com']
 
 MANAGEMENT = ['Admin', 'HR', 'Manager', 'Finance', 'Super Admin']
 TIMESHEET_MANAGEMENT = ['Admin', 'HR', 'Manager']

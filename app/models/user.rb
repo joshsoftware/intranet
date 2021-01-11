@@ -317,7 +317,7 @@ class User
   end
 
   def self.get_hr_emails
-    User.approved.where(role: "HR").pluck(:email)
+    User.approved.where(role: ROLE[:HR]).pluck(:email)
   end
 
   def project_ids

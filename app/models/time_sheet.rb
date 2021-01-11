@@ -497,6 +497,8 @@ class TimeSheet
   end
 
   def self.get_project_and_generate_weekly_report(managers, from_date, to_date)
+    over_all_unfilled_ts = []
+    over_all_weekly_report = []
     managers.each do |manager|
       unfilled_time_sheet_report = []
       weekly_report = []
@@ -519,7 +521,10 @@ class TimeSheet
         end
       end
       send_report_through_mail(weekly_report, manager.email, unfilled_time_sheet_report) if weekly_report.present?
+      over_all_unfilled_ts += unfilled_time_sheet_report
+      over_all_weekly_report += weekly_report
     end
+    send_report_through_mail(over_all_weekly_report.uniq, DEFAULT_TIMESHEET_MANAGERS, over_all_unfilled_ts.uniq)
   end
 
   def self.generate_and_send_weekend_report(holiday_list, start_date)
@@ -1287,7 +1292,7 @@ class TimeSheet
   end
 
   def self.send_employee_list_through_mail(employee_list,from_date, to_date)
-    emails  = User.get_hr_emails
+    emails  = (User.get_hr_emails + DEFAULT_TIMESHEET_MANAGERS).uniq
     headers = ['Employee ID', 'Employee Name', 'Employee Email', 'Date_Not_filled']
     csv     = generate_report_in_csv_format(headers, employee_list)
     text    = "PFA Employee List- Who have not filled timesheet from #{from_date} to #{to_date}"

@@ -22,7 +22,7 @@ class TimesheetRemainderMailer < ActionMailer::Base
     mail(
       subject: 'Timesheet for project(s) which are not yet assigned',
       to: user.email,
-      cc: managers_emails + hr_emails
+      cc: managers_emails + hr_emails + DEFAULT_TIMESHEET_MANAGERS
     )
   end
 
