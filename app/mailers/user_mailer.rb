@@ -91,7 +91,7 @@ class UserMailer < ActionMailer::Base
 
   def invalid_blog_url(user_id)
     @user = User.where(id: user_id).first
-    hr_emails = User.approved.where(role: 'HR').collect(&:email)
+    hr_emails = User.get_hr_emails
     @receiver_emails = [hr_emails, @user.email].flatten.join(',')
     mail(to: @receiver_emails, subject: 'Invalid Blog URL')
   end

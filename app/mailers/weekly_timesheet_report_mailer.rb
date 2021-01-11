@@ -11,10 +11,11 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
 
   def send_weekend_timesheet_report(csv, start_date)
     attachments["WeekendTimesheetReport - #{Date.today}.csv"] = csv
-    hr_emails = User.approved.where(role: 'HR').collect(&:email)
+    hr_emails = User.get_hr_emails
     emails = [ 'sameert@joshsoftware.com', 
                'shailesh.kalekar@joshsoftware.com',
-               hr_emails ].flatten
+               DEFAULT_TIMESHEET_MANAGERS,
+               hr_emails ].flatten.uniq
     @start_date = start_date.strftime('%d %B')
     mail(
       subject: "Weekend Timesheet Report (#{start_date.strftime('%d %B')} - #{Date.today.strftime('%d %B')})",
@@ -24,10 +25,11 @@ class WeeklyTimesheetReportMailer < ActionMailer::Base
 
   def send_employees_working_hour_report(csv, start_date)
     attachments["EmployeesWorkingHourReport - #{Date.today}.csv"] = csv
-    hr_emails = User.approved.where(role: 'HR').collect(&:email)
+    hr_emails = User.get_hr_emails
     emails = [ 'sameert@joshsoftware.com', 
                'shailesh.kalekar@joshsoftware.com',
-               hr_emails ].flatten
+               DEFAULT_TIMESHEET_MANAGERS,
+               hr_emails ].flatten.uniq
     @start_date = start_date.strftime('%d %B')
     mail(
       subject: "Employee Report - Worked More than 9 Hours During (#{start_date.strftime('%d %B')} - #{(Date.today - 1).strftime('%d %B')})",
