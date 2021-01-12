@@ -33,11 +33,15 @@ ROLE = { admin: 'Admin', employee: 'Employee', HR: 'HR', manager: 'Manager',
          intern: 'Intern', team_member: 'team member', consultant: 'Consultant',
          finance: 'Finance' }
 
+DIVISION_TYPES = {
+  consultant: 'Consultant', digital: 'Digital', management: 'Management', project: 'Projects'
+}
+
 EMAIL_ADDRESS = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 
 DEFAULT_TIMESHEET_MANAGERS = ['pritam.pandit.jc@joshsoftware.com']
 
-MANAGEMENT = ['Admin', 'HR', 'Manager', 'Finance', 'Super Admin']
+MANAGEMENT = ['Admin', 'HR', 'Manager', 'Finance']
 TIMESHEET_MANAGEMENT = ['Admin', 'HR', 'Manager']
 
 DOCUMENT_MANAGEMENT = ['Super Admin', 'Admin', 'HR']
