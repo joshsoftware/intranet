@@ -10,6 +10,8 @@ RSpec.describe Company, type: :model do
   it { should validate_presence_of(:name) }
   it { should validate_uniqueness_of(:name) }
   it { should validate_uniqueness_of(:invoice_code) }
+  it { is_expected.to validate_inclusion_of(:billing_location).to_allow(COUNTRIES_ABBREVIATIONS) }
+  
 
   it 'Should fail as invoice code length is more than 3' do
     company = FactoryGirl.build(:company, invoice_code: 'a234')

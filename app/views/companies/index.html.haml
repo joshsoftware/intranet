@@ -14,6 +14,7 @@
         %th Active
         %th GST number
         %th Invoice Code
+        %th Billing Location
         %th Website
         %th Actions
     %tbody
@@ -36,6 +37,8 @@
           %td
             {{invoice_code}}
           %td
+            {{billing_location}}
+          %td
             {{website}}
           %td
             = link_to '', "/companies/{{record._slugs}}/edit", data: {'no-turbolink': true}, class: 'icon-edit'
@@ -44,4 +47,4 @@
           {{/record}}
 
 :coffeescript
-  @data = #{@companies.to_json(only: [:_slugs, :name, :active, :gstno, :invoice_code, :website])}
+  @data = #{@companies.to_json(only: [:_slugs, :name, :active, :gstno, :invoice_code, :billing_location, :website])}

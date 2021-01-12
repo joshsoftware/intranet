@@ -4,6 +4,7 @@ FactoryGirl.define do
     gstno { Faker::Bank.swift_bic }
     invoice_code { Faker::Lorem.characters(3) }
     website { Faker::Internet.url }
+    billing_location { COUNTRIES_ABBREVIATIONS[0] }
     logo nil
   end
 
