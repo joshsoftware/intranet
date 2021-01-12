@@ -3,6 +3,7 @@ class EmployeeDetail
   include Mongoid::Timestamps
   include UserDetail
   DESIGNATION_TRACKS = ['Software Engineer', 'QA Engineer', 'UI/UX Designer']
+
   embedded_in :user
 
   field :employee_id, type: String
@@ -16,6 +17,7 @@ class EmployeeDetail
   field :designation_track, type: String, default: DESIGNATION_TRACKS.first
   field :location
   field :source, type: String
+  field :division, type: String
 
   belongs_to :designation
 
@@ -25,6 +27,7 @@ class EmployeeDetail
   validates :available_leaves, numericality: {greater_than_or_equal_to: 0}
   after_update :delete_team_cache, if: Proc.new{ updated_at_changed? }
   validates :location, presence: true
+  validates :division, inclusion: { in: DIVISION_TYPES.values, allow_nil: true }
 
   before_save do
     self.notification_emails.try(:reject!, &:blank?)

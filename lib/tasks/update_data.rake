@@ -41,6 +41,21 @@ namespace :update_data do
       end
     end
   end
+
+  desc 'Update division column for all users'
+  task update_division: :environment do
+    User.employees.where(:status.ne => STATUS[:resigned]).each do |user|
+      if user.location == LOCATIONS[0] # Bengaluru
+        user.employee_detail.set(division: DIVISION_TYPES[:digital])
+      elsif MANAGEMENT.include?(user.role)
+        user.employee_detail.set(division: DIVISION_TYPES[:management])
+      else
+        user.employee_detail.set(division: DIVISION_TYPES[:project])
+      end
+
+      puts "Changing Division of user email: #{user.email} as #{user.employee_detail.division}"
+    end
+  end
 end
 
 def calculate_emp_id
