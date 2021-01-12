@@ -30,6 +30,9 @@
         %th Website
         %td= link_to @company.website
       %tr
+        %th Billing Location
+        %td= @company.billing_location
+      %tr
         %th Logo
         %td= image_tag @company.logo.try(:url, :thumb)
 

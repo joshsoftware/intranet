@@ -12,7 +12,8 @@ PENDING = 'Pending'
 APPROVED = 'Approved'
 REJECTED = 'Rejected'
 LOCATIONS = ['Bengaluru', 'Plano', 'Pune']
-COUNTRIES = [ 'India', 'USA']
+COUNTRIES = ['India', 'USA']
+COUNTRIES_ABBREVIATIONS = ['IN', 'US']
 CityCountryMapping = [
   { city: 'Bengaluru', country: 'India'},
   { city: 'Pune', country: 'India'},

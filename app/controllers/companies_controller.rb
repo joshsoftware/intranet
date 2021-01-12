@@ -68,7 +68,7 @@ class CompaniesController < ApplicationController
 
   def company_params
     params.require(:company).permit(:name, :gstno, :invoice_code, :logo, :website, :active,
-      contact_persons_attributes: [:id, :role, :name, :phone_no, :email, :_destroy],
+      :billing_location, contact_persons_attributes: [:id, :role, :name, :phone_no, :email, :_destroy],
       addresses_attributes: [:id, :type_of_address, :address, :city, :state, :landline_no, :pin_code, :_destroy])
   end
 
