@@ -4,7 +4,7 @@ class TrainingsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @trainings = Training.training_only.asc(:date)
+    @trainings = Training.training_only.showcase_on_website.asc(:date)
   end
 
   def new

@@ -1,11 +1,11 @@
 .list-group.list-group-root.well
   - @trainings.each do |training|
     %h4.list-group-item
-      %a{href: "##{training.subject}", 'data-toggle':"collapse"}
+      %a{href: "##{training.subject}", 'data-toggle': 'collapse'}
         .icon.icon-chevron-right
-        = training.subject
-      = link_to '', edit_training_path(training), class: "icon-edit", data: {'no-turbolink' =>  true}, style: 'margin-left: 10;'
+      = link_to "#{training.subject}", training_path(training), data: {'no-turbolink':  true}, style: 'margin-left: 10;'
+      = link_to '', edit_training_path(training), class: 'icon-edit pull-right', data: {'no-turbolink':  true}, style: 'margin-left: 10;'
     %div.collapse{id: "#{training.subject}"}
       - training.chapters.each do |chapter|
         %h4.list-group-item
-          = link_to "#{chapter.chapter_number}. #{chapter.subject}", video_render_trainings_path(chapter), target: "_blank", style: 'margin-left: 20'
+          = link_to "#{chapter.chapter_number}. #{chapter.subject}", video_render_trainings_path(chapter), target: '_blank', style: 'margin-left: 20'
