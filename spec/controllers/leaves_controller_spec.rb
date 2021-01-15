@@ -597,13 +597,13 @@ describe LeaveApplicationsController do
     end
   end
 
-  context 'Leave type - LWP' do
+  context 'Leave type - SPL' do
     before(:each) do
       @admin = FactoryGirl.create(:admin)
       @user = FactoryGirl.create(:user, status: APPROVED)
       @leave = FactoryGirl.build(
         :leave_application,
-        leave_type: LeaveApplication::LWP,
+        leave_type: LeaveApplication::SPL,
         user: @user
       )
     end
@@ -623,7 +623,7 @@ describe LeaveApplicationsController do
       expect(leave_count).to eq(24)
     end
 
-    it 'should not deduct leave count after approving the LWP request' do
+    it 'should not deduct leave count after approving the SPL request' do
       sign_in @admin
       @leave.save
       get :process_leave, {
@@ -705,7 +705,7 @@ describe LeaveApplicationsController do
       expect(@user.leave_applications.processed.count).to eq(1)
     end
 
-    it 'should be able to apply LWP if overlapping WFH request is present' do
+    it 'should be able to apply SPL if overlapping WFH request is present' do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
         end_at: @end_date,
@@ -718,7 +718,7 @@ describe LeaveApplicationsController do
         start_at: Date.today,
         end_at: Date.today,
         user: @user,
-        leave_type: LeaveApplication::LWP
+        leave_type: LeaveApplication::SPL
       )
       params = {
         user_id: @user.id,
@@ -751,12 +751,12 @@ describe LeaveApplicationsController do
       expect(@user.leave_applications.processed.count).to eq(1)
     end
 
-    it 'should not be able to apply WFH request if overlapping LWP request is present' do
+    it 'should not be able to apply WFH request if overlapping SPL request is present' do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
         end_at: @end_date,
         leave_status: APPROVED,
-        leave_type: LeaveApplication::LWP,
+        leave_type: LeaveApplication::SPL,
         user: @user
       )
       @leave.update_attributes(leave_type: LeaveApplication::WFH)
@@ -765,7 +765,7 @@ describe LeaveApplicationsController do
         leave_application: @leave.attributes
       }
       post :create, params
-      expect(flash[:error]).to eq('Already applied for LWP on same date')
+      expect(flash[:error]).to eq('Already applied for SPL on same date')
       expect(@user.reload.leave_applications.pending.count).to eq(0)
       expect(@user.leave_applications.processed.count).to eq(1)
     end

@@ -69,7 +69,7 @@
       = link_to 'Assessments', ENV['snowflake_url']
 
   - if can? :manage, EntryPass
-    %li
+    %li.hide
       = link_to 'Office Entry Pass', '/entry_passes'
 
   - if can_access?('Repositories')

@@ -364,18 +364,18 @@ describe LeaveApplication do
       end
     end
 
-    context 'when request is for LWP' do
+    context 'when request is for SPL' do
       it 'should not deduct leave from available leave' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LeaveApplication::LWP)
+        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LeaveApplication::SPL)
         expect(employee_detail.available_leaves).to eq(available_leaves)
       end
 
       it 'rejected leave should not be added to available leaves' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LeaveApplication::LWP)
+        wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LeaveApplication::SPL)
         expect(employee_detail.available_leaves).to eq(available_leaves)
         wfh_application.process_reject_application
         expect(employee_detail.available_leaves).to eq(available_leaves)
