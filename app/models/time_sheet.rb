@@ -1076,7 +1076,7 @@ class TimeSheet
     user.leave_applications.where(
       start_at: {'$gte': from_date, '$lte': to_date},
       leave_status: APPROVED,
-      :leave_type.in => [LeaveApplication::LEAVE, LeaveApplication::LWP]
+      :leave_type.in => [LeaveApplication::LEAVE, LeaveApplication::SPL]
     ).sum(:number_of_days)
   end
 

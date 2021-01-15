@@ -18,6 +18,6 @@ def is_leave_overlapping?(leave)
     :end_at.gte => Date.tomorrow,
     :start_at.lte => Date.tomorrow,
     leave_status: APPROVED,
-    :leave_type.in => [LeaveApplication::LEAVE, LeaveApplication::LWP]
+    :leave_type.in => [LeaveApplication::LEAVE, LeaveApplication::SPL]
   ).exists?
 end

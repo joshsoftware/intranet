@@ -7,11 +7,11 @@ class LeaveApplication
   #has_one :address
 
   LEAVE = 'LEAVE'
-  LWP = 'LWP'
+  SPL = 'SPL'
   WFH = 'WFH'
   OPTIONAL = 'OPTIONAL'
 
-  LEAVE_TYPES = [LEAVE, WFH, OPTIONAL, LWP]
+  LEAVE_TYPES = [LEAVE, WFH, OPTIONAL, SPL]
 
   field :start_at,        type: Date
   field :end_at,          type: Date
@@ -50,7 +50,7 @@ class LeaveApplication
   scope :pending, ->{where(leave_status: PENDING)}
   scope :processed, ->{where(:leave_status.ne => PENDING)}
   scope :unrejected, -> { where(:leave_status.ne => REJECTED )}
-  scope :leaves, -> { where(:leave_type.in => [LEAVE, OPTIONAL, LWP]) }
+  scope :leaves, -> { where(:leave_type.in => [LEAVE, OPTIONAL, SPL]) }
 
   attr_accessor :sanctioning_manager
 
@@ -63,7 +63,7 @@ class LeaveApplication
   end
 
   def is_leave?
-    [LEAVE, LWP, OPTIONAL].include?(leave_type)
+    [LEAVE, SPL, OPTIONAL].include?(leave_type)
   end
 
   def leave_count
