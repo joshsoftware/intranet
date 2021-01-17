@@ -889,4 +889,38 @@ describe LeaveApplicationsController do
       expect(leave_count).to eq(24)
     end
   end
+
+  context 'Next year leave ' do
+    before(:each) do
+      @user = FactoryGirl.create(:user, status: STATUS[:approved])
+      @leave = FactoryGirl.build(:leave_application,
+        leave_type: LeaveApplication::LEAVE,
+        user: @user,
+        start_at: Date.today.next_year,
+        end_at: (Date.today + 1).next_year
+      )
+      sign_in @user
+    end
+
+    it 'should fail as month of appling is less than November' do
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+
+      expect(flash[:error]).to eq('You can not apply leave for next year until 1st November of current year')
+    end
+
+    it 'should not deduct leave count' do
+      leave_count = @user.employee_detail.available_leaves
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+
+      expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
+    end
+  end
 end

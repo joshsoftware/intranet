@@ -126,16 +126,16 @@ class LeaveApplicationsController < ApplicationController
 
   def search_conditions
     today = Date.today
-    beginning_of_year = today.beginning_of_year.strftime("%d-%m-%Y")
-    end_of_year = today.end_of_year.strftime("%d-%m-%Y")
+    beginning_of_current_year = today.beginning_of_year.strftime("%d-%m-%Y")
+    end_of_next_year = today.end_of_year.next_year.strftime("%d-%m-%Y")
     if params[:from].present?
       to = params[:to].empty? ? today.strftime("%d-%m-%Y") : params[:to]
       start_at =  { start_at: params[:from].to_date..to.to_date }
       end_at = { end_at: params[:from].to_date..to.to_date }
       [start_at, end_at]
     else
-      start_at =  { start_at: beginning_of_year..end_of_year }
-      end_at = { end_at: beginning_of_year..end_of_year }
+      start_at =  { start_at: beginning_of_current_year..end_of_next_year }
+      end_at = { end_at: beginning_of_current_year..end_of_next_year }
       [start_at, end_at]
     end
   end
