@@ -23,7 +23,7 @@ class UserProject
   after_save :call_monitor_service, if: 'active_changed?'
 
   validates :end_date, presence: {unless: "!!active || active.nil?", message: "is mandatory to mark inactive"}
-  validate :start_date_less_than_end_date, if: 'end_date.present?'
+  validate :start_date_less_than_end_date, if: 'end_date.present? && start_date.present?'
 
   scope :approved_users, ->{where(:user_id.in => User.approved.pluck(:id))}
   scope :active_users, ->{where(:user_id.in => User.approved.pluck(:id), :active => true)}

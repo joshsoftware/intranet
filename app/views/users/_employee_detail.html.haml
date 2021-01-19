@@ -21,7 +21,7 @@
     = e.input :source
   = f.input :project_ids, collection: @projects, input_html: {class: 'project_ids', multiple: true, style: 'width:300px;', tabindex: 0, 'data-placeholder': 'Add projects'}, label: 'Projects', disabled: true
   = f.submit :save, class: "btn controls"
-- if @notify_users
+- if @notify_users.present?
   %h4 Current Notification to
   %table.table.table-hover
     %tr
@@ -31,6 +31,57 @@
       %tr
         %td= n.public_profile.name if n.public_profile
         %td= n.email
+%br
+#project_list
+  - if @current_user_projects.present?
+    %h4 Current Projects
+    %table.table.table-bordered
+      %thead
+        %tr
+          %th Name
+          %th Type
+          %th Start Date
+          %th End Date
+          %th.text_wrap Timesheet Required?
+          %th Billable
+          %th Allocation
+      %tbody
+        - @current_user_projects.each do |up|
+          %tr
+            %td= link_to up.project.name, project_path(up.project)
+            %td= up.project.type_of_project
+            %td= up.start_date
+            %td= up.end_date
+            %td.text_wrap= up.time_sheet ? 'Yes' : 'No'
+            %td= up.billable ? 'Yes' : 'No'
+            %td= up.allocation
+
+  %br
+  - if @previous_user_projects.present?
+    %h4 Previous Projects
+    %table.table.table-bordered
+      %thead
+        %tr
+          %th Name
+          %th.text_wrap Project Status
+          %th Type
+          %th Start Date
+          %th End Date
+          %th.text_wrap Timesheet Required?
+          %th Billable
+          %th Allocation
+      %tbody
+        - @previous_user_projects.each do |up|
+          %tr
+            %td= up.project.name
+            %td.text-wrap= up.project.is_active ? 'Active' : 'Inactive'
+            %td= up.project.type_of_project
+            %td= up.start_date
+            %td= up.end_date
+            %td.text-wrap= up.time_sheet ? 'Yes' : 'No'
+            %td= up.billable ? 'Yes' : 'No'
+            %td= up.allocation
+
 :javascript
   $(".notification_emails").select2();
   $(".project_ids").select2();
