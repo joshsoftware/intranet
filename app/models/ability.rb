@@ -10,7 +10,7 @@ class Ability
     elsif user.role? 'HR'
       hr_abilities(user.id)
     elsif user.role? 'Finance'
-      can [:public_profile, :private_profile, :edit, :apply_leave], User
+      can [:public_profile, :private_profile, :apply_leave], User, id: user.id
       can :read, :dashboard
       can [:index, :holiday_list], HolidayList
       can :manage, Company

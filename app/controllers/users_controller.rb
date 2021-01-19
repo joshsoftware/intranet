@@ -174,6 +174,8 @@ class UsersController < ApplicationController
     @projects = Project.all.collect { |p| [p.name, p.id] }
     notification_emails = @user.employee_detail.try(:notification_emails)
     @notify_users = User.where(:email.in => notification_emails || [])
+    @current_user_projects = @user.user_projects.where(active: true).order_by(:end_date.desc)
+    @previous_user_projects = @user.user_projects.where(active: false).order_by(:end_date.desc)
   end
 
   def authorize

@@ -43,6 +43,10 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def edit
+    @user_projects = @project.user_projects.sort_by(&:start_date)
+  end
+
   def update
     update_obj(@project, safe_params, edit_project_path)
   end

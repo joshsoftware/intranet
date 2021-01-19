@@ -10,7 +10,7 @@
     .span2.width10 Billable?
     .span2.width10 Allocation (hrs/month)
   #team-members.team-popover
-    = f.fields_for :user_projects do |project_user_form|
+    = f.fields_for :user_projects, @user_projects do |project_user_form|
       - if project_user_form.object.user.blank? || (project_user_form.object.user && project_user_form.object.user.is_approved? && (project_user_form.object.active || project_user_form.object.end_date.nil?))
         .row.span12
           .span2.width10
