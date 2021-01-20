@@ -262,6 +262,8 @@ describe LeaveApplicationsController do
     end
 
     it "should be able to view all leaves" do
+      sign_out @admin
+      sign_in @hr
       leave_application_count = LeaveApplication.count
       leave_application = FactoryGirl.create(:leave_application, user: @user)
       get :index

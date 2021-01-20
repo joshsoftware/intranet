@@ -228,20 +228,18 @@ describe UsersController do
 
   context '#resource_list' do
     before(:each) do
-      @user = FactoryGirl.create(:user)
-      sign_in @user
+      @admin = FactoryGirl.create(:admin)
+      sign_in @admin
     end
+
     it 'should show all resources' do
       get :resource_list
       expect(response).to have_http_status(:success)
     end
-  end
 
-  context "#resource_list_download" do
     it 'should send Resource List csv' do
       user1 = FactoryGirl.create(:user, role: ROLE[:employee], status: STATUS[:approved])
       user2 = FactoryGirl.create(:user, role: ROLE[:employee], status: STATUS[:approved])
-      sign_in user1
       get :resource_list_download
       expect(response).to have_http_status(:success)
     end

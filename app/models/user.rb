@@ -97,7 +97,7 @@ class User
 
   after_update do
     if (status_changed? && status == STATUS[:resigned])
-      reject_future_leaves 
+      reject_future_leaves
       set_user_project_entries_inactive
       remove_from_manager_ids
       remove_from_notification_emails
@@ -171,7 +171,7 @@ class User
   end
 
   def can_edit_user?(user)
-    (["HR", "Admin", "Finance", "Manager", "Super Admin"].include?(self.role)) || self == user
+    ([ROLE[:HR], ROLE[:admin], ROLE[:manager], ROLE[:super_admin]].include?(self.role)) || self == user
   end
 
   def can_download_document?(user, attachment)
@@ -244,7 +244,7 @@ class User
       end
       errors.delete(profile)
     end
-    
+
     error_msg.push self.errors.full_messages
     error_msg.flatten.join(' ')
   end

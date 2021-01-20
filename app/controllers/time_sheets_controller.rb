@@ -2,14 +2,15 @@ class TimeSheetsController < ApplicationController
   before_action :authenticate_user!
   skip_before_filter :verify_authenticity_token
   load_and_authorize_resource only: [:index, :users_timesheet, :edit_timesheet, :update_timesheet,
-                                     :new, :projects_report, :add_time_sheet, :import]
+                                     :new, :projects_report, :add_time_sheet, :import, :export_project_report,
+                                     :export_resource_report]
   load_and_authorize_resource only: :individual_project_report, class: Project
   before_action :user_exists?, only: [:create, :daily_status]
 
   def new
     @from_date = params[:from_date] || Date.today.beginning_of_month.to_s
     @to_date = params[:to_date] || Date.today.to_s
-    if params[:user_id].present? 
+    if params[:user_id].present?
       @user = User.where(id: params[:user_id]).first
     else
       @user = current_user
@@ -93,7 +94,7 @@ class TimeSheetsController < ApplicationController
       @from_date = params['user']['from_date']
       @to_date = params['user']['to_date']
       @user = User.find_by(id: params['user']['user_id'])
-    
+
       data_params = timesheet_params['time_sheets_attributes'].reject{|key, data| data["_destroy"] == "1"}
       data_params = {"time_sheets_attributes"=>data_params}
       return_values, @time_sheets = TimeSheet.create_time_sheet(@user.id, current_user, data_params)
