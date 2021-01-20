@@ -18,6 +18,20 @@ namespace :leave_reminder do
     end
   end
 
+  desc 'Reminds admin and HR who will be on leave next month for Optional Holiday.'
+  task optional_holiday_reminder_next_month: :environment do
+    date = Date.today.at_end_of_month + 1
+    leaves = LeaveApplication.where(
+      leave_status: APPROVED,
+      leave_type: LeaveApplication::OPTIONAL,
+      start_at: {
+        '$gte': date,
+        '$lte': date.at_end_of_month
+      }
+    )
+    UserMailer.delay.optional_holiday_reminder_next_month(leaves.to_a, date) if leaves.present?
+  end
+
   desc 'Reminds managers and HR whose leave beginning in next two days and leave is pending.'
   task :pending_leave => :environment do
     country = COUNTRIES[0]

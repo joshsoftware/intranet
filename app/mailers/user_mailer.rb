@@ -79,14 +79,14 @@ class UserMailer < ActionMailer::Base
   end
 
   def leaves_reminder(leaves, leave_type)
-    user_ids = leaves.map(&:user_id)
-    @receiver_emails = User.leave_notification_emails(user_ids)
-    leaves.map do |leave|
-      leave.sanctioning_manager = User.where(id: leave.processed_by).first.try(:name)
-    end
-    @leaves = leaves
+    get_leave_details(leaves)
     @leave_type = leave_type
     mail(to: @receiver_emails, subject: "Employees on #{@leave_type.downcase} tomorrow.")
+  end
+
+  def optional_holiday_reminder_next_month(leaves, date)
+    get_leave_details(leaves)
+    mail(to: @receiver_emails, subject: "List of employees on optional holiday - #{date.to_date.strftime("%b '%y")}.")
   end
 
   def invalid_blog_url(user_id)
@@ -166,6 +166,15 @@ class UserMailer < ActionMailer::Base
   end
 
   private
+
+  def get_leave_details(leaves)
+    user_ids = leaves.map(&:user_id)
+    @receiver_emails = User.leave_notification_emails(user_ids)
+    leaves.map do |leave|
+      leave.sanctioning_manager = User.where(id: leave.processed_by).first.try(:name)
+    end
+    @leaves = leaves
+  end
 
   def get_leave(id)
     @leave_application = LeaveApplication.where(id: id).first

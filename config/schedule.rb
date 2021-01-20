@@ -65,6 +65,10 @@ every '0 10 15 * *' do
   rake "light:remove_bounced_emails"
 end
 
+every '0 10 15 * *' do
+  rake 'optional_hoiday_reminder_next_month'
+end
+
 every :day, :at => '10:00pm' do
   rake "database_backup"
 end
