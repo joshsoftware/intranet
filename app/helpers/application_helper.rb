@@ -23,6 +23,7 @@ module ApplicationHelper
     when 'Manage Leave' then [ROLE[:admin], 'Super Admin', ROLE[:HR]].include?(role)
     when 'Assessments' then ROLE.except(:consultant).values.include?(role) || applicable_consultants
     when 'Repositories' then [ROLE[:admin], ROLE[:manager], ROLE[:employee], ROLE[:intern]].include?(role)
+    when 'Timesheets' then [ROLE[:admin], ROLE[:manager], ROLE[:finance], ROLE[:HR]].include?(role)
     end
   end
 
