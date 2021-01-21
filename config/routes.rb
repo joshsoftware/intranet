@@ -90,6 +90,7 @@ Rails.application.routes.draw do
 
   resources :companies, except: [:destroy] do
     resources :projects, only: [:new, :create, :edit, :update]
+    get :export_billing_location_report, on: :collection
   end
 
   resources :attachments do

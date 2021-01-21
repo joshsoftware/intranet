@@ -1,11 +1,17 @@
 - if can? :manage, Company
   .remove_underline
-    = link_to '', new_company_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Add Project",
-                 class: "icon-plus" unless (params[:action] == "new" || params[:action] == "show")
-    = link_to '', edit_company_path, data: {'no-turbolink' =>  true}, "data-toggle" => "tooltip", title: "Edit Project",
-                 class: "icon-edit" if params[:action] == "show"
-    = ["show", "edit", 'index'].include?(params[:action]) ? "|" : ''
-    = link_to '', companies_path, "data-toggle" => "tooltip", title: "All Companies",
-                 class: " icon-th-list" unless params[:action] == "index"
-    = link_to "", companies_path(format: "csv"), class: 'icon-download-alt' if params[:action] == 'index'
+    = link_to '', new_company_path, data: {'no-turbolink': true}, 'data-toggle': 'tooltip', title: 'Add Company',
+                 class: 'icon-plus' unless (params[:action] == 'new' || params[:action] == 'show')
+    = link_to '', edit_company_path, data: {'no-turbolink': true}, 'data-toggle': 'tooltip', title: 'Edit Company',
+                 class: 'icon-edit' if params[:action] == 'show'
+    = ['show', 'edit', 'index'].include?(params[:action]) ? '|' : ''
+    = link_to '', companies_path, 'data-toggle': 'tooltip', title: 'All Companies',
+                 class: 'icon-th-list' unless params[:action] == 'index'
+    = link_to '', '', 'data-toggle': 'dropdown', class: 'dropdown-toggle icon-download-alt' if params[:action] == 'index'
+    %ul.dropdown-menu.drop.pull-right
+      %li
+        = link_to 'Download Company CSV', companies_path(format: 'csv'), class: 'menu-font'
+      %li
+        = link_to 'Billing Location Details', '#billing_location_details_modal', class: 'menu-font', 'data-target': '#billing_location_details_modal', 'data-toggle': 'modal'
 
+  = render 'companies/billing_location_modal'

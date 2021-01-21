@@ -30,6 +30,22 @@ class Company
     update_projects_end_date unless active
   end
 
+  def self.billing_location_report(billing_location)
+    attributes = ['Company Name', 'Company Status', 'Project Name', 'Employee ID', 'Employee Name', 'Billable(Y/N)', 'Allocation(hrs)']
+    CSV.generate(headers: true, converters: nil) do |csv|
+      csv << attributes
+      Company.where(billing_location: billing_location, active: true).order_by(:name.asc).each do |company|
+        company.projects.where(is_active: true).order_by(:name.asc).each do |project|
+          project.user_projects.where(active: true).each do |up|
+            csv << [company.name, company.active ? 'Active' : 'Inactive', project.name,
+                    up.user.employee_detail.try(:employee_id).try(:rjust, 3, '0'),
+                    up.user.name, up.billable ? 'Yes' : 'No', up.allocation]
+          end
+        end
+      end
+    end
+  end
+
   def website_url
     return true if website.nil? || website.empty?
     url = URI.parse(website) rescue false

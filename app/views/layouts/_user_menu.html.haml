@@ -62,7 +62,7 @@
     %ul.dropdown-menu{class: 'timesheet-menu'}
       %li
         = link_to 'Employees', main_app.time_sheets_path, class: 'menu-font', role: 'menuitem'
-        - if can? :manage, TimeSheet
+        - if can_access?('Timesheets')
           %li
             = link_to 'Projects', main_app.projects_report_time_sheets_path, class: 'menu-font', role: 'menuitem'
           %li

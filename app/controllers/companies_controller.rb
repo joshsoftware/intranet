@@ -17,6 +17,16 @@ class CompaniesController < ApplicationController
     end
   end
 
+  def export_billing_location_report
+    flash[:success] = 'You will receive billing location details report to your mail shortly.'
+    CompanyMailer.delay.send_billing_location_report(
+      current_user.name,
+      current_user.email,
+      params[:billing_location]
+    )
+    redirect_to companies_path
+  end
+
   def new
     @company = Company.new
     @company.addresses.build

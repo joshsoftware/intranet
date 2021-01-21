@@ -71,4 +71,31 @@ RSpec.describe Company, type: :model do
     expect(user_project.reload.active).to eq(false)
     expect(user_project.end_date).to eq(Date.today)
   end
+
+  context 'billing_location_report' do
+    before do
+      @company1 = FactoryGirl.create(:company)
+      @company2 = FactoryGirl.create(:company, billing_location: COUNTRIES_ABBREVIATIONS[1])
+      @project1 = FactoryGirl.create(:project, company: @company1)
+      @project2 = FactoryGirl.create(:project, company: @company2)
+      @user1 = FactoryGirl.create(:user)
+      @user2 = FactoryGirl.create(:user)
+      @user_project1 = FactoryGirl.create(:user_project, project_id: @project1.id, user_id: @user1.id)
+      @user_project2 = FactoryGirl.create(:user_project, project_id: @project2.id, user_id: @user2.id)
+
+      #should not consider inactive companies, projects and user_projects
+      @company3 = FactoryGirl.create(:company, billing_location: COUNTRIES_ABBREVIATIONS[1])
+      @project3 = FactoryGirl.create(:project, company: @company2, is_active: false, end_date: Date.today)
+      @user_project3 = FactoryGirl.create(:user_project, project_id: @project3.id, user_id: @user2.id, active: false, end_date: Date.today)
+    end
+
+    it 'should list records where company billing location matches with the given argument' do
+      csv = Company.billing_location_report(COUNTRIES_ABBREVIATIONS[0])
+
+      expected_csv = "Company Name,Company Status,Project Name,Employee ID,Employee Name,Billable(Y/N),Allocation(hrs)\n"
+      expected_csv << "#{@company1.name},#{@company1.active ? 'Active' : 'Inactive'},#{@project1.name},#{@user1.employee_detail.try(:employee_id).try(:rjust, 3, '0')},#{@user1.name},#{@user_project1.billable ? 'Yes' : 'No'},#{@user_project1.allocation}\n"
+      expect(csv).to eq(expected_csv)
+    end
+  end
+
 end

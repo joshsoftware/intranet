@@ -11,6 +11,8 @@ class Ability
       hr_abilities(user.id)
     elsif user.role? 'Finance'
       can [:public_profile, :private_profile, :apply_leave, :users_optional_holiday_list], User, id: user.id
+      can [:projects_report, :export_project_report], TimeSheet
+      can [:individual_project_report], [TimeSheet, Project]
       can :read, :dashboard
       can [:index, :holiday_list], HolidayList
       can :manage, Company
