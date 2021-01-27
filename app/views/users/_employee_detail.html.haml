@@ -18,6 +18,9 @@
       = e.check_box :skip_unassigned_project_ts_mail, {}, 'Yes', 'No'
     %br
     %br
+    = e.label 'Joining Bonus Paid'
+    .make-switch{ tabindex: 0, 'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'Yes', 'data-off-label': 'No'}
+      = e.check_box :joining_bonus_paid, {}, 'Yes', 'No'
     = e.input :source
   = f.input :project_ids, collection: @projects, input_html: {class: 'project_ids', multiple: true, style: 'width:300px;', tabindex: 0, 'data-placeholder': 'Add projects'}, label: 'Projects', disabled: true
   = f.submit :save, class: "btn controls"
