@@ -18,6 +18,7 @@ class EmployeeDetail
   field :location
   field :source, type: String
   field :division, type: String
+  field :joining_bonus_paid, type: Boolean, default: false
 
   belongs_to :designation
 
