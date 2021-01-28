@@ -30,6 +30,12 @@ FactoryGirl.define do
     password { Faker::Internet.password }
   end
 
+  factory :consultant, class: User, parent: :user do |u|
+    role { 'Consultant' }
+    sequence(:email) { |n| "consultant#{n}@#{ORGANIZATION_DOMAIN}" }
+    password { Faker::Internet.password }
+  end
+
   factory :employee, class: User do
     role { 'Employee' }
     status { 'approved' }

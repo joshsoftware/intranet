@@ -27,6 +27,10 @@
     %li
       = link_to 'Documents', main_app.attachments_path, data: {'no-turbolink' =>  true}
 
+  - if current_user.role == ROLE[:consultant]
+    %li
+      = link_to 'Holiday List', main_app.holiday_lists_path, data: {'no-turbolink' =>  true}
+
   - unless can_access?('Events')
     %li
       = link_to 'Events', "https://intranet.joshsoftware.com/functions", 'target' => '_blank'

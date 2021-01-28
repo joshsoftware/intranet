@@ -81,7 +81,6 @@ class Ability
 
   def consultant_abilities(user_id)
     can [:public_profile, :private_profile, :apply_leave], User, id: user_id
-    can :read, Policy
     cannot :manage, LeaveApplication
     can [:new, :create], LeaveApplication, user_id: user_id
     can [:edit, :update], LeaveApplication, leave_status: 'Pending', user_id: user_id
@@ -90,6 +89,7 @@ class Ability
     cannot :manage, EntryPass, user_id: user_id
     cannot :report, EntryPass
     cannot :read, :dashboard
+    can :index, HolidayList
   end
 
   def admin_abilities

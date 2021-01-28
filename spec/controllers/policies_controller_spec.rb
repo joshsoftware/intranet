@@ -81,4 +81,18 @@ RSpec.describe PoliciesController, :type => :controller do
       expect(response).to redirect_to(attachments_path)
     end
   end
+
+  context 'as consultant role' do
+    before do
+      @consultant = FactoryGirl.create(:consultant)
+      sign_in @consultant
+    end
+
+    it 'should not allow to view policies' do
+      policy = FactoryGirl.create(:policy)
+      get :show, id: policy.id
+      expect(response).to_not be_success
+      expect(flash[:error]).to eq('You are not authorized to access this page.')
+    end
+  end
 end
