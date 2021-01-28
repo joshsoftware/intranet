@@ -1,4 +1,5 @@
-= link_to '', attachments_path, class: 'icon-arrow-left', title: 'Back'
+- unless current_user.role == ROLE[:consultant]
+  = link_to '', attachments_path, class: 'icon-arrow-left', title: 'Back'
 %center
   %table
     %thead
@@ -7,7 +8,7 @@
     %tbody
       %td= select_year(Date.today, start_year: Date.today.prev_year.year, end_year: Date.today.next_year.year)
       %td= select_tag('country', options_for_select(COUNTRIES, @country))
-    
+
     - if can? :edit, HolidayList
       .pull-right
         = link_to '', new_holiday_list_path, class: 'icon-plus add-timesheet-icon', title: 'Add Holiday'
@@ -18,4 +19,3 @@
 
   - else
     %h4 No records found. Please Contact System Admin.
-  

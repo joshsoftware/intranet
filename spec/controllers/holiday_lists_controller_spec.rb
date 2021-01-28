@@ -16,7 +16,7 @@ RSpec.describe HolidayListsController, type: :controller do
     end
   end
 
-  context '#index' do 
+  context '#index' do
     it 'show list of holidays' do
       get :index
       expect(response).to have_http_status(200)
@@ -51,7 +51,7 @@ RSpec.describe HolidayListsController, type: :controller do
   end
 
   context '#update' do
-    let!(:holiday) { FactoryGirl.create(:holiday) } 
+    let!(:holiday) { FactoryGirl.create(:holiday) }
     it 'update holiday' do
       params  = {
         holiday_date: '05/09/2019',
@@ -65,13 +65,11 @@ RSpec.describe HolidayListsController, type: :controller do
   context '#holiday_list' do
     before do
       @holiday = FactoryGirl.create(:holiday)
-      @user = FactoryGirl.create(:user)
-      sign_in @user
     end
 
     it 'render holiday list' do
       get :holiday_list
-      
+
       holiday_list = JSON.parse response.body
       expect(response).to have_http_status(:success)
       expect(holiday_list.first['country']).to eq(@holiday.country)
@@ -94,6 +92,19 @@ RSpec.describe HolidayListsController, type: :controller do
       expect(holiday_list.first['holiday_date']).to eq(holiday.holiday_date.strftime("%Y-%m-%d"))
       expect(holiday_list.first['holiday_type']).to eq(HolidayList::OPTIONAL)
       expect(holiday_list.first['reason']).to eq(holiday.reason)
+    end
+  end
+
+  context 'as consultant role' do
+    before do
+      @consultant = FactoryGirl.create(:consultant)
+      sign_in @consultant
+    end
+
+    it 'should not allow to view policies' do
+      get :index
+      expect(response).to have_http_status(200)
+      expect(response).to render_template :index
     end
   end
 end
