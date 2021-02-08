@@ -249,19 +249,30 @@ describe LeaveApplication do
 
         before do
           ActionMailer::Base.deliveries = []
+          travel_to Date.new(2021, 02, 8)
+        end
+
+        after do
+          travel_back
         end
 
         it 'send reminder mail if leave begins in next 2 day' do
-          leave_application = FactoryGirl.create(:leave_application, user: user)
+          leave_application = FactoryGirl.create(
+            :leave_application,
+            user: user,
+            start_at: Date.new(2021, 02, 10),
+            end_at: Date.new(2021, 02, 10)
+          )
           LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
           expect(ActionMailer::Base.deliveries.count).to eq(1)
         end
 
         it 'send reminder mail if leave begins in next 1 day' do
-          leave_application = FactoryGirl.create(:leave_application,
+          leave_application = FactoryGirl.create(
+            :leave_application,
             user: user,
-            start_at: Date.today + 1,
-            end_at: Date.today + 1,
+            start_at: Date.new(2021, 02, 9),
+            end_at: Date.new(2021, 02, 9)
           )
           LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
           expect(ActionMailer::Base.deliveries.count).to eq(1)
