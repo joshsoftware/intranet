@@ -1138,6 +1138,14 @@ RSpec.describe TimeSheet, type: :model do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project) }
 
+    before do
+      travel_to Date.new(2021,02,8)
+    end
+
+    after do
+      travel_back
+    end
+
     it 'Should give expected project report' do
       FactoryGirl.create(:user_project,
         user: user,
@@ -1262,6 +1270,14 @@ RSpec.describe TimeSheet, type: :model do
     let!(:user_two) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:user_three) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:project) { FactoryGirl.create(:project) }
+
+    before do
+      travel_to Date.new(2021,02,8)
+    end
+
+    after do
+      travel_back
+    end
 
     it 'Should give the expected project report' do
       user_one.public_profile.update_attributes(
