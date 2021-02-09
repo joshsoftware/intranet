@@ -1,6 +1,6 @@
 class PrivateProfile
   include Mongoid::Document
-  
+
   field :pan_number
   field :personal_email
   field :passport_number
@@ -11,7 +11,7 @@ class PrivateProfile
   field :previous_company
   field :bonusly_auth_token
   field :tshirt_size
-  field :previous_work_experience, :type => Integer #in months
+  field :previous_work_experience, :type => Integer , default: 0 #in months
 
   embedded_in :user
   embeds_many :contact_persons
@@ -44,6 +44,6 @@ class PrivateProfile
     users = User.approved.employees.where('private_profile.end_of_probation': date)
     UserMailer.notify_probation(users, date).deliver_now if users.present?
   end
-  
+
   #validates_presence_of :qualification, :date_of_joining, :personal_emailid, :on => :update
 end
