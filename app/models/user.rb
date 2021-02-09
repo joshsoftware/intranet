@@ -97,7 +97,7 @@ class User
 
   after_update do
     if (status_changed? && status == STATUS[:resigned])
-      reject_future_leaves 
+      reject_future_leaves
       set_user_project_entries_inactive
       remove_from_manager_ids
       remove_from_notification_emails
@@ -244,7 +244,7 @@ class User
       end
       errors.delete(profile)
     end
-    
+
     error_msg.push self.errors.full_messages
     error_msg.flatten.join(' ')
   end
@@ -399,8 +399,9 @@ class User
       # if current months is not completed then reduce by 1
       months += today.month - date_of_joining.month - (today.day >= date_of_joining.day ? 0 : 1)
 
-      previous_work_experience ? previous_work_experience + months : months
+      previous_work_experience = previous_work_experience ? previous_work_experience + months : months
     end
+    previous_work_experience
   end
 
   def self.to_csv(options={})
