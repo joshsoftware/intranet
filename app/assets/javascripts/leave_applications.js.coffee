@@ -2,15 +2,27 @@ CalculateWeekendDays = (fromDate, toDate) ->
   weekDayCount = 0
   fromDate = new Date(fromDate)
   toDate = new Date(toDate)
+
+  holiday_list = JSON.parse(localStorage.items)
+  holiday_dates  = holiday_list.filter (h) -> h.holiday_type == 'MANDATORY'
+  holiday_dates  = holiday_dates.map (h) -> h.holiday_date
+
+  optional_holiday_list = JSON.parse(localStorage.userOptionalItems)
+  optional_holiday_list = optional_holiday_list.user_optional_holiday.map (h) ->
+                            new Date(h).toLocaleDateString('fr-CA')
+  holiday_dates = holiday_dates.concat(optional_holiday_list)
+
   while fromDate <= toDate
     date = fromDate.toISOString().substring(0,10);
-    ++weekDayCount if not (fromDate.getDay() is 0 or fromDate.getDay() is 6 or findHolidayDate(date))
+    ++weekDayCount if not (fromDate.getDay() is 0 or fromDate.getDay() is 6 or holiday_dates.includes(date))
     fromDate.setDate fromDate.getDate() + 1
   $("#leave_application_number_of_days").val(weekDayCount)
 
 @set_number_of_days = (location) ->
   getHolidayList(location)
   getHolidayOptionalList(location)
+  getEmpOptionalList()
+
   $("#leave_application_start_at").on "change", ->
     CalculateWeekendDays($("#leave_application_start_at").val(),
      $("#leave_application_end_at").val()) if $("#leave_application_end_at").val()
@@ -28,6 +40,14 @@ getHolidayList = (location) ->
     success: (response) ->
       localStorage.setItem 'items', JSON.stringify(response)
 
+getEmpOptionalList = () ->
+  $.ajax
+    dataType: 'json'
+    type: 'GET'
+    url: '/users_optional_holiday_list'
+    success: (response) ->
+      localStorage.setItem 'userOptionalItems', JSON.stringify(response)
+
 getHolidayOptionalList = (location) ->
   $.ajax
     dataType: 'json'
@@ -36,18 +56,6 @@ getHolidayOptionalList = (location) ->
     data: {location: location, leave_type: 'OPTIONAL'}
     success: (response) ->
       localStorage.setItem 'optional_items', JSON.stringify(response)
-
-findHolidayDate = (fromDate) ->
-  i = 0
-  array = localStorage.items
-  array = JSON.parse(array)
-  data  = array.map (h) ->
-            h.holiday_date
-  while i < data.length
-    if data[i] == fromDate
-      return true
-    i++
-  false
 
 setLeaveDate = (min, max) ->
   $('#leave_application_start_at').attr('min', min)

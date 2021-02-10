@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   end
 
   get 'holiday_list', to: 'holiday_lists#holiday_list'
+  get 'users_optional_holiday_list', to: 'users#users_optional_holiday_list'
   get '/unsubscribe' => 'light/users#unsubscribe', as: 'users/unsubscribe'
   #get '/unsubscribe/:id' => 'light/users#unsubscribe', as: 'users/unsubscribe'
   match '/subscribe' => 'light/users#subscribe', as: 'users/subscribe', via: [:get, :post]

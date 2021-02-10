@@ -1,5 +1,6 @@
 class HolidayListsController < ApplicationController
 
+  load_and_authorize_resource only: [:index, :new, :edit, :update, :destroy, :holiday_list]
   before_action :authenticate_user!
   load_and_authorize_resource only: [:index, :new, :edit, :holiday_list]
   before_action :load_holiday, only: [:update, :edit, :destroy]
