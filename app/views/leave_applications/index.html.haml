@@ -18,13 +18,17 @@
           = link_to user.employee_detail.try(:available_leaves),'#', {class: 'available_leaves', id: "leave_#{user.try(:id)}", data:{pk: user.id, url: update_available_leave_path(id: user.id)}} if user.status.eql?(STATUS[:approved])
 
 :javascript
-  $.fn.editable.defaults.ajaxOptions = {type: "PUT"}; 
+  $.fn.editable.defaults.ajaxOptions = {type: "PUT"};
   $('.available_leaves').editable({
     url: $(this).data('url'),
     validate: function(value){
       if(value == '')
       {
         return 'Can not be blank'
+      }
+      if(value > 24)
+      {
+        return 'Cannot exceed 24'
       }
       if(isNaN(value)){
         return 'Enter only Number'

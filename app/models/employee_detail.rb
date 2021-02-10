@@ -25,7 +25,7 @@ class EmployeeDetail
   validates :employee_id, uniqueness: true
   #validates :designation_track, presence: true
   validates :date_of_relieving, presence: true, if: :user_status_changed?, on: :update
-  validates :available_leaves, numericality: {greater_than_or_equal_to: 0}
+  validates :available_leaves, numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 24}
   after_update :delete_team_cache, if: Proc.new{ updated_at_changed? }
   validates :location, presence: true
   validates :division, inclusion: { in: DIVISION_TYPES.values, allow_nil: true }

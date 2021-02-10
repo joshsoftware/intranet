@@ -64,6 +64,50 @@ namespace :update_data do
       puts "Changing Division of user email: #{user.email} as #{user.employee_detail.division}"
     end
   end
+
+  desc 'Update number of days count for leaves which overlaps optional holidays' +
+       ' And availble leaves for respective employee'
+  task update_leave_count: :environment do
+    user_list = []
+    User.each do |u|
+      optional_holidays = HolidayList.where(
+        holiday_type: 'OPTIONAL',
+        :holiday_date.gte => Date.today.beginning_of_year,
+        country: u.country
+      )
+      applied_optional_leaves = u.leave_applications.unrejected.where(
+        leave_type: 'OPTIONAL',
+        :start_at.gte => Date.today.beginning_of_year
+      ).pluck(:start_at)
+      optional_holidays.each do |o|
+        leaves = u.leave_applications.where(
+          :start_at.lte => o.holiday_date,
+          :end_at.gte => o.holiday_date,
+          leave_type: 'LEAVE'
+        )
+        leaves.each do |leave|
+          number_of_days_count = 0
+          (leave.start_at..leave.end_at).each do |date|
+            number_of_days_count += 1 if !HolidayList.is_holiday?(date, u.country) || (HolidayList.is_optional_holiday?(date) && !applied_optional_leaves.include?(date))
+          end
+          user_list << [u.email, leave.id] if number_of_days_count != leave.number_of_days
+        end
+      end
+    end
+    puts "Email \t | Leave start at | Leave end at | Number of days | Updated number of days |  Available leave | Updated available leave"
+    user_list.each do |user|
+      leave = LeaveApplication.where(id: user[1]).first
+      employee_detail = User.where(email: user[0]).first.employee_detail
+      if leave.leave_status == REJECTED
+        leave.update_attributes(number_of_days: leave.number_of_days + 1)
+        puts "#{user[0]} \t | #{leave.start_at} | #{leave.end_at} | #{leave.number_of_days} | #{leave.number_of_days + 1} | #{employee_detail.available_leaves} | #{employee_detail.available_leaves}"
+      else
+        leave.update_attributes(number_of_days: leave.number_of_days + 1)
+        employee_detail.update_attributes(available_leaves: employee_detail.available_leaves - 1)
+        puts "#{user[0]} \t | #{leave.start_at} | #{leave.end_at} | #{leave.number_of_days} | #{leave.number_of_days + 1} | #{employee_detail.available_leaves} | #{employee_detail.available_leaves - 1}"
+      end
+    end
+  end
 end
 
 def calculate_emp_id

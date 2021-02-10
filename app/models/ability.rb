@@ -10,7 +10,7 @@ class Ability
     elsif user.role? 'HR'
       hr_abilities(user.id)
     elsif user.role? 'Finance'
-      can [:public_profile, :private_profile, :apply_leave], User, id: user.id
+      can [:public_profile, :private_profile, :apply_leave, :users_optional_holiday_list], User, id: user.id
       can :read, :dashboard
       can [:index, :holiday_list], HolidayList
       can :manage, Company
@@ -62,7 +62,7 @@ class Ability
   end
 
   def employee_abilities(user_id)
-    can [:public_profile, :private_profile, :apply_leave], User, id: user_id
+    can [:public_profile, :private_profile, :apply_leave, :users_optional_holiday_list], User, id: user_id
     can [:index, :download_document], Attachment do |attachment|
       attachment.user_id == user_id || attachment.is_visible_to_all
     end
@@ -80,7 +80,7 @@ class Ability
   end
 
   def consultant_abilities(user_id)
-    can [:public_profile, :private_profile, :apply_leave], User, id: user_id
+    can [:public_profile, :private_profile, :apply_leave, :users_optional_holiday_list], User, id: user_id
     cannot :manage, LeaveApplication
     can [:new, :create], LeaveApplication, user_id: user_id
     can [:edit, :update], LeaveApplication, leave_status: 'Pending', user_id: user_id
@@ -88,6 +88,7 @@ class Ability
     cannot [:projects_report, :individual_project_report], TimeSheet
     cannot :manage, EntryPass, user_id: user_id
     cannot :report, EntryPass
+    can [:index, :holiday_list], HolidayList
     cannot :read, :dashboard
     can [:index, :holiday_list], HolidayList
   end
@@ -95,14 +96,14 @@ class Ability
   def admin_abilities
     common_admin_hr
     can :edit, User
-    can [:public_profile, :private_profile], User
+    can [:public_profile, :private_profile, :users_optional_holiday_list], User
     can :manage, :admin
     can :manage, EntryPass
   end
 
   def hr_abilities(user_id)
     common_admin_hr
-    can [:public_profile, :private_profile, :edit, :apply_leave], User
+    can [:public_profile, :private_profile, :edit, :apply_leave, :users_optional_holiday_list], User
     cannot :manage, LeaveApplication
     can :index, LeaveApplication
     can [:new, :create], LeaveApplication, user_id: user_id

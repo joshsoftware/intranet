@@ -43,6 +43,9 @@ class LeaveApplication
   after_save do
     deduct_available_leave_send_mail
     send_leave_notification
+    #below is to update number of days in overlapping leave and
+    #available leaves of user if optional leave is created or modified
+    adjust_leave_count if optional_leave?
   end
 
   after_update :update_available_leave_send_mail, if: 'pending?'
@@ -105,6 +108,41 @@ class LeaveApplication
     if leave_count > 2
       errors.add(:leave_type, 'Cannot apply for more than 2 Optional leaves')
     end
+  end
+
+  def adjust_leave_count
+    overlapping_leave = self.user.leave_applications.where(
+      :start_at.lte => self.start_at,
+      :end_at.gte => self.start_at,
+      leave_type: LEAVE
+    ).first
+    return if overlapping_leave.nil?
+    employee_detail = self.user.employee_detail
+    if pending_or_approved_after_rejecting
+      #decrement number of days of overlapping leave by 1
+      #increment user's available leaves by 1
+      revise_leave_count(overlapping_leave, employee_detail, 'decreament')
+    elsif (self.leave_status_was != REJECTED and self.leave_status == REJECTED)
+      #increment number of days of overlapping leave by 1
+      #decrement user's available leaves by 1
+      revise_leave_count(overlapping_leave, employee_detail, 'increament')
+    end
+  end
+
+  def revise_leave_count(overlapping_leave, employee_detail, operation)
+    count = operation.eql?('decreament') ? +1 : -1
+    #when operation is 'decreament' then number of days of leave is increamented by 1
+    #and user's available leaves is decremented by 1 OR visa versa
+    overlapping_leave.update_attributes(number_of_days: overlapping_leave.number_of_days - count)
+    #no need to update user's available leaves if overlapping leave is rejected
+    employee_detail.update_attributes(
+      available_leaves: employee_detail.available_leaves + count
+    ) unless overlapping_leave.leave_status == REJECTED
+  end
+
+  def pending_or_approved_after_rejecting
+    (pending? and self.leave_status_was.nil?) or
+    (approved? and self.leave_status_was == REJECTED)
   end
 
   def process_after_update(status)
@@ -238,7 +276,7 @@ class LeaveApplication
     # Since leave has been deducted on creation, don't deduct leaves
     # if changed from PENDING to APPROVED
     # Deduct on creation and changed from 'Rejected' to 'Approved'
-    if (pending? and self.leave_status_was.nil?) or (approved? and self.leave_status_was == REJECTED)
+    if pending_or_approved_after_rejecting
       user = self.user
       user.employee_detail.deduct_available_leaves(number_of_days) if leave?
       user.sent_mail_for_approval(self.id) unless self.leave_status_was == REJECTED

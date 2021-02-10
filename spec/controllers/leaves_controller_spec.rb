@@ -811,9 +811,19 @@ describe LeaveApplicationsController do
   context 'Optional Leave' do
     before(:each) do
       @user = FactoryGirl.create(:user, status: STATUS[:approved])
-      @leave = FactoryGirl.build(:leave_application,
+      @optional_holiday = FactoryGirl.create(:holiday, holiday_date: Date.new(2021,2,9), holiday_type: HolidayList::OPTIONAL)
+      @optional_leave = FactoryGirl.build(:leave_application,
         leave_type: LeaveApplication::OPTIONAL,
-        user: @user
+        user: @user,
+        start_at: @optional_holiday.holiday_date,
+        end_at: @optional_holiday.holiday_date
+      )
+      @leave = FactoryGirl.build(:leave_application,
+        leave_type: LeaveApplication::LEAVE,
+        user: @user,
+        start_at: Date.new(2021,2,8),
+        end_at: Date.new(2021,2,10),
+        number_of_days: 3
       )
     end
 
@@ -822,7 +832,7 @@ describe LeaveApplicationsController do
       leave_count = @user.employee_detail.available_leaves
       params = {
         user_id: @user.id,
-        leave_application: @leave.attributes
+        leave_application: @optional_leave.attributes
       }
       post :create, params
 
@@ -831,62 +841,114 @@ describe LeaveApplicationsController do
 
     it 'should deduct leave if leave type updated to LEAVE' do
       sign_in @user
-      @leave.save
-      leave_count = @user.employee_detail.available_leaves - @leave.number_of_days
+      @optional_leave.save
+      leave_count = @user.employee_detail.available_leaves - @optional_leave.number_of_days
       params = {
-        id: @leave.id,
-        leave_application: @leave.attributes.merge(leave_type: LeaveApplication::LEAVE)
+        id: @optional_leave.id,
+        leave_application: @optional_leave.attributes.merge(leave_type: LeaveApplication::LEAVE)
       }
       put :update, params
 
       expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
-      expect(@leave.reload.leave_type).to eq(LeaveApplication::LEAVE)
+      expect(@optional_leave.reload.leave_type).to eq(LeaveApplication::LEAVE)
     end
 
     it 'should not deduct any leave if leave type updated to WFH' do
       sign_in @user
-      @leave.save
+      @optional_leave.save
       leave_count = @user.employee_detail.available_leaves
       params = {
-        id: @leave.id,
-        leave_application: @leave.attributes.merge(leave_type: LeaveApplication::WFH)
+        id: @optional_leave.id,
+        leave_application: @optional_leave.attributes.merge(leave_type: LeaveApplication::WFH)
       }
       put :update, params
 
       expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
-      expect(@leave.reload.leave_type).to eq(LeaveApplication::WFH)
+      expect(@optional_leave.reload.leave_type).to eq(LeaveApplication::WFH)
     end
 
     it 'should not deduct leave count after approving the Optional request' do
       admin = FactoryGirl.create(:admin, status: STATUS[:approved])
       sign_in admin
-      @leave.save
+      @optional_leave.save
       params = {
-        id: @leave.id,
+        id: @optional_leave.id,
         leave_action: :approve
       }
       xhr :get, :process_leave, params
 
       leave_count = @user.reload.employee_detail.available_leaves
-      expect(@leave.reload.leave_status).to eq(APPROVED)
-      expect(@leave.leave_type).to eq(LeaveApplication::OPTIONAL)
+      expect(@optional_leave.reload.leave_status).to eq(APPROVED)
+      expect(@optional_leave.leave_type).to eq(LeaveApplication::OPTIONAL)
       expect(leave_count).to eq(24)
     end
 
     it 'should not add or deduct leave count after reject the Optional request' do
       admin = FactoryGirl.create(:admin, status: STATUS[:approved])
       sign_in admin
+      @optional_leave.save
+      params = {
+        id: @optional_leave.id,
+        leave_action: :reject
+      }
+      xhr :get, :process_leave, params
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(@optional_leave.reload.leave_status).to eq(REJECTED)
+      expect(@optional_leave.leave_type).to eq(LeaveApplication::OPTIONAL)
+      expect(leave_count).to eq(24)
+    end
+
+    it 'should deduct or add leave count of approved leave and' +
+       ' increment or decreament available leaves of employee' +
+       ' if the overlapping Optional leave is approved or rejected' do
+      admin = FactoryGirl.create(:admin, status: STATUS[:approved])
+      sign_in admin
+      leave_count = @user.employee_detail.available_leaves
+      @leave.save
+      params = {
+        id: @leave.id,
+        leave_action: :approve
+      }
+      xhr :get, :process_leave, params
+      expect(@user.reload.employee_detail.available_leaves).to eq(21)
+
+      @optional_leave.save
+      params = {
+        id: @optional_leave.id,
+        leave_action: :approve
+      }
+      xhr :get, :process_leave, params
+
+      expect(@optional_leave.reload.leave_status).to eq(APPROVED)
+      expect(@leave.reload.number_of_days).to eq(2)
+      expect(@user.reload.employee_detail.available_leaves).to eq(22)
+    end
+
+    it 'should deduct or add leave count of rejected leave and' +
+       ' if the overlapping Optional leave is approved or rejected' do
+      admin = FactoryGirl.create(:admin, status: STATUS[:approved])
+      sign_in admin
+      leave_count = @user.employee_detail.available_leaves
       @leave.save
       params = {
         id: @leave.id,
         leave_action: :reject
       }
       xhr :get, :process_leave, params
+      expect(@leave.reload.number_of_days).to eq(3)
+      expect(@user.reload.employee_detail.available_leaves).to eq(24)
 
-      leave_count = @user.reload.employee_detail.available_leaves
-      expect(@leave.reload.leave_status).to eq(REJECTED)
-      expect(@leave.leave_type).to eq(LeaveApplication::OPTIONAL)
-      expect(leave_count).to eq(24)
+      @optional_leave.save
+      params = {
+        id: @optional_leave.id,
+        leave_action: :approve
+      }
+      xhr :get, :process_leave, params
+
+      expect(@optional_leave.reload.leave_status).to eq(APPROVED)
+      expect(@leave.reload.number_of_days).to eq(2)
+      expect(@user.reload.employee_detail.available_leaves).to eq(24)
     end
   end
 end
