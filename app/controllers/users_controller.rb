@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   before_action :load_user, only: [:edit, :update, :show, :public_profile, :private_profile, :get_feed]
   before_action :load_profiles, only: [:public_profile, :private_profile, :update, :edit]
   before_action :build_addresses, only: [:public_profile, :private_profile, :edit]
-  before_action :authorize, only: [:public_profile, :edit]
+  before_action :authorize, only: [:public_profile, :edit, :resource_list, :resource_list_download, :invite_user]
   before_action :authorize_document_download, only: :download_document
   after_action :notify_document_download, only: :download_document
 

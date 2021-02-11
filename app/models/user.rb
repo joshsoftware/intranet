@@ -171,7 +171,7 @@ class User
   end
 
   def can_edit_user?(user)
-    (["HR", "Admin", "Finance", "Manager", "Super Admin"].include?(self.role)) || self == user
+    ([ROLE[:HR], ROLE[:admin], ROLE[:manager], ROLE[:super_admin]].include?(self.role)) || self == user
   end
 
   def can_download_document?(user, attachment)
