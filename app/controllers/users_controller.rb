@@ -11,9 +11,12 @@ class UsersController < ApplicationController
     if current_user.role == ROLE[:consultant]
       flash[:error] = 'You are not authorized to access this page.'
       redirect_to public_profile_user_path(current_user)
+    elsif request.format.xlsx? && !MANAGEMENT.include?(current_user.role)
+      flash[:error] = 'You are not authorized to access this page.'
+      redirect_to root_path
     else
       @users = params[:all].present? ?  User.employees : User.employees.approved
-      @usersxls = params[:status] == "all" ? User.employees : User.employees.approved
+      @usersxls = params[:status] == "all" ? User.nin(status: STATUS[:created]).employees : User.employees.approved
       respond_to do |format|
         format.html # index.html.erb
         format.xlsx
