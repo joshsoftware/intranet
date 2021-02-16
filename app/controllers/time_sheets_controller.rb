@@ -177,6 +177,18 @@ class TimeSheetsController < ApplicationController
     redirect_to export_project_report_time_sheets_path
   end
 
+  def export_time_sheet_weekend_report
+    @from_date = params[:from_date] || Date.today.beginning_of_month
+    @to_date = params[:to_date] || Date.today
+    TimesheetWeekendReportWorker.perform_async(
+      @from_date,
+      @to_date,
+      current_user.email
+    )
+    flash[:success] = 'You will receive timesheet weekend report to your mail shortly.'
+    redirect_to export_project_report_time_sheets_path
+  end
+
   def import
     if params[:file].present? && params[:file_name]
       ImportTimesheetWorker.perform_async(params[:file].path, params[:file_name], current_user.email)

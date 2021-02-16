@@ -1,0 +1,10 @@
+= form_tag export_time_sheet_weekend_report_time_sheets_path, method: 'GET', class: 'form form-inline' do
+  .form-horizontal
+    .div.form-position
+      .row.row-padding
+        %label.col-md-3 From Date:
+        %input{ name: 'from_date', 'aria-label': 'From Date', class: 'col-md-3 form-control date-picker', type: 'date', placeholder: 'From Date', value: @from_date}
+      .row.row-padding
+        %label To Date:
+        %input{ name: 'to_date', 'aria-label': 'To Date', class: 'form-control date-picker', type: 'date', placeholder: 'From Date', value: @to_date}
+      = submit_tag 'Export Report', class: 'btn btn-primary btn-padding'

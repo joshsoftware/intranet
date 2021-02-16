@@ -127,6 +127,7 @@ Rails.application.routes.draw do
     get :individual_project_report, on: :member
     get :export_project_report, on: :collection
     get :export_resource_report, on: :collection
+    get :export_time_sheet_weekend_report, on: :collection
 
     collection do
       get 'users_timesheet/:user_id' => 'time_sheets#users_timesheet', as: 'users'

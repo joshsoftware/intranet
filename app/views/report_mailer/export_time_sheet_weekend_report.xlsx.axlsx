@@ -1,0 +1,12 @@
+wb = xlsx_package.workbook
+reports.each do |report|
+  wb.add_worksheet(name: report[:country_name]) do |sheet|
+    sheet.add_row(['Weekends & Holidays', ''] + report[:header])
+    sheet.add_row(['Employee Id', 'Employee Name'])
+
+    report[:records].each do | record |
+      sheet.add_row [record[0]] + record[1].values,
+                    types: [:string]
+    end
+  end
+end
