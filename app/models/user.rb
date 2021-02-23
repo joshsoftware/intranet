@@ -67,6 +67,7 @@ class User
   scope :project_engineers, ->{where(:role.nin => [ROLE[:HR], ROLE[:finance]], status: STATUS[:approved]).asc('public_profile.first_name')}
   scope :get_employees, -> (country) {where( :'employee_detail.location'.in => User.get_cities(country))}
   scope :employees, ->{all.asc('public_profile.first_name')}
+  scope :team, -> {nin(:status.in => [STATUS[:created], STATUS[:resigned]]).asc('public_profile.first_name')}
   scope :approved, ->{where(status: STATUS[:approved])}
   scope :visible_on_website, -> {where(visible_on_website: true)}
   scope :interviewers, ->{where(:role.ne => ROLE[:intern])}
@@ -82,8 +83,8 @@ class User
   delegate :date_of_relieving, to: :employee_detail, :allow_nil =>true
   delegate :location, to: :employee_detail, :allow_nil => true
 
-  scope :leaders, ->{ visible_on_website.asc(:website_sequence_number).in(role: ROLE[:admin]) }
-  scope :members, ->{ visible_on_website.nin(:role.in => [ ROLE[:admin], ROLE[:consultant] ]).asc(['public_profile.first_name']) }
+  scope :leaders, ->{ team.visible_on_website.asc(:website_sequence_number).in(role: ROLE[:admin]) }
+  scope :members, ->{ team.visible_on_website.nin(:role.in => [ ROLE[:admin], ROLE[:consultant] ]).asc(['public_profile.first_name']) }
 
   before_create do
     self.website_sequence_number = (User.max(:website_sequence_number) || 0) + 1
