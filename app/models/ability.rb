@@ -12,7 +12,7 @@ class Ability
     elsif user.role? 'Finance'
       can [:public_profile, :private_profile, :edit, :apply_leave], User
       can :read, :dashboard
-      can :index, HolidayList
+      can [:index, :holiday_list], HolidayList
       can :manage, Company
     elsif user.role? 'Manager'
       employee_abilities(user.id)
@@ -75,7 +75,7 @@ class Ability
     cannot [:projects_report, :individual_project_report], TimeSheet
     can :manage, EntryPass, user_id: user_id
     cannot :report, EntryPass
-    can :index, HolidayList
+    can [:index, :holiday_list], HolidayList
     can :read, :dashboard
   end
 
@@ -89,7 +89,7 @@ class Ability
     cannot :manage, EntryPass, user_id: user_id
     cannot :report, EntryPass
     cannot :read, :dashboard
-    can :index, HolidayList
+    can [:index, :holiday_list], HolidayList
   end
 
   def admin_abilities
