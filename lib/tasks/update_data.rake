@@ -56,6 +56,14 @@ namespace :update_data do
       puts "Changing Division of user email: #{user.email} as #{user.employee_detail.division}"
     end
   end
+
+  desc "Set division value as consultant for employees having '.jc@joshsoftware.com' as a part of email-id"
+  task set_division_for_consultant: :environment do
+    User.employees.where(:status.ne => STATUS[:resigned], email: /\.jc@joshsoftware\.com$/).each do |user|
+      user.employee_detail.set(division: DIVISION_TYPES[:consultant])
+      puts "Changing Division of user email: #{user.email} as #{user.employee_detail.division}"
+    end
+  end
 end
 
 def calculate_emp_id
