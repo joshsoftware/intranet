@@ -23,7 +23,7 @@ class Company
 
   validates :name, uniqueness: true, presence: true
   validates :billing_location, inclusion: { in: COUNTRIES_ABBREVIATIONS }
-  validates :invoice_code, uniqueness: true, length: {maximum: 3}, allow_blank: true
+  validates :invoice_code, uniqueness: {scope: :billing_location}, length: {maximum: 3}, allow_blank: true
   validate :website_url
 
   after_save do

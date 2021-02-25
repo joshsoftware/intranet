@@ -11,7 +11,6 @@ RSpec.describe Company, type: :model do
   it { should validate_uniqueness_of(:name) }
   it { should validate_uniqueness_of(:invoice_code) }
   it { is_expected.to validate_inclusion_of(:billing_location).to_allow(COUNTRIES_ABBREVIATIONS) }
-  
 
   it 'Should fail as invoice code length is more than 3' do
     company = FactoryGirl.build(:company, invoice_code: 'a234')
@@ -21,6 +20,18 @@ RSpec.describe Company, type: :model do
   it 'Should pass as invoice code length is maximum 3' do
     company = FactoryGirl.build(:company, invoice_code: 'a23')
     expect(company.valid?).to_not be_falsy
+  end
+
+  it 'Should pass as invoice code is unique with scope billing location' do
+    company1 = FactoryGirl.create(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[0])
+    company2 = FactoryGirl.build(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[1])
+    expect(company2.valid?).to_not be_falsy
+  end
+
+  it 'Should fail as invoice code is not unique with scope billing location' do
+    company1 = FactoryGirl.create(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[0])
+    company2 = FactoryGirl.build(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[0])
+    expect(company2.valid?).to be_falsy
   end
 
   it "Should validate website URL" do
