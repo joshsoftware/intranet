@@ -7,10 +7,10 @@ class CompaniesController < ApplicationController
 
   def index
     @offset = params[:offset] || 0
-    @companies = Company.skip(@offset).limit(10)
+    @companies = Company.order_by(:name.asc).skip(@offset).limit(10)
     respond_to do |format|
       format.html
-      format.json { render json: @companies.to_json(only:[:_slugs, :name, :active, :gstno, :invoice_code, :website])}
+      format.json { render json: @companies.to_json(only:[:_slugs, :name, :active, :gstno, :invoice_code, :website, :billing_location])}
       format.csv do
         send_data Company.to_csv, filename: "Compaines - #{Date.today}.csv"
       end
