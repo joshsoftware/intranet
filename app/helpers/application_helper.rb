@@ -1,9 +1,9 @@
 module ApplicationHelper
-  
+
   def flash_class(type)
     case type
     when 'notice' then "alert alert-info"
-    when 'success' then "alert alert-success" 
+    when 'success' then "alert alert-success"
     when 'error' then "alert alert-error"
     when 'alert' then "alert alert-error"
     end
@@ -21,8 +21,12 @@ module ApplicationHelper
     when 'Newsletter' then [ROLE[:HR], ROLE[:admin], 'Super Admin'].include?(role)
     when 'Contacts' then [ROLE[:admin], 'Super Admin'].include?(role)
     when 'Manage Leave' then [ROLE[:admin], 'Super Admin', ROLE[:HR]].include?(role)
-    when 'Assessments' then [ROLE[:consultant]].include?(role)
+    when 'Assessments' then ROLE.except(:consultant).values.include?(role) || applicable_consultants
     when 'Repositories' then [ROLE[:admin], ROLE[:manager], ROLE[:employee], ROLE[:intern]].include?(role)
     end
+  end
+
+  def applicable_consultants
+    ENV['APPLICABLE_CONSULTANTS'].include?(current_user.email)
   end
 end
