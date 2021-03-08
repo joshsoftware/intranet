@@ -58,3 +58,5 @@ CUSTOM_MANAGERS = {
 }
 
 LEAVE_TYPES = {leave: 'LEAVE', wfh: 'WFH', optional_holiday: 'OPTIONAL HOLIDAY', spl: 'SPL'}
+
+ASSET_TYPES = {hardware: 'Hardware', software: 'Software', other: 'Other'}

@@ -259,6 +259,12 @@ describe UsersController do
       expect(response).to have_http_status(:success)
     end
 
+    it 'should download assets images' do
+      user_asset = FactoryGirl.create(:asset, user: @user)
+      get :download_document, {id: user_asset.id, image: 'before_image'}
+      expect(response).to have_http_status(:success)
+    end
+
     it 'should send notification mail if user downloads his document and user is not HR or Admin' do
       Sidekiq::Testing.inline! do
         ActionMailer::Base.deliveries = []
@@ -298,6 +304,14 @@ describe UsersController do
       attachment = FactoryGirl.build(:attachment, user: @user, document: nil)
       attachment.save(validate: false)
       get :download_document, {id: attachment.id}
+      expect(response).to redirect_to(public_profile_user_path(@user))
+      expect(flash[:error]).to eq('You are trying to download invalid document')
+    end
+
+    it 'should fail as before_images is not present' do
+      asset = FactoryGirl.build(:asset, user: @user, before_image: nil)
+      asset.save(validate: false)
+      get :download_document, {id: asset.id, image: 'before_image'}
       expect(response).to redirect_to(public_profile_user_path(@user))
       expect(flash[:error]).to eq('You are trying to download invalid document')
     end
