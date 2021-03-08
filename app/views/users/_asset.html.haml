@@ -1,0 +1,68 @@
+= simple_nested_form_for(@user, :url => user_path(@user), :html => { method: :put, class: "form-horizontal", multipart: true}) do |f|
+  %h4 Current Assets
+  = f.fields_for :assets, @current_assets do |a|
+    %table.asset_list
+      %tr
+        %td
+          = a.input :name, input_html: { 'aria-label': 'Asset name' }
+        %td
+          = a.input :type, as: :select, collection: ASSET_TYPES.values.sort, input_html: {class: 'assets'}, prompt: 'Select Type', selected: a.object.try(:type)
+      %tr
+        %td
+          = a.input :model, input_html: { 'aria-label': 'Asset model' }
+        %td
+          = a.input :serial_number, input_html: { 'aria-label': 'Asset serial number' }
+      %tr
+        %td
+          = a.input :date_of_issue, input_html: {type: 'date', class: 'date-picker', label: 'Date of issue', value: a.object.date_of_issue.try(:strftime, "%Y-%m-%d")}
+        %td
+          = a.input :valid_till, input_html: {type: 'date', class: 'date-picker', label: 'Valid Till', value: a.object.valid_till.try(:strftime, "%Y-%m-%d")}
+      %tr
+        - if a.object.persisted?
+          %td
+            = a.label 'Recovered'
+            .make-switch{'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'Yes', 'data-off-label': 'No'}
+              = a.check_box :recovered
+        %td
+          = a.input :date_of_recovery, input_html: {type: 'date', class: 'date-picker', label: 'Recovery Date', value: a.object.date_of_recovery.try(:strftime, "%Y-%m-%d")}
+      %tr
+        %td
+          = a.input :before_image, input_html: {'aria-label': 'Choose file', role: 'button'}
+          - if a.object.persisted? && a.object.before_image.present?
+            .asset
+              = link_to '', download_document_user_path(id: a.object.id, image: 'before_image'), class: 'icon-download', role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}, title: 'Download Image'
+        %td
+          = a.input :after_image, input_html: { 'aria-label': 'Choose file', role: 'button' }
+          - if a.object.persisted? && a.object.after_image.present?
+            .asset
+              = link_to '', download_document_user_path(id: a.object.id, image: 'after_image'), class: 'icon-download', role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}, title: 'Download Image'
+      - unless a.object.persisted?
+        .remove_asset.pull-right
+          = a.link_to_remove '', class: 'btn icon-remove', 'aria-label': 'Remove the document', role: 'button', title: 'Remove Asset'
+  = f.link_to_add 'Add new asset', :assets, 'aria-label': 'Add new Asset', class: 'btn controls'
+  = f.submit :save, value: 'Upload', 'aria-label': 'Upload Assets', class: "btn"
+
+- if @previous_assets.present?
+  %h4 Previous Assets
+  %table.table.table-bordered
+    %thead
+      %tr
+        %th Name
+        %th Model
+        %th Serial Number
+        %th Date Of Issue
+        %th Date Of Recovery
+        %th Valid Till
+        %th Before Image
+        %th After Image
+    %tbody
+      - @previous_assets.each do |asset|
+        %tr
+          %td= asset.name
+          %td= asset.model
+          %td= asset.serial_number
+          %td= asset.date_of_issue
+          %td= asset.date_of_recovery
+          %td= asset.valid_till
+          %td= link_to 'Download', download_document_user_path(id: asset.id, image: 'before_image'), role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}, title: 'Download Image'
+          %td= link_to 'Download', download_document_user_path(id: asset.id, image: 'after_image'), role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}, title: 'Download Image'

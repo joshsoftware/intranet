@@ -15,6 +15,10 @@
       %li.emp-details-tab
         %a{data: {toggle: 'tab'}, href: '#emp-details'}
           Employee details
+    - if [ROLE[:HR]].include?(current_user.role)
+      %li.asset-tab
+        %a{data: {toggle: 'tab'}, href: '#assets'}
+          Assets
     - if DOCUMENT_MANAGEMENT.include?(current_user.role) || current_user == @user
       %li.document-tab
         %a{data: {toggle: 'tab'}, href: '#document'}
@@ -27,6 +31,8 @@
       = render partial: 'private_profile'
     .tab-pane#emp-details
       = render partial: 'employee_detail'
+    .tab-pane#assets
+      = render partial: 'asset'
     .tab-pane#document
       = render partial: 'document'
 

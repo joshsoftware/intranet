@@ -41,6 +41,7 @@ class User
 
   has_many :leave_applications
   has_many :attachments
+  has_many :assets
   has_many :time_sheets
   has_many :user_projects
   has_and_belongs_to_many :schedules
@@ -59,6 +60,7 @@ class User
   accepts_nested_attributes_for :entry_passes, reject_if: :all_blank, :allow_destroy => true
 
   accepts_nested_attributes_for :attachments, reject_if: :all_blank, :allow_destroy => true
+  accepts_nested_attributes_for :assets, reject_if: :all_blank, :allow_destroy => true
   accepts_nested_attributes_for :time_sheets, :allow_destroy => true
   accepts_nested_attributes_for :employee_detail
   validates :email, format: {with: /\A.+@#{ORGANIZATION_DOMAIN}/, message: "Only #{ORGANIZATION_NAME} email-id is allowed."}
@@ -235,11 +237,13 @@ class User
 
   def generate_errors_message
     error_msg = []
-    profiles = [:employee_detail, :private_profile, :public_profile, :attachments] & errors.keys
+    profiles = [:employee_detail, :private_profile, :public_profile, :attachments, :assets] & errors.keys
 
     profiles.each do |profile|
       if profile == :attachments
-        error_msg.push attachments_errors
+        error_msg.push get_errors(attachments)
+      elsif profile == :assets
+        error_msg.push get_errors(assets)
       else
         error_msg.push self.try(profile).try(:errors).try(:full_messages)
       end
@@ -256,8 +260,8 @@ class User
     end
   end
 
-  def attachments_errors
-    error_msg = self.attachments.map { |i| i.errors.full_messages }
+  def get_errors(document)
+    error_msg = document.map { |i| i.errors.full_messages }
     error_msg.flatten!.empty? ? error_msg : error_msg.uniq.join(', ')
   end
 

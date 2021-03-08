@@ -5,7 +5,6 @@ class UsersController < ApplicationController
   before_action :build_addresses, only: [:public_profile, :private_profile, :edit]
   before_action :authorize, only: [:public_profile, :edit]
   before_action :authorize_document_download, only: :download_document
-  after_action :notify_document_download, only: :download_document
 
   def index
     if current_user.role == ROLE[:consultant]
@@ -33,16 +32,16 @@ class UsersController < ApplicationController
 
   def update
     return_value_of_add_project = return_value_of_remove_project = true
-    @user.attributes =  user_params
+    @user.attributes = user_params
     return_value_of_add_project, return_value_of_remove_project = @user.add_or_remove_projects(params) if params[:user][:project_ids].present?
     if return_value_of_add_project && return_value_of_remove_project
-      tab = params[:user][:attachments_attributes].present? ? 'Documents': 'Employee details'
       if @user.save
-        flash.notice = "#{tab} updated Successfully"
+        flash.notice = "#{current_tab} updated Successfully"
         redirect_to public_profile_user_path(@user)
       else
+        @current_assets = @user.assets.reject{|asset| asset.recovered}
         load_emails_and_projects
-        flash[:error] = "#{tab}: Error #{@user.generate_errors_message}"
+        flash[:error] = "#{current_tab}: Error #{@user.generate_errors_message}"
         render 'public_profile'
       end
     else
@@ -104,7 +103,14 @@ class UsersController < ApplicationController
   def download_document
     document_type = MIME::Types.type_for(@document.url).first.content_type
     document_extension = '.' + @document.file.extension.downcase
-    send_file @document.path, filename: @document.model.name + document_extension, type: "#{document_type}"
+    send_file(
+      @document.path,
+      filename: @document.model.name + document_extension,
+      type: "#{document_type}"
+    )
+    notification_not_required = DOCUMENT_MANAGEMENT.include?(current_user.role) ||
+                                @attachment.instance_of?(Asset)
+    notify_document_download unless notification_not_required
   end
 
   def update_available_leave
@@ -162,7 +168,9 @@ class UsersController < ApplicationController
       :reason_of_resignation, :designation, :division, :description, :is_billable,
       :skip_unassigned_project_ts_mail, :designation_track, :joining_bonus_paid,
       :assessment_platform, :assessment_month => [], :notification_emails => [] ],
-      attachments_attributes: [:id, :name, :document, :_destroy]
+      attachments_attributes: [:id, :name, :document, :_destroy],
+      assets_attributes: [:id, :name, :model, :serial_number, :type, :date_of_issue,
+      :date_of_recovery, :valid_till, :before_image, :after_image, :recovered, :_destroy]
     )
   end
 
@@ -170,6 +178,9 @@ class UsersController < ApplicationController
     @public_profile = @user.public_profile || @user.build_public_profile
     @private_profile = @user.private_profile || @user.build_private_profile
     @user.employee_detail || @user.build_employee_detail
+    assets = @user.assets
+    @current_assets = assets.where(recovered: false).order_by(:date_of_issue.desc)
+    @previous_assets = assets.where(recovered: true).order_by(:date_of_issue.desc)
   end
 
   def build_addresses
@@ -194,10 +205,14 @@ class UsersController < ApplicationController
     (current_user.can_edit_user?(@user)) || (flash[:error] = message; redirect_to root_url)
   end
 
+  # def authorize_document_download is used to authorising and handling failures
+  # while downloading user documents or before_image and after_image of assets
   def authorize_document_download
-    @attachment = Attachment.where(id: params[:id]).first
-    @document = @attachment.document
-    unless @attachment.document.present?
+    @attachment = Attachment.where(id: params[:id]).first ||
+                  Asset.where(id: params[:id]).first
+    @document = @attachment.try(:document) ||
+                @attachment.try(:"#{params[:image]}")
+    unless @document.present?
       message = 'You are trying to download invalid document'
       flash[:error] = message
       redirect_to public_profile_user_path(@attachment.user)
@@ -211,7 +226,7 @@ class UsersController < ApplicationController
     UserMailer.delay.download_notification(
       current_user.id,
       @attachment.name
-    ) unless DOCUMENT_MANAGEMENT.include?(current_user.role)
+    )
   end
 
   def get_bonusly_messages
@@ -295,5 +310,11 @@ class UsersController < ApplicationController
     parse_url = url.split(/\'medium.com\''|\//)
     medium_id = parse_url.select { |i| i.start_with?('@') }.first
     domain_name + 'feed/' + medium_id
+  end
+
+  def current_tab
+    return 'Documents' if params[:user][:attachments_attributes].present?
+    return 'Employee details' if params[:user][:employee_detail_attributes].present?
+    return 'Assets' if params[:user][:assets_attributes].present?
   end
 end

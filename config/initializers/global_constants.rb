@@ -60,3 +60,4 @@ LEAVE_TYPES = {leave: 'LEAVE', wfh: 'WFH', optional_holiday: 'OPTIONAL HOLIDAY',
 
 ASSESSMENT_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 ASSESSMENT_PLATFORM = ['PLAI', 'Snowflake', 'None']
+ASSET_TYPES = {hardware: 'Hardware', software: 'Software', other: 'Other'}
