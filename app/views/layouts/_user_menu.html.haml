@@ -68,7 +68,7 @@
           %li
             = link_to 'Export Reports', main_app.export_project_report_time_sheets_path, class: 'menu-font'
 
-  - unless can_access?('Assessments')
+  - if can_access?('Assessments')
     %li
       = link_to 'Assessments', ENV['snowflake_url']
 
