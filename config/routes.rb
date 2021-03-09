@@ -33,6 +33,8 @@ Rails.application.routes.draw do
   end
 
   unauthenticated :user do
+    match '/events' => 'home#store_url', via: [:get]
+    match '/events/*criteria' => 'home#store_url', via: [:get]
     match '/screamout/contents' => 'home#store_url', via: [:get]
   end
 
