@@ -11,7 +11,7 @@ class HomeController < ApplicationController
 
   def store_url
     session[:previous_url] = request.fullpath
-    redirect_to new_user_session_path
+    redirect_to root_path
   end
   private
 
