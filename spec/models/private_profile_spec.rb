@@ -47,6 +47,27 @@ describe PrivateProfile do
     end
   end
 
+  context 'validation the joining data failure' do
+    let!(:user) { FactoryGirl.create(:user) }
+
+    before do
+      @private_profile = user.private_profile
+    end
+
+    it 'in valid joining data' do
+      @private_profile.date_of_joining = Date.tomorrow
+      expect(user.save).to eq(false)
+      expect('should not be future date.').to eq(
+        'should not be future date.'
+      )   
+    end
+
+    it 'in valid joining data' do
+      @private_profile.date_of_joining = Date.today
+      expect(user.save).to eq(true) 
+    end
+  end
+
   context 'validation should not trigger' do
     let!(:user){ FactoryGirl.create(:user) }
 
@@ -83,7 +104,7 @@ describe PrivateProfile do
       expect(user.generate_errors_message.blank?).to eq(true)
     end
 
-    it 'because joining date is present, role is employee' do
+     it 'because joining date is present, role is employee' do
       user.role = 'Employee'
     end
 

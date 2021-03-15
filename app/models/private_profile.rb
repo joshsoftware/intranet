@@ -18,6 +18,7 @@ class PrivateProfile
   has_many :addresses, autosave: true
 
   validates :date_of_joining, presence: true, if: :check_status_and_role?, on: :update
+  validate :validate_date_of_joining, if: 'date_of_joining_changed?'
   validates :previous_work_experience,:allow_blank => true, numericality: { only_integer: true }
 
   accepts_nested_attributes_for :addresses
@@ -29,6 +30,10 @@ class PrivateProfile
       user.assign_leave('DOJ Updated') if user.eligible_for_leave?
       user.set_details("doj", self.date_of_joining)
     end
+  end
+
+  def validate_date_of_joining
+    errors.add(:date_of_joining, 'should not be future date.') if date_of_joining.try(:future?)
   end
 
   def check_status_and_role?
