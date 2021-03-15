@@ -9,7 +9,7 @@
     = ["show", "edit", 'index'].include?(params[:action]) ? "|" : ''
     = link_to '', projects_path, "data-toggle" => "tooltip", title: "All Projects",
                  class: " icon-th-list" unless params[:action] == "index"
-    = link_to "", "", 'data-toggle' => "dropdown", class: 'dropdown-toggle icon-download-alt' if params[:action] == 'index'
+    = link_to '', '', 'data-toggle': 'dropdown', class: 'dropdown-toggle icon-download-alt', title: 'Download Project CSV' if params[:action] == 'index'
     %ul.dropdown-menu.drop
       %li
         = link_to "Projects Report", projects_path(format: 'csv'), class: 'menu-font'
