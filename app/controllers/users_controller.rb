@@ -76,6 +76,8 @@ class UsersController < ApplicationController
         #UserMailer.delay.verification(@user.id)
         redirect_to public_profile_user_path(@user)
       else
+        tab = (profile == "private_profile") ? 'Private Profile' : 'Public Profile'
+        flash[:error] = "#{tab}: Error #{@user.generate_errors_message}"
         render "public_profile"
       end
     end

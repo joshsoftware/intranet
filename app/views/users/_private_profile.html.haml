@@ -18,7 +18,7 @@
         - if can? :edit, User
           = pri.input :end_of_probation, input_html: { type: 'date', class: 'date-picker', value: @private_profile.end_of_probation.try(:strftime, "%Y-%m-%d")}, label: 'End of probation (Date after 90 days)'
       %td
-        = pri.input :previous_work_experience, placeholder: 'No of Months', input_html: {type: 'number'}, label: 'Previous Work Experience (in Months)'
+        = pri.input :previous_work_experience, placeholder: 'No of Months', input_html: {type: 'number', min: 0}, label: 'Previous Work Experience (in Months)'
     %tr
       %td
         = pri.input :previous_company, as: :text
