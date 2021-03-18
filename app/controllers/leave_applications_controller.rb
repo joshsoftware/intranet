@@ -47,15 +47,17 @@ class LeaveApplicationsController < ApplicationController
   def view_leave_status
     @available_leaves = current_user.employee_detail.try(:available_leaves)
     @users = User.employees.collect{ |u| [u.name, u.id, {id: u.status}] }
+    @skip_past_leaves = false
     if MANAGEMENT.include? current_user.role
       @pending_leaves = LeaveApplication.where(:user_id.in => user_ids)
         .any_of(search_conditions)
         .pending
-        .order_by(:start_at.desc).includes(:user).to_a
+        .order_by(:start_at.asc).includes(:user).to_a
+      @skip_past_leaves = true
       @processed_leaves = LeaveApplication.where(:user_id.in => user_ids)
         .any_of(search_conditions)
         .processed
-        .order_by(:start_at.desc).includes(:user).to_a
+        .order_by(:start_at.asc).includes(:user).to_a
     else
       @pending_leaves = current_user.leave_applications
         .pending
@@ -127,7 +129,8 @@ class LeaveApplicationsController < ApplicationController
 
   def search_conditions
     today = Date.today
-    beginning_of_year = today.beginning_of_year.strftime("%d-%m-%Y")
+    beginning_of_year = @skip_past_leaves ? today : today.beginning_of_year
+    beginning_of_year = beginning_of_year.strftime("%d-%m-%Y")
     end_of_year = today.end_of_year.strftime("%d-%m-%Y")
     if params[:from].present?
       to = params[:to].empty? ? today.strftime("%d-%m-%Y") : params[:to]
