@@ -24,8 +24,6 @@ class User
   field :reset_password_token, type: String
   field :reset_password_sent_at, type: String
 
-
-
   ## Trackable
   field :sign_in_count,      type: Integer, default: 0
   field :current_sign_in_at, type: Time
@@ -88,6 +86,7 @@ class User
 
   before_create do
     self.website_sequence_number = (User.max(:website_sequence_number) || 0) + 1
+    create_newsletter_user
   end
 
   before_save do
@@ -102,6 +101,7 @@ class User
       set_user_project_entries_inactive
       remove_from_manager_ids
       remove_from_notification_emails
+      unsubscribe_newsletter
     end
   end
 
@@ -115,6 +115,21 @@ class User
     UserProject.where(user_id: self.id, active: true).update_all(
       active: false,
       end_date: self.employee_detail.date_of_relieving
+    )
+  end
+
+  def create_newsletter_user
+    Light::User.create(
+      email_id: self.email,
+      username: self.email.split('@').first
+    )
+  end
+
+  def unsubscribe_newsletter
+    Light::User.where(email_id: self.email).first.update_attributes(
+      sidekiq_status: Light::User::STATUS[:unsubscribed],
+      unsubscribed_at: DateTime.now,
+      is_subscribed: false
     )
   end
 
