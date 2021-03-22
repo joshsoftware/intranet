@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe PrivateProfile do
-  
+
   it { should have_fields(
                           :pan_number,
                           :personal_email,
@@ -15,12 +15,38 @@ describe PrivateProfile do
      }
   it { should have_field(:date_of_joining).of_type(Date) }
   it { should have_many :addresses }
+  it { should embed_many :bank_accounts }
   it { should embed_many :contact_persons }
   it { should be_embedded_in(:user) }
   it { should accept_nested_attributes_for(:addresses) }
   it { should accept_nested_attributes_for(:contact_persons) }
   it { should validate_numericality_of(:previous_work_experience) }
   it { should validate_presence_of(:date_of_joining).on(:update) }
+
+  context 'Validation ' do
+    it 'should pass as atmost two bank accounts are being added' do
+      user = FactoryGirl.create(:user)
+      user.private_profile.bank_accounts = [
+        FactoryGirl.attributes_for(:bank_account),
+        FactoryGirl.attributes_for(:bank_account)
+      ]
+      expect(user.valid?).to_not be_falsy
+      expect(user.private_profile.errors.full_messages).to eq([])
+    end
+
+    it 'should fail as more than two bank accounts are being added' do
+      user = FactoryGirl.create(:user)
+      user.private_profile.bank_accounts = [
+        FactoryGirl.attributes_for(:bank_account),
+        FactoryGirl.attributes_for(:bank_account),
+        FactoryGirl.attributes_for(:bank_account)
+      ]
+      expect(user.valid?).to be_falsy
+      expect(user.private_profile.errors.full_messages).to eq(
+        ["Bank accounts cannot be added more than two."]
+      )
+    end
+  end
 
   context 'While updating user, should not update user' do
     let!(:user) { FactoryGirl.create(:user) }

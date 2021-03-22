@@ -173,6 +173,9 @@ class UsersController < ApplicationController
       ADDRESSES.each{|a| @user.private_profile.addresses.build({:type_of_address => a})} if @user.private_profile.addresses.empty?
       # need atleast two contact persons details
       2.times {@user.private_profile.contact_persons.build} if @user.private_profile.contact_persons.empty?
+      # atmost two bank accounts
+      bank_account_count = 2 - @user.private_profile.bank_accounts.size
+      bank_account_count.times {@user.private_profile.bank_accounts.build}
     end
   end
 
