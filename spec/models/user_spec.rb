@@ -566,4 +566,56 @@ describe User do
       expect(user.experience_as_of_today).to eq(experience)
     end
   end
+
+  describe 'get_managers_names' do
+    let!(:user) { FactoryGirl.create(:user) }
+
+    it 'should return manager name of respective employee' do
+      project = FactoryGirl.create(:project)
+      manager_one = FactoryGirl.create(:manager)
+      manager_two = FactoryGirl.create(:manager)
+      user_project = FactoryGirl.create(:user_project,
+        user: user,
+        project: project,
+        start_date: Date.today - 2
+      )
+      project.managers << manager_one
+      project.managers << manager_two
+      managers_names = user.get_managers_names
+      expect(managers_names.count).to eq(2)
+      expect(managers_names[0]).to eq(manager_one.name)
+      expect(managers_names[1]).to eq(manager_two.name)
+    end
+
+    context 'if emp has not assigned any project then should return default manager name and if' do
+
+      it 'employee work in Bengaluru' do
+        user.employee_detail.set(location: LOCATIONS[0]) #Bengaluru
+        default_manager = FactoryGirl.create(:user, email: CUSTOM_MANAGERS[:bengaluru])
+        managers_names = user.get_managers_names
+        expect(managers_names.count).to eq(1)
+      end
+
+      it 'employee role is admin' do
+        user.set(role: ROLE[:admin])
+        default_manager = FactoryGirl.create(:user, email: CUSTOM_MANAGERS[:admin], role: ROLE[:admin], status: STATUS[:approved])
+        managers_names = user.get_managers_names
+        expect(managers_names.count).to eq(1)
+      end
+
+      it 'employee designation is UI/UX Designer' do
+        designation = FactoryGirl.create(:designation, name: UI_UX_DESIGNATION[1])  # 'UI/UX Designer'
+        user.employee_detail.designation = designation
+        default_manager = FactoryGirl.create(:user, email: CUSTOM_MANAGERS[:ui_ux])
+        managers_names = user.get_managers_names
+        expect(managers_names.count).to eq(1)
+      end
+
+      it 'employee has no any role and designation then assign default manager' do
+        default_manager = FactoryGirl.create(:user, email: CUSTOM_MANAGERS[:default])
+        managers_names = user.get_managers_names
+        expect(managers_names.count).to eq(1)
+      end
+    end
+  end
 end
