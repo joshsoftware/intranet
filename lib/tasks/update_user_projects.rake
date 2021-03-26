@@ -1,42 +1,40 @@
 desc 'Update user projects active status and end date'
 task update_user_projects: :environment do
-  # update user_project status of inactive projects
-  Project.where(is_active: false).each do |project|
-    user_projects = project.user_projects.where(active: true)
-    puts "\n Project Name: #{project.name}" if user_projects.present?
-    user_projects.each do |user_project|
-      if user_project.end_date.present?
-        puts "Name: #{user_project.user.name}, Status Changed: false"
-        user_project.set(active: false)
-      else
-        puts "Name: #{user_project.user.name}, Status Changed: false, End_date Changed: #{project.end_date}"
-        user_project.set(active: false, end_date: project.end_date)
-      end
+  # update user_project status and end_date of inactive projects
+  inactive_pids = Project.where(is_active: false).pluck(:id)
+  ups = UserProject.where(:project_id.in => inactive_pids)
+  ups.each do |up|
+    if up.active && up.end_date.present?
+      puts "Project: #{up.project.name}, Name: #{up.user.name}, Status Changed: false"
+      up.set(active: false)
+    elsif up.active
+      puts "Project: #{up.project.name}, Name: #{up.user.name}, Status Changed: false, End_date Changed: #{up.project.end_date}"
+      up.set(active: false, end_date: up.project.end_date)
+    elsif up.end_date.nil?
+      puts "Project: #{up.project.name}, Name: #{up.user.name}, End_date Changed: #{up.project.end_date}"
+      up.set(end_date: up.project.end_date)
     end
   end
 
-  # update end_date of active user project whose project end_date is present
-  Project.where(is_active: true, :end_date.ne => nil).each do |project|
-    user_projects = project.user_projects.where(active: true)
-    end_date = project.end_date
-    puts "\n Project Name: #{project.name}" if user_projects.present?
-    user_projects.each do |user_project|
-      if user_project.end_date.present? && (project.end_date >= user_project.end_date)
-        end_date = user_project.end_date
-      end
-      puts "Name: #{user_project.user.name}, End_date Changed: #{project.end_date}"
-      user_project.update_attributes(end_date: end_date)
+  # update user_project end_date whose project end_date is present
+  active_pids = Project.nin(id: inactive_pids, end_date: nil).pluck(:id)
+  user_projects = UserProject.where(:id.in => active_pids, active: true)
+  user_projects.each do |up|
+    if up.end_date.nil? || (up.end_date.present? && up.project.end_date < up.end_date)
+      print "\n Project Name: #{project.name} \t| Name: #{user_project.user.name}, " +
+            "End_date Was: #{up.end_date}, End_date Changed: #{up.project.end_date}"
+      user_project.update_attributes(end_date: up.project.end_date)
     end
   end
+end
 
-  desc 'Update start date of inactive user projects where start date is greater than end date'
-  task update_start_date: :environment do
-    puts 'Project Name | Employee Name | Start_date Changed'
-    UserProject.where(active: false).each do |user_project|
-      if user_project.start_date > user_project.end_date
-        puts "#{user_project.project.name} | #{user_project.user.name} | #{user_project.end_date - 1}"
-        user_project.set(start_date: user_project.end_date - 1)
-      end
+desc 'Update start date of inactive user projects where start date is greater than end date'
+task update_start_date: :environment do
+  puts 'Project Name | Employee Name | Start_date Changed'
+  UserProject.where(active: false).each do |user_project|
+    if user_project.start_date > user_project.end_date
+      puts "#{user_project.project.name} | #{user_project.user.name} | #{user_project.end_date - 1}"
+      user_project.set(start_date: user_project.end_date - 1)
     end
   end
 end
