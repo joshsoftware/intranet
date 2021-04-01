@@ -22,7 +22,7 @@
   = pub.input :date_of_birth, input_html: { type: 'date', class: 'date-picker', value: @public_profile.date_of_birth.try(:strftime, "%Y-%m-%d")}
   = pub.input :technical_skills, collection: (LANGUAGE + FRAMEWORK + OTHER).sort, input_html: {class: 'technical_skills', multiple: true, style: 'width:240px;', 'data-placeholder': 'Add your technical skills'}, label: 'Core Technical Skills', include_blank: false
   = pub.hint '(Note: Mention only 3 Core Technical Skills here)', class: 'skill'
-  = pub.input :skills, as: :text
+  = pub.input :skills, input_html: {class: 'skills', multiple: true }
   = pub.hint '(Note: Mention your skills which are not covered in technical skills)', class: 'skill'
   = pub.input :skype_id, label: 'Skype Id'
   = pub.input :pivotal_tracker_id, label: 'Pivotal Tracker Id'
@@ -47,3 +47,8 @@
     readURL(this, '.profile-image')
   })
   $('.technical_skills').select2();
+  $('.skills').select2({
+    tags: true,
+    tokenSeparators: [';', ','],
+    placeholder: 'Add your Skills'
+  });
