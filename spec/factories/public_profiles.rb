@@ -5,7 +5,7 @@ FactoryGirl.define do
     gender { Faker::Gender.binary_type }
     mobile_number { Faker::Number.number(10) }
     blood_group { 'A+' }
-    skills { 'Badminton,Cricket' }
+    skills { ["Badminton, Cricket"] }
     technical_skills { ['ReactJs', 'Ruby', 'UI/UX'] }
     date_of_birth { Date.today }
     github_handle { Faker::Internet.username }

@@ -41,6 +41,7 @@ class PublicProfile
   validates_presence_of :first_name, :last_name, on: :update
 
   before_validation do
+    self.skills = self.skills.try(:first) if skills_changed? && self.skills.instance_of?(Array)
     self.technical_skills.try(:reject!, &:blank?) if technical_skills_changed?
   end
 

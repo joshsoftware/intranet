@@ -28,7 +28,7 @@
           %td=user.employee_detail.designation.try(:name)
           %td=user.employee_detail.is_billable? ? "Yes" : "No"
           %td= "#{user.public_profile.technical_skills.join(', ') if user.public_profile.technical_skills.present?}"
-          %td= "#{user.public_profile.skills if user.public_profile.skills.present?}"
+          %td= "#{user.public_profile.skills.split(',').join(', ') if user.public_profile.skills.present?}"
           %td="#{user.projects.collect(&:name).join(', ')}"
 
 :javascript
