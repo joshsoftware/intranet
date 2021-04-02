@@ -112,4 +112,28 @@ describe PrivateProfile do
     end
   end
 
+  context 'validate_internship_date' do
+    let!(:user) { FactoryGirl.create(:user, role: 'Intern') }
+
+    before do
+      @private_profile = user.private_profile
+      @employee_detail = user.employee_detail
+    end
+
+    it 'sholud be greater than intrnship start date' do
+      @private_profile.internship_start_date = Date.tomorrow
+      @private_profile.internship_end_date = Date.today
+      expect(user.valid?).to be_falsy
+      expect(@private_profile.errors.full_messages).to eq(
+        ['Internship end date should be greater than internship start date.']
+      )
+    end
+
+    it 'should pass because internship end date is past date' do
+      @private_profile.internship_start_date = Date.today
+      @private_profile.internship_end_date = Date.tomorrow
+      expect(user.valid?).to_not be_falsy
+    end
+  end
+
 end

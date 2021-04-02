@@ -12,8 +12,14 @@
       %td
         = pri.input :qualification
     %tr
+      - disable = !( can? :edit, User )
       %td
-        - disable = ( can? :edit, User ) ? false : true
+        = pri.input :internship_start_date, disabled: disable, input_html: { type: 'date', class: 'date-picker', value: @private_profile.internship_start_date.try(:strftime, "%Y-%m-%d")}
+      %td
+        = pri.input :internship_end_date, disabled: disable, input_html: { type: 'date', class: 'date-picker', value: @private_profile.internship_end_date.try(:strftime, "%Y-%m-%d")}
+    %tr
+      %td
+        - disable = !( can? :edit, User )
         = pri.input :date_of_joining, disabled: disable, input_html: { type: 'date', class: 'date-picker', value: @private_profile.date_of_joining.try(:strftime, "%Y-%m-%d")}
         - if can? :edit, User
           = pri.input :end_of_probation, input_html: { type: 'date', class: 'date-picker', value: @private_profile.end_of_probation.try(:strftime, "%Y-%m-%d")}, label: 'End of probation (Date after 90 days)'

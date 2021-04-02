@@ -24,6 +24,7 @@ class EmployeeDetail
 
   validates :employee_id, uniqueness: true
   #validates :designation_track, presence: true
+  validate :validate_date_of_relieving
   validates :date_of_relieving, presence: true, if: :user_status_changed?, on: :update
   validates :available_leaves, numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 24}
   after_update :delete_team_cache, if: Proc.new{ updated_at_changed? }
@@ -32,6 +33,29 @@ class EmployeeDetail
 
   before_save do
     self.notification_emails.try(:reject!, &:blank?)
+  end
+
+  def validate_date_of_relieving
+    errors.add(:date_of_relieving, 'should be greater than date of joining.') if check_employee_relieving_date?
+    errors.add(:date_of_relieving, 'should be greater than Internship Start Date.') if check_intern_relieving_date?
+  end
+
+  def check_employee_relieving_date?
+    unless user.try(:role).eql?('Intern')
+      'date_of_relieving_changed?' &&
+      date_of_relieving.present? &&
+      user.private_profile.date_of_joining.present? &&
+      date_of_relieving < user.private_profile.date_of_joining
+    end
+  end
+
+  def check_intern_relieving_date?
+    if user.try(:role).eql?('Intern')
+      'date_of_relieving_changed?' &&
+      date_of_relieving.present? &&
+      user.private_profile.internship_start_date.present? &&
+      date_of_relieving < user.private_profile.internship_start_date
+    end
   end
 
   def user_status_changed?
