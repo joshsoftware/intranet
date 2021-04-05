@@ -28,6 +28,7 @@ class DesignationsController < ApplicationController
 
   def edit
     @designation = Designation.find(params[:id])
+    @user_list = User.approved.where('employee_detail.designation_id': @designation.id)
   end
 
   def update
