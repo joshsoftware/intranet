@@ -11,14 +11,24 @@
             = select_tag :parent_designation_id, options_for_select(Designation.pluck(:name, :id), f.object.try(:designation).try(:id)), {:prompt => "-- Select Designation --", class: "list", name: "designation[parent_designation_id]", style: "width: 340px", selected: f.object.try(:parent_designation_id)}
 
     .row= f.submit :Save, class: 'btn controls btn-info'
-    - unless f.object.new_record?
-      .row{style: 'margin-top: 5%;'}
-        .col-md-6
-          .control-group
-            = label_tag "Employees with this Designation", nil, class: 'control-label'
-            .controls
-              = User.approved.where("employee_detail.designation_id" => f.object.id).pluck(:email).sort.join(', ')
-
+    
+- if @designation.persisted?
+  - if @user_list.count > 0
+    %h3 Employees with this Designation
+    %table.table.table-bordered.table-responsive#sortable
+      %thead
+        %tr
+          %th.span2 ID
+          %th.span2 Name
+          %th.span2 Email
+      %tbody
+        - @user_list.each do |user|
+          %tr
+            %td.span2= user.employee_detail.employee_id
+            %td.span2= user.public_profile.name
+            %td.span2= user.email
+  - else
+    %h4 Note- No user with this designation
 
 :javascript
   $('.list').val("#{@designation.try(:parent_designation_id)}");
