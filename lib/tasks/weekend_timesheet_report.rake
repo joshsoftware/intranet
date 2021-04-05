@@ -5,7 +5,7 @@ task :weekend_timesheet_report => :environment do
   end_date = Date.today - 1
 
   start_date.upto(end_date) do |date|
-    COUNTRIES.each do |country|
+    COUNTRIES.values.each do |country|
       holiday_list <<  {date: date, country: country} if HolidayList.is_holiday?(date, country)
     end
   end

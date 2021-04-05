@@ -15,7 +15,7 @@ wb.add_worksheet(name: 'Employees') do |sheet|
     contact_details = p.contact_persons.pluck(:name, :relation, :phone_no)
     address = {}
     p.addresses.each do |i|
-      if ADDRESSES.include?(i.type_of_address)
+      if ADDRESSES.values.include?(i.type_of_address)
         address[i.type_of_address] = i.to_line
       end
     end
@@ -26,7 +26,7 @@ wb.add_worksheet(name: 'Employees') do |sheet|
       p.end_of_probation, u.employee_detail.date_of_relieving, u.employee_detail.reason_of_resignation,
       u.public_profile.skills, u.public_profile.technical_skills.join(', '), p.pan_number, p.personal_email,
       p.passport_number, p.qualification, p.previous_work_experience, p.previous_company, contact_details,
-      address[ADDRESSES[0]], address[ADDRESSES[1]]
+      address[ADDRESSES[:permanent]], address[ADDRESSES[:temporary]]
     ].flatten
   end
 end

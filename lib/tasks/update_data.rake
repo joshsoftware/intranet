@@ -33,7 +33,7 @@ namespace :update_data do
   desc 'Update employee ids of Bengaluru employees'
   task update_bengaluru_employee_ids: :environment do
     puts "Email \t | Previous EmpId | Current EmpId"
-    User.where('employee_detail.location': LOCATIONS[0]).each do |user|
+    User.where('employee_detail.location': LOCATIONS[:bengaluru]).each do |user|
       if user.employee_detail.employee_id.to_i > 8000
         emp_id = calculate_emp_id + 1
         puts "#{user.email} | #{user.employee_detail.employee_id} | #{emp_id}"
@@ -45,7 +45,7 @@ namespace :update_data do
   desc 'Update division column for all users'
   task update_division: :environment do
     User.employees.where(:status.ne => STATUS[:resigned]).each do |user|
-      if user.location == LOCATIONS[0] # Bengaluru
+      if user.location == LOCATIONS[:bengaluru] # Bengaluru
         user.employee_detail.set(division: DIVISION_TYPES[:digital])
       elsif MANAGEMENT.include?(user.role)
         user.employee_detail.set(division: DIVISION_TYPES[:management])
@@ -98,7 +98,7 @@ namespace :update_data do
     user_list.each do |user|
       leave = LeaveApplication.where(id: user[1]).first
       employee_detail = User.where(email: user[0]).first.employee_detail
-      if leave.leave_status == REJECTED
+      if leave.leave_status == LEAVE_STATUS[:rejected]
         leave.update_attributes(number_of_days: leave.number_of_days + 1)
         puts "#{user[0]} \t | #{leave.start_at} | #{leave.end_at} | #{leave.number_of_days} | #{leave.number_of_days + 1} | #{employee_detail.available_leaves} | #{employee_detail.available_leaves}"
       else

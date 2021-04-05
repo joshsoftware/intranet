@@ -499,7 +499,7 @@ RSpec.describe TimeSheet, type: :model do
       it 'Should return true because user is on leave' do
         FactoryGirl.create(:leave_application,
           user: user,
-          leave_status: APPROVED
+          leave_status: LEAVE_STATUS[:approved]
         )
         expect(TimeSheet.user_on_leave?(user, Date.today + 2)).to eq(true)
       end
@@ -507,7 +507,7 @@ RSpec.describe TimeSheet, type: :model do
       it 'Should return false because user is not on leave' do
         FactoryGirl.create(:leave_application,
           user: user,
-          leave_status: APPROVED
+          leave_status: LEAVE_STATUS[:approved]
         )
         expect(TimeSheet.user_on_leave?(user, Date.today + 4)).to eq(false)
       end
@@ -518,7 +518,7 @@ RSpec.describe TimeSheet, type: :model do
           start_at: Date.today + 3,
           end_at:Date.today + 5,
           leave_type: LeaveApplication::WFH,
-          leave_status: APPROVED
+          leave_status: LEAVE_STATUS[:approved]
         )
         expect(TimeSheet.user_on_leave?(user, Date.today + 4)).to eq(false)
       end
@@ -704,14 +704,14 @@ RSpec.describe TimeSheet, type: :model do
       admin = FactoryGirl.create(:admin)
       FactoryGirl.create(:leave_application,
         user: user,
-        leave_status: APPROVED,
+        leave_status: LEAVE_STATUS[:approved],
         processed_by: admin.id
       )
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: Date.today + 1,
         end_at: Date.today + 1,
-        leave_status: APPROVED,
+        leave_status: LEAVE_STATUS[:approved],
         leave_type: LeaveApplication::WFH,
         processed_by: admin.id
       )
@@ -1045,7 +1045,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '14/09/2018',
         end_at: '14/09/2018',
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       from_date = '01/09/2018'.to_date
       to_date = '20/09/2018'.to_date
@@ -1065,14 +1065,14 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '14/09/2018',
         end_at: '14/09/2018',
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: '13/09/2018',
         end_at: '13/09/2018',
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       from_date = '01/09/2018'.to_date
       to_date = '20/09/2018'.to_date
@@ -1093,14 +1093,14 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '14/09/2018',
         end_at: '14/09/2018',
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: '13/09/2018',
         end_at: '13/09/2018',
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       leave_count = TimeSheet.get_leaves(project, from_date, to_date)
       expect(leave_count).to eq(2)
@@ -1120,14 +1120,14 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '03/09/2018',
         end_at: '03/09/2018',
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       FactoryGirl.create(:leave_application,
         user: user,
         start_at: '13/09/2018',
         end_at: '13/09/2018',
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       leave_count = TimeSheet.get_leaves(project, from_date, to_date)
       expect(leave_count).to eq(1)
@@ -1167,7 +1167,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: Date.today - 2,
         end_at: Date.today - 2,
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       from_date = Date.today - 20
       to_date = Date.today
@@ -1328,7 +1328,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: Date.today - 10,
         end_at: Date.today - 7,
         number_of_days: 3,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       FactoryGirl.create(:time_sheet,
         user: user_two,
@@ -1349,7 +1349,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: '12/09/2018',
         end_at: '13/09/2018',
         number_of_days: 2,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
 
       params = { from_date: Date.today - 20, to_date: Date.today }
@@ -1400,7 +1400,7 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:holiday, holiday_date: '11/10/2018'.to_date)
       from_date = '05/10/2018'.to_date
       to_date = '15/10/2018'.to_date
-      count = TimeSheet.get_holiday_count(from_date, to_date, COUNTRIES[0])
+      count = TimeSheet.get_holiday_count(from_date, to_date, COUNTRIES[:india])
       expect(count).to eq(2)
     end
 
@@ -1409,7 +1409,7 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:holiday, holiday_date: '11/10/2018'.to_date)
       from_date = '01/10/2018'.to_date
       to_date = '05/10/2018'.to_date
-      count = TimeSheet.get_holiday_count(from_date, to_date, COUNTRIES[0])
+      count = TimeSheet.get_holiday_count(from_date, to_date, COUNTRIES[:india])
       expect(count).to eq(0)
     end
   end
@@ -1453,7 +1453,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: Date.today - 1,
         end_at: Date.today- 1,
         number_of_days: 1,
-        leave_status: APPROVED
+        leave_status: LEAVE_STATUS[:approved]
       )
       from_date = Date.today - 3
       to_date = Date.today + 3
@@ -2174,7 +2174,7 @@ RSpec.describe TimeSheet, type: :model do
                                         project: project)
       date = Date.today - Date.today.wday
       FactoryGirl.create(:time_sheet, date: date, user: user, project: project )
-      TimeSheet.generate_and_send_weekend_report([{date: date, country: COUNTRIES[0]}], @start_date)
+      TimeSheet.generate_and_send_weekend_report([{date: date, country: COUNTRIES[:india]}], @start_date)
 
       expect(ActionMailer::Base.deliveries.count).to eq(1)
       expect(ActionMailer::Base.deliveries.first.subject).to eq(
@@ -2187,9 +2187,9 @@ RSpec.describe TimeSheet, type: :model do
                                         user: user,
                                         project: project)
       date = Date.today - 1
-      FactoryGirl.build(:holiday, holiday_date: date, reason: 'Test', country: COUNTRIES[0])
+      FactoryGirl.build(:holiday, holiday_date: date, reason: 'Test', country: COUNTRIES[:india])
       FactoryGirl.create(:time_sheet, date: date, user: user, project: project )
-      TimeSheet.generate_and_send_weekend_report([{date: date, country: COUNTRIES[0]}], @start_date)
+      TimeSheet.generate_and_send_weekend_report([{date: date, country: COUNTRIES[:india]}], @start_date)
 
       expect(ActionMailer::Base.deliveries.count).to eq(1)
       expect(ActionMailer::Base.deliveries.first.subject).to eq(
@@ -2300,7 +2300,7 @@ RSpec.describe TimeSheet, type: :model do
       FactoryGirl.create(:time_sheet, :date => Date.today - 3,
         :user => user, :project => project )
       leave = FactoryGirl.create(:leave_application, start_at: Date.today - 2, end_at: Date.today,
-        user: user, leave_status: APPROVED)
+        user: user, leave_status: LEAVE_STATUS[:approved])
       from_date = Date.today - 3
       to_date   = Date.today
       TimeSheet.get_users_who_not_filled_timesheet(from_date, to_date)

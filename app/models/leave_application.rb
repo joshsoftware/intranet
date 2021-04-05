@@ -28,7 +28,7 @@ class LeaveApplication
   # Remove this field
   field :reject_reason,   type: String
 
-  field :leave_status,    type: String, default: PENDING
+  field :leave_status,    type: String, default: LEAVE_STATUS[:pending]
   track_history
 
   validates :start_at, :end_at, :contact_number, :reason, :number_of_days, :user_id, :leave_type, presence: true
@@ -50,9 +50,9 @@ class LeaveApplication
 
   after_update :update_available_leave_send_mail, if: 'pending?'
 
-  scope :pending, ->{where(leave_status: PENDING)}
-  scope :processed, ->{where(:leave_status.ne => PENDING)}
-  scope :unrejected, -> { where(:leave_status.ne => REJECTED )}
+  scope :pending, ->{where(leave_status: LEAVE_STATUS[:pending])}
+  scope :processed, ->{where(:leave_status.ne => LEAVE_STATUS[:pending])}
+  scope :unrejected, -> { where(:leave_status.ne => LEAVE_STATUS[:rejected] )}
   scope :leaves, -> { where(:leave_type.in => [LEAVE, OPTIONAL, SPL]) }
 
   attr_accessor :sanctioning_manager
@@ -74,7 +74,7 @@ class LeaveApplication
   end
 
   def previous_leave_type?
-    self.leave_status == PENDING &&
+    self.leave_status == LEAVE_STATUS[:pending] &&
     self.leave_type_changed? &&
     (self.leave_type_was == LEAVE || self.leave_type == LEAVE)
   end
@@ -122,7 +122,7 @@ class LeaveApplication
       #decrement number of days of overlapping leave by 1
       #increment user's available leaves by 1
       revise_leave_count(overlapping_leave, employee_detail, 'decreament')
-    elsif (self.leave_status_was != REJECTED and self.leave_status == REJECTED)
+    elsif (self.leave_status_was != LEAVE_STATUS[:rejected] and self.leave_status == LEAVE_STATUS[:rejected])
       #increment number of days of overlapping leave by 1
       #decrement user's available leaves by 1
       revise_leave_count(overlapping_leave, employee_detail, 'increament')
@@ -137,12 +137,12 @@ class LeaveApplication
     #no need to update user's available leaves if overlapping leave is rejected
     employee_detail.update_attributes(
       available_leaves: employee_detail.available_leaves + count
-    ) unless overlapping_leave.leave_status == REJECTED
+    ) unless overlapping_leave.leave_status == LEAVE_STATUS[:rejected]
   end
 
   def pending_or_approved_after_rejecting
     (pending? and self.leave_status_was.nil?) or
-    (approved? and self.leave_status_was == REJECTED)
+    (approved? and self.leave_status_was == LEAVE_STATUS[:rejected])
   end
 
   def process_after_update(status)
@@ -150,17 +150,17 @@ class LeaveApplication
   end
 
   def pending?
-    leave_status == PENDING
+    leave_status == LEAVE_STATUS[:pending]
   end
 
   def processed?
     # Currently we have only three status (Approved, Rejected, Pending)
     # so processed means !pending i.e. Approved or Rejected
-    leave_status != PENDING
+    leave_status != LEAVE_STATUS[:pending]
   end
 
   def approved?
-    leave_status == APPROVED
+    leave_status == LEAVE_STATUS[:approved]
   end
 
   def processed_by_name
@@ -185,7 +185,7 @@ class LeaveApplication
       if emails.present?
         if approved?
           UserMailer.send_accept_leave_notification(id, emails).deliver_now!
-        elsif leave_status_changed? && leave_status_was == APPROVED && leave_status == REJECTED
+        elsif leave_status_changed? && leave_status_was == LEAVE_STATUS[:approved] && leave_status == LEAVE_STATUS[:rejected]
           UserMailer.send_reject_leave_notification(id, emails).deliver_now!
         end
       end
@@ -223,14 +223,14 @@ class LeaveApplication
   def self.get_leaves_for_sending_reminder(date)
     LeaveApplication.leaves.where(
       start_at: date,
-      leave_status: APPROVED
+      leave_status: LEAVE_STATUS[:approved]
     )
   end
 
   def self.get_optional_holiday_request(date)
     LeaveApplication.where(
       start_at: date,
-      leave_status: APPROVED,
+      leave_status: LEAVE_STATUS[:approved],
       leave_type: OPTIONAL
     )
   end
@@ -239,7 +239,7 @@ class LeaveApplication
     LeaveApplication.leaves.where(
       user_id: user_id,
       start_at: Date.today - 6.month...Date.today,
-      leave_status: APPROVED
+      leave_status: LEAVE_STATUS[:approved]
     ).order_by(:start_at.desc)
   end
 
@@ -247,7 +247,7 @@ class LeaveApplication
     LeaveApplication.leaves.where(
       user_id: user_id,
       :start_at.gt => Date.today,
-      :leave_status.ne => REJECTED
+      :leave_status.ne => LEAVE_STATUS[:rejected]
     ).order_by(:start_at.asc)
   end
 
@@ -260,7 +260,7 @@ class LeaveApplication
       #checking count for 2 days - sending mail only for 1 and 2 day remaining leaves.
       leave_applications = LeaveApplication.where(
         start_at: date,
-        leave_status: PENDING,
+        leave_status: LEAVE_STATUS[:pending],
       )
       next if leave_applications.empty?
       leave_applications.each do |leave_application|
@@ -279,7 +279,7 @@ class LeaveApplication
     if pending_or_approved_after_rejecting
       user = self.user
       user.employee_detail.deduct_available_leaves(number_of_days) if leave?
-      user.sent_mail_for_approval(self.id) unless self.leave_status_was == REJECTED
+      user.sent_mail_for_approval(self.id) unless self.leave_status_was == LEAVE_STATUS[:rejected]
     end
   end
 
@@ -295,7 +295,7 @@ class LeaveApplication
 
 
   def validate_available_leaves
-    if number_of_days_changed? or (self.leave_status_was == REJECTED and self.leave_status == APPROVED)
+    if number_of_days_changed? or (self.leave_status_was == LEAVE_STATUS[:rejected] and self.leave_status == LEAVE_STATUS[:approved])
       available_leaves = self.user.employee_detail.available_leaves
       available_leaves += number_of_days_change[0].to_i if number_of_days_change.present? and number_of_days_change[1].present?
       errors.add(:base, 'Not Sufficient Leave!') if available_leaves < number_of_days
@@ -313,7 +313,7 @@ class LeaveApplication
       # While updating leave application do not consider self..
       leave_applications = LeaveApplication.where(
         :start_at.gte => self.start_at.beginning_of_year,
-        :leave_status.ne => REJECTED,
+        :leave_status.ne => LEAVE_STATUS[:rejected],
         user_id: self.user
       ).ne(id: self.id)
 

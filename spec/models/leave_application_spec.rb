@@ -118,7 +118,7 @@ describe LeaveApplication do
           to eq(@available_leaves - @number_of_days)
         @message = LeaveApplication.process_leave(
           leave_application.id,
-          APPROVED,
+          LEAVE_STATUS[:approved],
           :process_accept_application,
           '',
           @admin.id
@@ -131,7 +131,7 @@ describe LeaveApplication do
 
         @message = LeaveApplication.process_leave(
           leave_application.id,
-          REJECTED,
+          LEAVE_STATUS[:rejected],
           :process_reject_application,
           '',
           @admin.id
@@ -161,7 +161,7 @@ describe LeaveApplication do
 
           @message = LeaveApplication.process_leave(
             leave_application.id,
-            REJECTED,
+            LEAVE_STATUS[:rejected],
             :process_reject_application,
             '',
             @admin.id
@@ -175,7 +175,7 @@ describe LeaveApplication do
 
           @message = LeaveApplication.process_leave(
             leave_application.id,
-            APPROVED,
+            LEAVE_STATUS[:approved],
             :process_accept_application,
             '',
             @admin.id
@@ -201,7 +201,7 @@ describe LeaveApplication do
 
           @message = LeaveApplication.process_leave(
             leave_application.id,
-            APPROVED,
+            LEAVE_STATUS[:approved],
             :process_accept_application,
             '',
             @admin.id
@@ -218,7 +218,7 @@ describe LeaveApplication do
           )
           LeaveApplication.process_leave(
             leave_application.id,
-            APPROVED,
+            LEAVE_STATUS[:approved],
             :process_accept_application,
             '',
             @admin.id
@@ -228,7 +228,7 @@ describe LeaveApplication do
 
           @message = LeaveApplication.process_leave(
             leave_application.id,
-            APPROVED,
+            LEAVE_STATUS[:approved],
             :process_accept_application,
             '',
             @admin.id
@@ -263,7 +263,7 @@ describe LeaveApplication do
             start_at: Date.new(2021, 02, 10),
             end_at: Date.new(2021, 02, 10)
           )
-          LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
+          LeaveApplication.pending_leaves_reminder(COUNTRIES[:india])
           expect(ActionMailer::Base.deliveries.count).to eq(1)
         end
 
@@ -274,12 +274,12 @@ describe LeaveApplication do
             start_at: Date.new(2021, 02, 9),
             end_at: Date.new(2021, 02, 9)
           )
-          LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
+          LeaveApplication.pending_leaves_reminder(COUNTRIES[:india])
           expect(ActionMailer::Base.deliveries.count).to eq(1)
         end
 
         it 'should not send mail if leave application is empty' do
-          LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
+          LeaveApplication.pending_leaves_reminder(COUNTRIES[:india])
           expect(ActionMailer::Base.deliveries.count).to eq(0)
         end
       end
@@ -291,40 +291,40 @@ describe LeaveApplication do
         #Past leave
         FactoryGirl.create(
           :leave_application, start_at: Date.today - 2.months, end_at: Date.today - 2.months,
-          number_of_days: 1, leave_status: PENDING, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:pending], user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today - 2.months - 1, end_at: Date.today - 2.months - 1,
-          number_of_days: 1, leave_status: APPROVED, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:approved], user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today - 6.months - 1, end_at: Date.today - 6.months - 1,
-          number_of_days: 1, leave_status: APPROVED, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:approved], user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today - 2.months - 2, end_at: Date.today - 2.months - 2,
-          number_of_days: 1, leave_status: APPROVED, leave_type: LeaveApplication::WFH, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:approved], leave_type: LeaveApplication::WFH, user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today - 2.months - 2, end_at: Date.today - 2.months - 2,
-          number_of_days: 1, leave_status: REJECTED, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:rejected], user: @user
         )
         #Upcoming leave
         FactoryGirl.create(
           :leave_application, start_at: Date.today + 2.months, end_at: Date.today + 2.months,
-          number_of_days: 1, leave_status: PENDING, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:pending], user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today + 2.months + 1, end_at: Date.today + 2.months + 1,
-          number_of_days: 1, leave_status: APPROVED, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:approved], user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today + 6.months + 1, end_at: Date.today + 6.months + 1,
-          number_of_days: 1, leave_status: APPROVED, leave_type: LeaveApplication::WFH, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:approved], leave_type: LeaveApplication::WFH, user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today + 2.months + 2, end_at: Date.today + 2.months + 2,
-          number_of_days: 1, leave_status: REJECTED, user: @user
+          number_of_days: 1, leave_status: LEAVE_STATUS[:rejected], user: @user
         )
       end
 

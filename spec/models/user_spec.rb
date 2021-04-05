@@ -65,8 +65,8 @@ describe User do
       leave_application1 = FactoryGirl.create(:leave_application, user: user)
       leave_application2 = FactoryGirl.create(:leave_application, user: user, start_at: Date.today + 4, end_at: Date.today + 7)
       user.update(status: STATUS[:resigned])
-      expect(leave_application1.reload.leave_status).to eq(REJECTED)
-      expect(leave_application2.reload.leave_status).to eq(REJECTED)
+      expect(leave_application1.reload.leave_status).to eq(LEAVE_STATUS[:rejected])
+      expect(leave_application2.reload.leave_status).to eq(LEAVE_STATUS[:rejected])
     end
   end
 

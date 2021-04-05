@@ -48,7 +48,7 @@
                   %button.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
                   %button.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject
               - elsif can? :manage, appr_leave
-                - if appr_leave.leave_status == REJECTED
+                - if appr_leave.leave_status == LEAVE_STATUS[:rejected]
                   %button.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
                 - else
                   %button.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject

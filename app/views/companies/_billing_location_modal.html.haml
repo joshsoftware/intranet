@@ -7,7 +7,7 @@
       .modal-body
         = form_tag export_billing_location_report_companies_path, method: 'GET', class: 'form' do
           .row.row-padding
-            = select_tag :billing_location, options_for_select(COUNTRIES_ABBREVIATIONS), 'aria-label': 'Billing Location', prompt: 'Select Billing Location', required: true
+            = select_tag :billing_location, options_for_select(COUNTRIES_ABBREVIATIONS.values), 'aria-label': 'Billing Location', prompt: 'Select Billing Location', required: true
           .row
             = submit_tag 'Export Report', class: 'btn btn-primary'
             %button.btn.btn-secondary{'data-dismiss': 'modal', type: 'button'} Close

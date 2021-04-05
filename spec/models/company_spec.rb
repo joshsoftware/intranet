@@ -10,7 +10,7 @@ RSpec.describe Company, type: :model do
   it { should validate_presence_of(:name) }
   it { should validate_uniqueness_of(:name) }
   it { should validate_uniqueness_of(:invoice_code) }
-  it { is_expected.to validate_inclusion_of(:billing_location).to_allow(COUNTRIES_ABBREVIATIONS) }
+  it { is_expected.to validate_inclusion_of(:billing_location).to_allow(COUNTRIES_ABBREVIATIONS.values) }
 
   it 'Should fail as invoice code length is more than 3' do
     company = FactoryGirl.build(:company, invoice_code: 'a234')
@@ -23,14 +23,14 @@ RSpec.describe Company, type: :model do
   end
 
   it 'Should pass as invoice code is unique with scope billing location' do
-    company1 = FactoryGirl.create(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[0])
-    company2 = FactoryGirl.build(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[1])
+    company1 = FactoryGirl.create(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[:in])
+    company2 = FactoryGirl.build(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[:us])
     expect(company2.valid?).to_not be_falsy
   end
 
   it 'Should fail as invoice code is not unique with scope billing location' do
-    company1 = FactoryGirl.create(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[0])
-    company2 = FactoryGirl.build(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[0])
+    company1 = FactoryGirl.create(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[:in])
+    company2 = FactoryGirl.build(:company, invoice_code: 'abc', billing_location: COUNTRIES_ABBREVIATIONS[:in])
     expect(company2.valid?).to be_falsy
   end
 
@@ -75,7 +75,7 @@ RSpec.describe Company, type: :model do
   context 'billing_location_report' do
     before do
       @company1 = FactoryGirl.create(:company)
-      @company2 = FactoryGirl.create(:company, billing_location: COUNTRIES_ABBREVIATIONS[1])
+      @company2 = FactoryGirl.create(:company, billing_location: COUNTRIES_ABBREVIATIONS[:us])
       @project1 = FactoryGirl.create(:project, company: @company1)
       @project2 = FactoryGirl.create(:project, company: @company2)
       @user1 = FactoryGirl.create(:user)
@@ -84,13 +84,13 @@ RSpec.describe Company, type: :model do
       @user_project2 = FactoryGirl.create(:user_project, project_id: @project2.id, user_id: @user2.id)
 
       #should not consider inactive companies, projects and user_projects
-      @company3 = FactoryGirl.create(:company, billing_location: COUNTRIES_ABBREVIATIONS[1])
+      @company3 = FactoryGirl.create(:company, billing_location: COUNTRIES_ABBREVIATIONS[:us])
       @project3 = FactoryGirl.create(:project, company: @company2, is_active: false, end_date: Date.today)
       @user_project3 = FactoryGirl.create(:user_project, project_id: @project3.id, user_id: @user2.id, active: false, end_date: Date.today)
     end
 
     it 'should list records where company billing location matches with the given argument' do
-      csv = Company.billing_location_report(COUNTRIES_ABBREVIATIONS[0])
+      csv = Company.billing_location_report(COUNTRIES_ABBREVIATIONS[:in])
 
       expected_csv = "Company Name,Company Status,Project Name,Employee ID,Employee Name,Billable(Y/N),Allocation(hrs)\n"
       expected_csv << "#{@company1.name},#{@company1.active ? 'Active' : 'Inactive'},#{@project1.name},#{@user1.employee_detail.try(:employee_id).try(:rjust, 3, '0')},#{@user1.name},#{@user_project1.billable ? 'Yes' : 'No'},#{@user_project1.allocation}\n"

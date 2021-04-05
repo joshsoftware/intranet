@@ -17,7 +17,7 @@ class ResourceCategorisationService
 
     users = User.approved.where(
       :role.in => include_roles,
-      :'employee_detail.location'.ne => LOCATIONS[0],
+      :'employee_detail.location'.ne => LOCATIONS[:bengaluru],
       :'employee_detail.designation_id'.nin => @exclude_designations_ids
     )
     users.each do |user|

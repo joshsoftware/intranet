@@ -5,13 +5,13 @@ pending_leave = ($(tr_id).attr('pending') == 'true')
 
 row = pending_leave ? $(tr_id).detach() : $(tr_id)
 
-if("#{@status}" == "#{REJECTED}"){
+if("#{@status}" == "#{LEAVE_STATUS[:rejected]}"){
 // LEAVE REJECTED
 message = 'Leave Cancelled'
 row.children('.status').text("#{@status}")
 row.children('.action').html("<div class='process_btn btn btn-mini btn-success' data-action='approve' data-id="+leave_application_id+">Approve</div>")
 }
-if("#{@status}" == "#{APPROVED}"){
+if("#{@status}" == "#{LEAVE_STATUS[:approved]}"){
 // LEAVE ACCEPTED
 message = 'Leave Approved'
 row.children('.status').text("#{@status}")

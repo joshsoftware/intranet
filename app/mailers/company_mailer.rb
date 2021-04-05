@@ -5,7 +5,7 @@ class CompanyMailer < ActionMailer::Base
   def send_billing_location_report(username, user_email, billing_location)
     csv = Company.billing_location_report(billing_location)
     @username = username
-    @billing_location = billing_location == COUNTRIES_ABBREVIATIONS[0] ? COUNTRIES[0] : COUNTRIES[1]
+    @billing_location = billing_location == COUNTRIES_ABBREVIATIONS[:in] ? COUNTRIES[:india] : COUNTRIES[:usa]
     attachments["BillingLocationDetails - #{Time.now.strftime("%d%b%Y-%H:%M")}.csv"] = csv
     mail(subject: "Billing Location Details Report(#{billing_location})", to: user_email)
   end
