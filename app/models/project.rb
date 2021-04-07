@@ -79,7 +79,7 @@ class Project
   validates :billing_frequency, inclusion: { in: BILLING_FREQUENCY_TYPES, allow_nil: true }
   validates :type_of_project, inclusion: { in: TYPE_OF_PROJECTS, allow_nil: true }
   validates :batch_name, inclusion: { in: TYPE_OF_BATCHES, allow_nil: true }
-  validate :start_date_less_than_end_date, if: 'end_date.present?'
+  validate :start_date_less_than_end_date, if: 'start_date.present? && end_date.present?'
   validate :validate_end_date, if: 'end_date.present?'
 
   def validate_end_date
@@ -131,7 +131,9 @@ class Project
           processed_by = nil
           processed_by = project.manager_ids.first if project.manager_ids.present?
           reject_reason = "Rejected optional leave by System: Project #{project.name} is aligned with client's holiday calender."
-          LeaveApplication.process_leave(leave_application.first.id, REJECTED, :process_reject_application, reject_reason, processed_by)
+          leave_application.each do |leave|
+            LeaveApplication.process_leave(leave.id, REJECTED, :process_reject_application, reject_reason, processed_by)
+          end
         end
 
         managers_email = Project.get_project_managers_emails(project)

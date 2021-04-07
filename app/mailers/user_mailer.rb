@@ -54,6 +54,24 @@ class UserMailer < ActionMailer::Base
     mail(from: 'intranet@joshsoftware.com', to: managers_email, subject: "Future leaves status of #{project_name} team member")
   end
 
+  def future_leave_details(user_ids, managers_email, project_name)
+    user_leave_history = []
+    user_ids.each do |user_id|
+      future_leave = LeaveApplication.get_users_upcoming_leaves(user_id)
+      if future_leave.exists?
+        user_leave_history << {
+          user_name: User.where(id: user_id).first.try(:name),
+          future_leave_detail: future_leave
+        }
+      end
+    end
+    return if user_leave_history.empty?
+    @future_leave = user_leave_history
+    @project_name = project_name
+    @managers_count = managers_email.count > 1 ? true : false
+    mail(from: 'intranet@joshsoftware.com', to: managers_email, subject: "Future leaves status of #{project_name} team member")
+  end
+
   def reject_leave(leave_application_id)
     get_leave(leave_application_id)
     mail(to: @notification_emails, subject: "#{@leave_type} Request got rejected")
