@@ -60,3 +60,4 @@ CUSTOM_MANAGERS = {
 LEAVE_TYPES = {leave: 'LEAVE', wfh: 'WFH', optional_holiday: 'OPTIONAL HOLIDAY', spl: 'SPL'}
 
 ASSESSMENT_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+REJECT_FUTURE_OPTIONAL_LEAVE_BY = 'hr@joshsoftware.com'

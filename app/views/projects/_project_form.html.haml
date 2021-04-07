@@ -22,10 +22,14 @@
           .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
             = f.check_box :is_activity, {}, 'true', 'false'
         %div.control-group
-          =f.label 'Timesheet Mandatory'
+          = f.label 'Timesheet Mandatory'
           .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
             = f.check_box :timesheet_mandatory, {}, 'true', 'false'
-        = f.input :start_date, required: true, 'aria-required': true, input_html: {type: :date, class: 'date-picker', value: f.object.start_date.try(:strftime, '%Y-%m-%d') || Date.today.strftime('%Y-%m-%d')}
+        %div.control-group
+          = f.label 'Follow Client Holiday Calendar'
+          .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "True", "data-off-label": "False"}
+            = f.check_box :follow_client_holiday_calendar, {}, 'true', 'false'
+        = f.input :start_date, required: true, 'aria-required': true, input_html: {type: :date, class: 'date-picker', value: f.object.start_date.try(:strftime, '%Y-%m-%d')}
         = f.input :end_date, input_html: {type: :date, class: 'date-picker', value: f.object.end_date.try(:strftime, '%Y-%m-%d')}
         = label_tag "Case Study", nil, class: 'control-label'
         = f.file_field :case_study, required: true, 'aria-required': true, class: 'case_study_upload', accept: "application/pdf"

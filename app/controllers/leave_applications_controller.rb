@@ -7,6 +7,10 @@ class LeaveApplicationsController < ApplicationController
   def new
     @leave_application = LeaveApplication.new(user_id: current_user.id)
     @available_leaves = current_user.employee_detail.try(:available_leaves)
+    follow_client_calender = false
+    project_id = current_user.projects.where(follow_client_holiday_calendar: true).pluck(:'_id')
+    @follow_client_calender = !UserProject.where(:user_id => current_user.id, :project_id.in => project_id, :allocation => 0).present? if project_id.present?
+    @leave_types = LEAVE_TYPES.values
   end
 
   def index

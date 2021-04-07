@@ -417,6 +417,56 @@ describe Project do
     end
   end
 
+  context 'check presence of end_date' do
+    it 'when project set to inactive' do
+      project = create(:project)
+      project.is_active = false
+      expect(project.valid?).to eq false
+    end
+  end
+
+  context 'validate end_date' do
+    it 'should validate end_date greater than start_date' do
+      project = FactoryGirl.build(:project, start_date: Date.today, end_date: Date.yesterday)
+      project.save
+      expect(project.errors[:end_date]).to eq(["should not be less than start date.", "should not be less than today. As project is active"])
+    end
+  end
+
+  describe '#client_holiday_calendar_validation' do
+    context 'when client_holiday_calendar flag' do
+      let!(:user1) { FactoryGirl.create(:user, role:  ROLE[:employee], status: STATUS[:approved]) }
+      let!(:user2) { FactoryGirl.create(:user, role:  ROLE[:employee], status: STATUS[:approved]) }
+      let!(:user3) { FactoryGirl.create(:user, role:  ROLE[:manager], status: STATUS[:approved]) }
+      let!(:project) { FactoryGirl.create(:project) }
+      let!(:user_project1) { FactoryGirl.create(:user_project, project: project, user: user1, active: true) }
+      let!(:user_project2) { FactoryGirl.create(:user_project, project: project, user: user2, active: true) }
+
+      it 'active and user applied future optional leave' do
+        project.managers << user3
+        project.update_attributes(follow_client_holiday_calendar: true)
+        FactoryGirl.create(:leave_application, user: user1, leave_type: LEAVE_TYPES[:optional_holiday], start_at: Date.today+1.month, end_at: Date.today+1.month+1)
+        response = Project.client_holiday_calendar_validation(project)
+        expect(response).to eq("following employees future optional holidays are rejected: #{user1.name}.")
+      end
+
+      it 'active and non of the user any future leave applied' do
+        project.managers << user3
+        project.update_attributes(follow_client_holiday_calendar: true)
+        response = Project.client_holiday_calendar_validation(project)
+        expect(response).to be_nil
+      end
+
+      it 'disable and user apply future optional leave' do
+        project.managers << user3
+        project.update_attributes(follow_client_holiday_calendar: false)
+        FactoryGirl.create(:leave_application, user: user2, leave_type: LEAVE_TYPES[:optional_holiday], start_at: Date.today+1.month, end_at: Date.today+1.month+1)
+        response = Project.client_holiday_calendar_validation(project)
+        expect(response).to be_nil
+      end
+    end
+  end
+
   context 'Trigger - should call code monitor service' do
     before(:each) do
       @project = build(:project)

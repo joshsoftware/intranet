@@ -154,6 +154,10 @@ class User
     ].flatten.compact.uniq
   end
 
+  def self.default_managers_email
+    [User.approved.where(role: 'HR').pluck(:email), 'sameert@joshsoftware.com'].flatten.compact.uniq
+  end
+
   def call_monitor_service
     CodeMonitoringWorker.perform_async({ event_type: 'User Resigned', user_id: id.to_s })
   end
