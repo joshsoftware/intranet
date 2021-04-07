@@ -14,48 +14,62 @@ describe LeaveApplication do
     it { is_expected.to validate_inclusion_of(:leave_type).to_allow(LEAVE_TYPES.values) }
   end
 
-  context 'Validate date - Cross date validation - ' do
-
+  context 'Validation ' do
     before do
       @user = FactoryGirl.create(:user)
     end
 
-    it 'should not be able to apply leave for same date' do
-      leave_application = FactoryGirl.create(:leave_application, user: @user)
-      leave_application2 = FactoryGirl.build(:leave_application, user: @user)
-      expect(leave_application2.valid?).to eq(false)
-      expect(leave_application2.errors[:base]).
-        to eq(['Already applied for LEAVE on same date'])
+    context 'Cross date validation - ' do
+      it 'should not be able to apply leave for same date' do
+        leave_application = FactoryGirl.create(:leave_application, user: @user)
+        leave_application2 = FactoryGirl.build(:leave_application, user: @user)
+        expect(leave_application2.valid?).to eq(false)
+        expect(leave_application2.errors[:base]).
+          to eq(['Already applied for LEAVE on same date'])
+      end
+
+      it 'start date should not exists in the range of applied leaves' do
+        FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
+        leave_application = FactoryGirl.build(:leave_application, start_at: Date.today + 1, end_at: Date.today + 3, user: @user)
+        leave_application.save
+        expect(leave_application.errors[:base]).to eq(['Already applied for LEAVE on same date'])
+      end
+
+      it 'end date should not exists in the range of applied leaves' do
+        FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
+        leave_application = FactoryGirl.build(:leave_application, start_at: Date.today - 1, end_at: Date.today + 1, user: @user)
+        leave_application.save
+        expect(leave_application.errors[:base]).to eq(['Already applied for LEAVE on same date'])
+      end
+
+      it 'start date of future leave should not clash with that of existing leave' do
+        FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
+        FactoryGirl.create(:leave_application, start_at: Date.today - 3, end_at: Date.today - 1, user: @user)
+        leave_application = FactoryGirl.build(:leave_application, start_at: Date.today + 1, end_at: Date.today + 3, user: @user)
+        leave_application.save
+        expect(leave_application.errors[:base]).to eq(['Already applied for LEAVE on same date'])
+      end
+
+      it 'end date of future leave should not clash with that of existing leave' do
+        FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
+        FactoryGirl.create(:leave_application, start_at: Date.today - 3, end_at: Date.today - 1, user: @user)
+        leave_application = FactoryGirl.build(:leave_application, start_at: Date.today - 6, end_at: Date.today - 1, user: @user)
+        leave_application.save
+        expect(leave_application.errors[:base]).to eq(['Already applied for LEAVE on same date'])
+      end
     end
 
-    it 'start date should not exists in the range of applied leaves' do
-      FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
-      leave_application = FactoryGirl.build(:leave_application, start_at: Date.today + 1, end_at: Date.today + 3, user: @user)
-      leave_application.save
-      expect(leave_application.errors[:base]).to eq(['Already applied for LEAVE on same date'])
-    end
-
-    it 'end date should not exists in the range of applied leaves' do
-      FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
-      leave_application = FactoryGirl.build(:leave_application, start_at: Date.today - 1, end_at: Date.today + 1, user: @user)
-      leave_application.save
-      expect(leave_application.errors[:base]).to eq(['Already applied for LEAVE on same date'])
-    end
-
-    it 'start date of future leave should not clash with that of existing leave' do
-      FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
-      FactoryGirl.create(:leave_application, start_at: Date.today - 3, end_at: Date.today - 1, user: @user)
-      leave_application = FactoryGirl.build(:leave_application, start_at: Date.today + 1, end_at: Date.today + 3, user: @user)
-      leave_application.save
-      expect(leave_application.errors[:base]).to eq(['Already applied for LEAVE on same date'])
-    end
-
-    it 'end date of future leave should not clash with that of existing leave' do
-      FactoryGirl.create(:leave_application, start_at: Date.today, end_at: Date.today + 2, user: @user)
-      FactoryGirl.create(:leave_application, start_at: Date.today - 3, end_at: Date.today - 1, user: @user)
-      leave_application = FactoryGirl.build(:leave_application, start_at: Date.today - 6, end_at: Date.today - 1, user: @user)
-      leave_application.save
-      expect(leave_application.errors[:base]).to eq(['Already applied for LEAVE on same date'])
+    context 'optional leave validation ' do
+      it 'should fail to apply optional holiday if employee '+
+         'trying to apply more than 2 optional holidays' do
+        FactoryGirl.create(:leave_application, user: @user, leave_type: LEAVE_TYPES[:optional_holiday], start_at: Date.today+1.month, end_at: Date.today+1.month)
+        FactoryGirl.create(:leave_application, user: @user, leave_type: LEAVE_TYPES[:optional_holiday], start_at: Date.today+1.month+1, end_at: Date.today+1.month+1)
+        leave_application = FactoryGirl.build(:leave_application, user: @user, leave_type: LEAVE_TYPES[:optional_holiday], start_at: Date.today+1.month+2, end_at: Date.today+1.month+2)
+        expect(leave_application.valid?).to be_falsy
+        expect(leave_application.errors.full_messages).to eq(
+          ['Leave type Cannot apply for more than 2 Optional leaves']
+        )
+      end
     end
   end
 

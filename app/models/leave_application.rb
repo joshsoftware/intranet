@@ -179,6 +179,11 @@ class LeaveApplication
   end
 
   def send_leave_notification
+    follow_client_calender = false
+    project_id = user.projects.where(follow_client_holiday_calendar: true).pluck(:'_id')
+    follow_client_calender = !UserProject.where(:user_id => user.id, :project_id.in => project_id, :allocation => 0).present? if project_id.present?
+    return if follow_client_calender
+
     if start_at >= Date.today && is_leave?
       emails = get_team_members
       if emails.present?
@@ -248,6 +253,15 @@ class LeaveApplication
       :start_at.gt => Date.today,
       :leave_status.ne => REJECTED
     ).order_by(:start_at.asc)
+  end
+
+  def self.get_user_upcoming_optional_leave(user_id)
+    LeaveApplication.where(
+      user_id: user_id,
+      :start_at.gt => Date.today,
+      :leave_status.in => [APPROVED, PENDING],
+      leave_type: LEAVE_TYPES[:optional_holiday]
+    )
   end
 
   def self.pending_leaves_reminder(country)

@@ -1,5 +1,8 @@
 = f.hidden_field :user_id
-= f.input :leave_type, collection: LEAVE_TYPES.values, prompt: 'Select Leave Type'
+- if @follow_client_calender
+  = f.input :leave_type, collection: @leave_types, prompt: 'Select Leave Type', :disabled => ['OPTIONAL']
+-else
+  = f.input :leave_type, collection: @leave_types, prompt: 'Select Leave Type'
 #leave_list
 = f.input :start_at, label: 'Start Date', input_html: { type: 'date', class: 'date-picker', min: Date.today.beginning_of_year.strftime('%Y-%m-%d'), data: { 'validation-required-message': 'You must select start date'}, required: true, value: f.object.start_at.try(:strftime, '%Y-%m-%d')}
 = f.input :end_at, label: 'End Date', input_html: { type: 'date', class: 'date-picker',  min: Date.today.beginning_of_year.strftime('%Y-%m-%d'), data: { 'validation-required-message': 'You must select end date'}, required: true, value: f.object.end_at.try(:strftime, '%Y-%m-%d')}
