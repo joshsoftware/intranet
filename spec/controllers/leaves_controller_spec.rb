@@ -812,6 +812,7 @@ describe LeaveApplicationsController do
     before(:each) do
       @user = FactoryGirl.create(:user, status: STATUS[:approved])
       @optional_holiday = FactoryGirl.create(:holiday, holiday_date: Date.new(2021,2,9), holiday_type: HolidayList::OPTIONAL)
+      travel_to @optional_holiday.holiday_date - 1.month
       @optional_leave = FactoryGirl.build(:leave_application,
         leave_type: LeaveApplication::OPTIONAL,
         user: @user,
@@ -825,6 +826,10 @@ describe LeaveApplicationsController do
         end_at: Date.new(2021,2,10),
         number_of_days: 3
       )
+    end
+
+    after do
+      travel_back
     end
 
     it 'should not deduct any leave count' do
