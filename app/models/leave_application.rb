@@ -37,7 +37,7 @@ class LeaveApplication
   validate :validate_available_leaves, on: [:create, :update], if: :leave?
   validate :end_date_less_than_start_date, if: 'start_at.present?'
   validate :validate_date, on: [:create, :update], unless: :optional_leave?
-  validate :validate_optional_leave, on: [:create, :update], if: :optional_leave?
+  validate :validate_optional_leave, on: [:create, :update], if: 'optional_leave? && !processed?'
   validate :update_leave_count, on: :update, if: :previous_leave_type?
 
   after_save do
@@ -56,6 +56,10 @@ class LeaveApplication
   scope :leaves, -> { where(:leave_type.in => [LEAVE, OPTIONAL, SPL]) }
 
   attr_accessor :sanctioning_manager
+
+  def processed?
+    leave_status != PENDING
+  end
 
   def leave_request?
     leave_type == LEAVE
@@ -92,12 +96,10 @@ class LeaveApplication
   end
 
   def validate_optional_leave
-    if start_at < Date.today + 1.month && start_at.month > 1
-      errors.add(
-        :start_at,
-        'Optional Holiday can not be applied within One month prior to Optional Holiday date'
-      )
-    end
+    errors.add(
+      :start_at,
+      'Optional Holiday can not be applied within One month prior to Optional Holiday date'
+    ) if start_at < Date.today + 1.month && start_at.month > 1
     leaves = LeaveApplication.unrejected.where(
       user_id: user_id,
       leave_type: OPTIONAL,
@@ -111,9 +113,7 @@ class LeaveApplication
                   else
                     leaves.count
                   end
-    if leave_count > 2
-      errors.add(:leave_type, 'Cannot apply for more than 2 Optional leaves')
-    end
+    errors.add(:leave_type, 'Cannot apply for more than 2 Optional leaves') if leave_count > 2
   end
 
   def adjust_leave_count
