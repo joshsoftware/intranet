@@ -304,10 +304,4 @@ class UsersController < ApplicationController
     return 'Employee details' if params[:user][:employee_detail_attributes].present?
     return 'Assets' if params[:user][:assets_attributes].present?
   end
-
-  def current_tab
-    return 'Documents' if params[:user][:attachments_attributes].present?
-    return 'Employee details' if params[:user][:employee_detail_attributes].present?
-    return 'Assets' if params[:user][:assets_attributes].present?
-  end
 end
