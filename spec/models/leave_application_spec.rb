@@ -11,7 +11,7 @@ describe LeaveApplication do
     it { should validate_presence_of(:contact_number) }
     it { should validate_numericality_of(:contact_number) }
     it { should validate_presence_of(:leave_type) }
-    it { is_expected.to validate_inclusion_of(:leave_type).to_allow(LeaveApplication::LEAVE_TYPES) }
+    it { is_expected.to validate_inclusion_of(:leave_type).to_allow(LEAVE_TYPES.values) }
   end
 
   context 'Validate date - Cross date validation - ' do
@@ -303,7 +303,7 @@ describe LeaveApplication do
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today - 2.months - 2, end_at: Date.today - 2.months - 2,
-          number_of_days: 1, leave_status: APPROVED, leave_type: LeaveApplication::WFH, user: @user
+          number_of_days: 1, leave_status: APPROVED, leave_type: LEAVE_TYPES[:wfh], user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today - 2.months - 2, end_at: Date.today - 2.months - 2,
@@ -320,7 +320,7 @@ describe LeaveApplication do
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today + 6.months + 1, end_at: Date.today + 6.months + 1,
-          number_of_days: 1, leave_status: APPROVED, leave_type: LeaveApplication::WFH, user: @user
+          number_of_days: 1, leave_status: APPROVED, leave_type: LEAVE_TYPES[:wfh], user: @user
         )
         FactoryGirl.create(
           :leave_application, start_at: Date.today + 2.months + 2, end_at: Date.today + 2.months + 2,
@@ -370,7 +370,7 @@ describe LeaveApplication do
       it 'should not deduct leave from available leave' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LeaveApplication::WFH)
+        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LEAVE_TYPES[:wfh])
         expect(employee_detail.available_leaves).to eq(available_leaves)
       end
     end
@@ -379,14 +379,14 @@ describe LeaveApplication do
       it 'should not deduct leave from available leave' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LeaveApplication::SPL)
+        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LEAVE_TYPES[:spl])
         expect(employee_detail.available_leaves).to eq(available_leaves)
       end
 
       it 'rejected leave should not be added to available leaves' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LeaveApplication::SPL)
+        wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LEAVE_TYPES[:spl])
         expect(employee_detail.available_leaves).to eq(available_leaves)
         wfh_application.process_reject_application
         expect(employee_detail.available_leaves).to eq(available_leaves)
@@ -401,7 +401,7 @@ describe LeaveApplication do
       it 'should update available leaves with new leaves changes' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LeaveApplication::LEAVE)
+        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LEAVE_TYPES[:leave])
         leave_application.number_of_days = 2
         leave_application.save
         expect(employee_detail.available_leaves).to eq(available_leaves - leave_application.number_of_days)
@@ -416,7 +416,7 @@ describe LeaveApplication do
       it 'rejected leave should be added to available leaves' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        leave_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LeaveApplication::LEAVE)
+        leave_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LEAVE_TYPES[:leave])
         expect(employee_detail.available_leaves).to eq(available_leaves - leave_application.number_of_days)
         leave_application.process_reject_application
         expect(employee_detail.available_leaves).to eq(available_leaves)
@@ -427,7 +427,7 @@ describe LeaveApplication do
       it 'rejected leave should not be added to available leaves' do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
-        wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LeaveApplication::WFH)
+        wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LEAVE_TYPES[:wfh])
         expect(employee_detail.available_leaves).to eq(available_leaves)
         wfh_application.process_reject_application
         expect(employee_detail.available_leaves).to eq(available_leaves)

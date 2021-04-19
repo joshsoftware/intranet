@@ -23,7 +23,7 @@ namespace :leave_reminder do
     date = Date.today.at_end_of_month + 1
     leaves = LeaveApplication.where(
       leave_status: APPROVED,
-      leave_type: LeaveApplication::OPTIONAL,
+      leave_type: LEAVE_TYPES[:optional_holiday],
       start_at: {
         '$gte': date,
         '$lte': date.at_end_of_month

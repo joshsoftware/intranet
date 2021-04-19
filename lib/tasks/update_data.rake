@@ -7,7 +7,7 @@ namespace :update_data do
 
   desc 'Update Leave Type column'
   task update_leave_type_field: :environment do
-    LeaveApplication.update_all(leave_type: LeaveApplication::LEAVE)
+    LeaveApplication.update_all(leave_type: LEAVE_TYPES[:leave])
   end
 
   desc 'Update notification emails column for users having notification emails value as nil'

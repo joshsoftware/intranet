@@ -69,10 +69,10 @@ setLeaveDate = (min, max) ->
   $('#leave_application_end_at').attr('readOnly', true)
   $('#leave_application_start_at').attr('readOnly', true)
   $('#leave_application_number_of_days').val(days)
-  $('#leave_application_reason').val('Optional Leave - ' + reason)
+  $('#leave_application_reason').val('Optional Holiday - ' + reason)
   $('#leave_application_reason').attr('readOnly', true)
-  if (reason == 'No Optional Leaves')
-    $('#leave_application_reason').val('Optional Leave - ')
+  if (reason == 'No Optional Holiday')
+    $('#leave_application_reason').val('Optional Holiday - ')
     $('#leave_application_number_of_days').val(0)
     $('.leave_submit').attr('disabled', true)
 
@@ -95,7 +95,7 @@ removeOptionalHolidayUI = () ->
     options = list.map (h) ->
                 '<option value="'+ h.holiday_date + '">' + h.reason + '</option>'
   else
-    options = '<option value="">No Optional Leaves</option>'
+    options = '<option value="">No Optional Holidays</option>'
 
   return '<div class="control-group select required leave_application_leave_list">' +
             '<label class="select required control-label" for="leave_application_leave_list">' +
@@ -132,7 +132,7 @@ $(document).ready ->
   $('#user_id').on 'change', ->
     $('#project_id').attr('disabled', true);
   $('#leave_application_leave_type').on 'change', ->
-    if $(this).val() == 'OPTIONAL'
+    if $(this).val() == 'OPTIONAL HOLIDAY'
       $('#leave_list').html(input_leave_list)
       $('#leave_application_leave_list').prop('selectedIndex', 0).change()
     else

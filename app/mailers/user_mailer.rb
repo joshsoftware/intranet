@@ -188,7 +188,7 @@ class UserMailer < ActionMailer::Base
   end
 
   def get_leave_type(leave_type)
-    leave_type == LeaveApplication::WFH ? leave_type : LeaveApplication::LEAVE.capitalize
+    leave_type == LEAVE_TYPES[:wfh] ? leave_type : LEAVE_TYPES[:leave].capitalize
   end
 
   def get_leave_message

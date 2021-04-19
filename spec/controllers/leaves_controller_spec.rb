@@ -554,14 +554,14 @@ describe LeaveApplicationsController do
       leave_count = @user.employee_detail.available_leaves - @leave.number_of_days
       params = {
         id: @leave.id,
-        leave_application: @leave.attributes.merge(leave_type: LeaveApplication::LEAVE)
+        leave_application: @leave.attributes.merge(leave_type: LEAVE_TYPES[:leave])
       }
       put :update, params
 
       expect(flash[:success]).to eq('Your request has been updated successfully.' +
         ' Please wait for the approval.')
       expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
-      expect(@leave.reload.leave_type).to eq(LeaveApplication::LEAVE)
+      expect(@leave.reload.leave_type).to eq(LEAVE_TYPES[:leave])
     end
 
     it 'should not deduct leave count if leave type updated to Optional' do
@@ -570,14 +570,14 @@ describe LeaveApplicationsController do
       leave_count = @user.employee_detail.available_leaves
       params = {
         id: @leave.id,
-        leave_application: @leave.attributes.merge(leave_type: LeaveApplication::OPTIONAL)
+        leave_application: @leave.attributes.merge(leave_type: LEAVE_TYPES[:optional_holiday])
       }
       put :update, params
 
       expect(flash[:success]).to eq('Your request has been updated successfully.' +
         ' Please wait for the approval.')
       expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
-      expect(@leave.reload.leave_type).to eq(LeaveApplication::OPTIONAL)
+      expect(@leave.reload.leave_type).to eq(LEAVE_TYPES[:optional_holiday])
     end
 
     it 'should not deduct leave count after approving the WFH request' do
@@ -603,7 +603,7 @@ describe LeaveApplicationsController do
       @user = FactoryGirl.create(:user, status: APPROVED)
       @leave = FactoryGirl.build(
         :leave_application,
-        leave_type: LeaveApplication::SPL,
+        leave_type: LEAVE_TYPES[:spl],
         user: @user
       )
     end
@@ -690,7 +690,7 @@ describe LeaveApplicationsController do
         start_at: @start_date,
         end_at: @end_date,
         leave_status: APPROVED,
-        leave_type: LeaveApplication::WFH,
+        leave_type: LEAVE_TYPES[:wfh],
         user: @user
       )
       params = {
@@ -710,7 +710,7 @@ describe LeaveApplicationsController do
         start_at: @start_date,
         end_at: @end_date,
         leave_status: APPROVED,
-        leave_type: LeaveApplication::WFH,
+        leave_type: LEAVE_TYPES[:wfh],
         user: @user
       )
       leave = FactoryGirl.build(
@@ -718,7 +718,7 @@ describe LeaveApplicationsController do
         start_at: Date.today,
         end_at: Date.today,
         user: @user,
-        leave_type: LeaveApplication::SPL
+        leave_type: LEAVE_TYPES[:spl]
       )
       params = {
         user_id: @user.id,
@@ -737,10 +737,10 @@ describe LeaveApplicationsController do
         start_at: @start_date,
         end_at: @end_date,
         leave_status: APPROVED,
-        leave_type: LeaveApplication::LEAVE,
+        leave_type: LEAVE_TYPES[:leave],
         user: @user
       )
-      @leave.update_attributes(leave_type: LeaveApplication::WFH)
+      @leave.update_attributes(leave_type: LEAVE_TYPES[:wfh])
       params = {
         user_id: @user.id,
         leave_application: @leave.attributes
@@ -756,10 +756,10 @@ describe LeaveApplicationsController do
         start_at: @start_date,
         end_at: @end_date,
         leave_status: APPROVED,
-        leave_type: LeaveApplication::SPL,
+        leave_type: LEAVE_TYPES[:spl],
         user: @user
       )
-      @leave.update_attributes(leave_type: LeaveApplication::WFH)
+      @leave.update_attributes(leave_type: LEAVE_TYPES[:wfh])
       params = {
         user_id: @user.id,
         leave_application: @leave.attributes
@@ -775,10 +775,10 @@ describe LeaveApplicationsController do
         start_at: @start_date,
         end_at: @end_date,
         leave_status: APPROVED,
-        leave_type: LeaveApplication::WFH,
+        leave_type: LEAVE_TYPES[:wfh],
         user: @user
       )
-      @leave.update_attributes(leave_type: LeaveApplication::WFH)
+      @leave.update_attributes(leave_type: LEAVE_TYPES[:wfh])
       params = {
         user_id: @user.id,
         leave_application: @leave.attributes
@@ -794,7 +794,7 @@ describe LeaveApplicationsController do
         start_at: @start_date,
         end_at: @end_date,
         leave_status: APPROVED,
-        leave_type: LeaveApplication::LEAVE,
+        leave_type: LEAVE_TYPES[:leave],
         user: @user
       )
       params = {
@@ -814,13 +814,13 @@ describe LeaveApplicationsController do
       @optional_holiday = FactoryGirl.create(:holiday, holiday_date: Date.new(2021,2,9), holiday_type: HolidayList::OPTIONAL)
       travel_to @optional_holiday.holiday_date - 1.month
       @optional_leave = FactoryGirl.build(:leave_application,
-        leave_type: LeaveApplication::OPTIONAL,
+        leave_type: LEAVE_TYPES[:optional_holiday],
         user: @user,
         start_at: @optional_holiday.holiday_date,
         end_at: @optional_holiday.holiday_date
       )
       @leave = FactoryGirl.build(:leave_application,
-        leave_type: LeaveApplication::LEAVE,
+        leave_type: LEAVE_TYPES[:leave],
         user: @user,
         start_at: Date.new(2021,2,8),
         end_at: Date.new(2021,2,10),
@@ -850,12 +850,12 @@ describe LeaveApplicationsController do
       leave_count = @user.employee_detail.available_leaves - @optional_leave.number_of_days
       params = {
         id: @optional_leave.id,
-        leave_application: @optional_leave.attributes.merge(leave_type: LeaveApplication::LEAVE)
+        leave_application: @optional_leave.attributes.merge(leave_type: LEAVE_TYPES[:leave])
       }
       put :update, params
 
       expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
-      expect(@optional_leave.reload.leave_type).to eq(LeaveApplication::LEAVE)
+      expect(@optional_leave.reload.leave_type).to eq(LEAVE_TYPES[:leave])
     end
 
     it 'should not deduct any leave if leave type updated to WFH' do
@@ -864,12 +864,12 @@ describe LeaveApplicationsController do
       leave_count = @user.employee_detail.available_leaves
       params = {
         id: @optional_leave.id,
-        leave_application: @optional_leave.attributes.merge(leave_type: LeaveApplication::WFH)
+        leave_application: @optional_leave.attributes.merge(leave_type: LEAVE_TYPES[:wfh])
       }
       put :update, params
 
       expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
-      expect(@optional_leave.reload.leave_type).to eq(LeaveApplication::WFH)
+      expect(@optional_leave.reload.leave_type).to eq(LEAVE_TYPES[:wfh])
     end
 
     it 'should not deduct leave count after approving the Optional request' do
@@ -884,7 +884,7 @@ describe LeaveApplicationsController do
 
       leave_count = @user.reload.employee_detail.available_leaves
       expect(@optional_leave.reload.leave_status).to eq(APPROVED)
-      expect(@optional_leave.leave_type).to eq(LeaveApplication::OPTIONAL)
+      expect(@optional_leave.leave_type).to eq(LEAVE_TYPES[:optional_holiday])
       expect(leave_count).to eq(24)
     end
 
@@ -900,7 +900,7 @@ describe LeaveApplicationsController do
 
       leave_count = @user.reload.employee_detail.available_leaves
       expect(@optional_leave.reload.leave_status).to eq(REJECTED)
-      expect(@optional_leave.leave_type).to eq(LeaveApplication::OPTIONAL)
+      expect(@optional_leave.leave_type).to eq(LEAVE_TYPES[:optional_holiday])
       expect(leave_count).to eq(24)
     end
 
