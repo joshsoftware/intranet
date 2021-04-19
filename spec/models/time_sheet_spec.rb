@@ -517,7 +517,7 @@ RSpec.describe TimeSheet, type: :model do
           user: user,
           start_at: Date.today + 3,
           end_at:Date.today + 5,
-          leave_type: LeaveApplication::WFH,
+          leave_type: LEAVE_TYPES[:wfh],
           leave_status: APPROVED
         )
         expect(TimeSheet.user_on_leave?(user, Date.today + 4)).to eq(false)
@@ -712,7 +712,7 @@ RSpec.describe TimeSheet, type: :model do
         start_at: Date.today + 1,
         end_at: Date.today + 1,
         leave_status: APPROVED,
-        leave_type: LeaveApplication::WFH,
+        leave_type: LEAVE_TYPES[:wfh],
         processed_by: admin.id
       )
 

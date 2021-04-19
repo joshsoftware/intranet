@@ -6,20 +6,13 @@ class LeaveApplication
   belongs_to :user
   #has_one :address
 
-  LEAVE = 'LEAVE'
-  SPL = 'SPL'
-  WFH = 'WFH'
-  OPTIONAL = 'OPTIONAL'
-
-  LEAVE_TYPES = [LEAVE, WFH, OPTIONAL, SPL]
-
   field :start_at,        type: Date
   field :end_at,          type: Date
   field :contact_number,  type: Integer
   field :number_of_days,  type: Integer
   field :processed_by
   field :reason,          type: String
-  field :leave_type,      type: String, default: LEAVE
+  field :leave_type,      type: String, default: LEAVE_TYPES[:leave]
 
   # We were accepting reason only on rejection so field named as reject_reason
   # but now we accept reason 1) For rejection and 2) For approval after rejection
@@ -32,7 +25,7 @@ class LeaveApplication
   track_history
 
   validates :start_at, :end_at, :contact_number, :reason, :number_of_days, :user_id, :leave_type, presence: true
-  validates :leave_type, inclusion: { in: LEAVE_TYPES }
+  validates :leave_type, inclusion: { in: LEAVE_TYPES.values }
   validates :contact_number, numericality: {only_integer: true}, length: {is: 10}
   validate :validate_available_leaves, on: [:create, :update], if: :leave?
   validate :end_date_less_than_start_date, if: 'start_at.present?'
@@ -53,7 +46,7 @@ class LeaveApplication
   scope :pending, ->{where(leave_status: PENDING)}
   scope :processed, ->{where(:leave_status.ne => PENDING)}
   scope :unrejected, -> { where(:leave_status.ne => REJECTED )}
-  scope :leaves, -> { where(:leave_type.in => [LEAVE, OPTIONAL, SPL]) }
+  scope :leaves, -> { where(:leave_type.nin => [LEAVE_TYPES[:wfh]]) }
 
   attr_accessor :sanctioning_manager
 
@@ -62,7 +55,7 @@ class LeaveApplication
   end
 
   def leave_request?
-    leave_type == LEAVE
+    leave_type == LEAVE_TYPES[:leave]
   end
 
   def leave?
@@ -70,7 +63,7 @@ class LeaveApplication
   end
 
   def is_leave?
-    [LEAVE, SPL, OPTIONAL].include?(leave_type)
+    !leave_type.eql?(LEAVE_TYPES[:wfh])
   end
 
   def leave_count
@@ -80,11 +73,11 @@ class LeaveApplication
   def previous_leave_type?
     self.leave_status == PENDING &&
     self.leave_type_changed? &&
-    (self.leave_type_was == LEAVE || self.leave_type == LEAVE)
+    (self.leave_type_was == LEAVE_TYPES[:leave] || self.leave_type == LEAVE_TYPES[:leave])
   end
 
   def update_leave_count
-    if self.leave_type_was == LEAVE
+    if self.leave_type_was == LEAVE_TYPES[:leave]
       user.employee_detail.add_rejected_leave(self.number_of_days_was)
     else
       user.employee_detail.deduct_available_leaves(self.number_of_days)
@@ -92,7 +85,7 @@ class LeaveApplication
   end
 
   def optional_leave?
-    leave_type == OPTIONAL
+    leave_type == LEAVE_TYPES[:optional_holiday]
   end
 
   def validate_optional_leave
@@ -102,13 +95,13 @@ class LeaveApplication
     ) if start_at < Date.today + 1.month && start_at.month > 1
     leaves = LeaveApplication.unrejected.where(
       user_id: user_id,
-      leave_type: OPTIONAL,
+      leave_type: LEAVE_TYPES[:optional_holiday],
       end_at: {
         '$gte': Date.today.beginning_of_year,
         '$lte': Date.today.end_of_year
       }
     )
-    leave_count = if self.new_record? || self.leave_type_was != OPTIONAL
+    leave_count = if self.new_record? || self.leave_type_was != LEAVE_TYPES[:optional_holiday]
                     leaves.count + 1
                   else
                     leaves.count
@@ -120,7 +113,7 @@ class LeaveApplication
     overlapping_leave = self.user.leave_applications.where(
       :start_at.lte => self.start_at,
       :end_at.gte => self.start_at,
-      leave_type: LEAVE
+      leave_type: LEAVE_TYPES[:leave]
     ).first
     return if overlapping_leave.nil?
     employee_detail = self.user.employee_detail
@@ -237,7 +230,7 @@ class LeaveApplication
     LeaveApplication.where(
       start_at: date,
       leave_status: APPROVED,
-      leave_type: OPTIONAL
+      leave_type: LEAVE_TYPES[:optional_holiday]
     )
   end
 
@@ -326,7 +319,7 @@ class LeaveApplication
       leave_applications.each do |leave|
         if self.start_at.between?(leave.start_at, leave.end_at) or
            self.end_at.between?(leave.start_at, leave.end_at)
-          unless self.is_leave? && leave.leave_type == WFH
+          unless self.is_leave? && leave.leave_type == LEAVE_TYPES[:wfh]
             errors.add(:base, "Already applied for #{leave.leave_type} on same date") and return
           end
         end

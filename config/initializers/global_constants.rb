@@ -56,3 +56,5 @@ CUSTOM_MANAGERS = {
   bengaluru: 'amit.singh@joshsoftware.com', ui_ux: 'sai@joshsoftware.com',
   admin: 'shailesh.kalekar@joshsoftware.com', default: 'sameert@joshsoftware.com'
 }
+
+LEAVE_TYPES = {leave: 'LEAVE', wfh: 'WFH', optional_holiday: 'OPTIONAL HOLIDAY', spl: 'SPL'}

@@ -10,4 +10,9 @@ namespace :leave do
       user.set_details("dob", user.public_profile.date_of_birth)
     end
   end
+
+  desc 'Replace the leave_type from OPTIONAL to OPTIONAL HOLIDAY'
+  task :update_leave_type => :environment do
+    LeaveApplication.where(leave_type: 'OPTIONAL').set(leave_type: 'OPTIONAL HOLIDAY')
+  end
 end

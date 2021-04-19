@@ -144,7 +144,7 @@ class UsersController < ApplicationController
   def users_optional_holiday_list
     optional_holiday = current_user.leave_applications.unrejected.where(
       :start_at.gte => Date.current.beginning_of_year,
-      leave_type: LeaveApplication::OPTIONAL
+      leave_type: LEAVE_TYPES[:optional_holiday]
     ).pluck(:start_at)
     render json: {user_optional_holiday: optional_holiday}
   end
