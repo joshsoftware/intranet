@@ -1,0 +1,5 @@
+= form_tag export_time_sheet_monthly_report_time_sheets_path, method: 'GET', html: { class: 'form-horizontal' } do
+  .form-horizontal
+    .div.form-position
+      = date_select("date", :date, :discard_day => true, :end_year => Date.today.year, :order => [:month, :year])
+  =	submit_tag 'Export Report', class: 'btn btn-primary btn-padding'

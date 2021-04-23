@@ -3,10 +3,13 @@
     %a{data:{toggle: 'tab'}, href: '#timesheet_export'} Project Report
   %li
     = link_to 'Employee Categorisation Report', '#resource_export', data:{toggle: ('tab')}, class: :resource_export
-  
+  %li
+    = link_to 'Monthly Timesheet Report', '#timesheet_monthly_export', data:{toggle: ('tab')}, class: :resource_export  
 
 .export_tab_content.tab-content
   #timesheet_export.tab-pane.fade{ class: 'in active' }
     = render 'export_project_report_form'
   #resource_export.tab-pane.fade
     = render 'export_resource_report_form'
+  #timesheet_monthly_export.tab-pane.fade
+    = render 'timesheet_monthly_report_form'

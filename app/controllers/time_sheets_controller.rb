@@ -203,6 +203,23 @@ class TimeSheetsController < ApplicationController
     redirect_to time_sheets_path
   end
 
+  def export_time_sheet_monthly_report
+    date = Date.civil(*params[:date].sort.map(&:last).map(&:to_i))
+    if date.present? && date.future?
+      flash[:error] = 'Invalid selection, Please select current or past date.'
+      redirect_to export_project_report_time_sheets_path  and return
+    end
+    @start_date = date || Date.today.beginning_of_month
+    @end_date = date.end_of_month || Date.today.end_of_month
+    TimesheetMonthlyReportWorker.perform_async(
+      @start_date,
+      @end_date,
+      current_user.email
+    )
+    flash[:success] = 'You will receive timesheet monthly report to your mail shortly.'
+    redirect_to export_project_report_time_sheets_path
+  end
+
   private
 
   def user_exists?
