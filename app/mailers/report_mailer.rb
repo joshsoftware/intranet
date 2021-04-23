@@ -23,4 +23,24 @@ class ReportMailer < ActionMailer::Base
       to: emails
     )
   end
+
+  def send_time_sheet_monthly_report(options, email)
+    @username = User.where(email: email).first.name
+    data_file  = render_to_string(
+      layout: false, handlers: [:axlsx], formats: [:xlsx],
+      template: 'report_mailer/export_time_sheet_monthly_report',
+      locals: {reports: options}
+    )
+
+    attachment = {
+      mime_type: Mime[:xlsx],
+      content: data_file
+    }
+
+    attachments["TimesheetMonthlyReport - #{Date.today}.xlsx"] = attachment
+    mail(
+      subject: "Timesheet Monthly Report - #{Date.today}",
+      to: email
+    )
+  end
 end

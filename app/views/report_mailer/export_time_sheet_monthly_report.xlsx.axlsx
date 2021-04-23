@@ -1,0 +1,75 @@
+wb = xlsx_package.workbook
+reports.each do |report|
+  wb.styles do |s|
+    burlywood_cell = s.add_style :bg_color => "ea9999", :border => { :style => :thin, :color => "00" }
+    yellow = s.add_style( :bg_color => "FFFF00", :type => :dxf, :border => { :style => :thin, :color => "00" } )
+    red = s.add_style( :bg_color => "FF0000", :type => :dxf, :border => { :style => :thin, :color => "00" } )
+    green = s.add_style( :bg_color => "008000", :type => :dxf, :border => { :style => :thin, :color => "00" } )
+    light_grey = s.add_style( :bg_color => "808080", :type => :dxf, :border => { :style => :thin, :color => "00" } )
+    header_dates = []
+    report[:header].each { |date| header_dates << date.strftime('%d/%m/%Y') }
+
+    wb.add_worksheet(name: report[:location_name]) do |sheet|
+      sheet.add_row(['', 'Date', ''] + header_dates)
+      holiday = report[:holiday]
+      day_abbrivation = []
+      color_column_no = []
+      start_column_from = 3
+      report[:header].each do |date|
+        if holiday.include?(date) && !HolidayList.is_weekend?(date)
+          if HolidayList.is_optional_holiday?(date)
+            day_abbrivation << (date.strftime('%a').to_s + " (Optional Holiday)")
+          else
+            day_abbrivation << (date.strftime('%a').to_s + " (Holiday)")
+          end
+        else
+          day_abbrivation << date.strftime('%a').to_s
+        end
+        color_column_no << start_column_from if holiday.include?(date)
+        start_column_from += 1
+	    end
+
+      sheet.add_row(['Employee Id', 'Employee Name', 'Project Name'] + day_abbrivation +
+                    ['Occurrence', '#Weekdays', '#Weekends', '#Holiday',
+                    '#Leaves days', '#Timesheet missing days'])
+
+      report[:records].each do |record|
+        sheet.add_row [ record[1][:employee_id], record[1][:'user_name'], record[1][:'project'].join(', '),
+                        record[1][:'timesheet'].values, record[1][:'occurances'], record[1][:'no_of_weekday'],
+                        record[1][:'no_of_weekend'], record[1][:'no_of_holiday'], record[1][:'no_of_leave_day'],
+                        record[1][:'no_of_ts_missing_days']].flatten, types: [:string]
+      end
+      sheet.add_row(['', 'Total no of people working', '', report[:timesheet_per_day_count].values].flatten)
+      color_column_no.each do |col_no|
+        sheet.col_style col_no, burlywood_cell, :row_offset => 1
+      end
+
+      total_col = 3 + report[:header].count + 1
+      total_records = (report[:records].count + 3).to_s
+
+      col_index = TimesheetMonthlyService.get_xlsx_column_index(total_col + 1)
+      col_range = col_index + 3.to_s + ":" + col_index + total_records
+      sheet.add_conditional_formatting(col_range, { :type => :cellIs, :operator => :between, :formula => ["5", "10"], :dxfId => yellow, :priority => 1 })
+      sheet.add_conditional_formatting(col_range, { :type => :cellIs, :operator => :greaterThan, :formula => "10", :dxfId => red, :priority => 1 })
+
+      col_index = TimesheetMonthlyService.get_xlsx_column_index(total_col + 2)
+      col_range = col_index + 3.to_s + ":" + col_index + total_records
+      sheet.add_conditional_formatting(col_range, { :type => :cellIs, :operator => :between, :formula => ["3", "4"], :dxfId => yellow, :priority => 1 })
+      sheet.add_conditional_formatting(col_range, { :type => :cellIs, :operator => :greaterThan, :formula => "4", :dxfId => red, :priority => 1 })
+
+      col_index = TimesheetMonthlyService.get_xlsx_column_index(total_col + 3)
+      col_range = col_index + 3.to_s + ":" + col_index + total_records
+      sheet.add_conditional_formatting(col_range, { :type => :cellIs, :operator => :greaterThan, :formula => "1", :dxfId => red, :priority => 1 })
+
+      col_index = TimesheetMonthlyService.get_xlsx_column_index(total_col + 5)
+      col_range = col_index + 3.to_s + ":" + col_index + total_records
+      sheet.add_conditional_formatting(col_range, { :type => :cellIs, :operator => :between, :formula => ["1", "4"], :dxfId => green, :priority => 1 })
+      sheet.add_conditional_formatting(col_range, { :type => :cellIs, :operator => :between, :formula => ["5", "10"], :dxfId => yellow, :priority => 1 })        
+      sheet.add_conditional_formatting(col_range, { :type => :cellIs, :operator => :greaterThan, :formula => "10", :dxfId => red, :priority => 1 })
+
+      report[:resigned_emp_name].each do |user_name|
+        sheet.add_conditional_formatting("B3:B"+total_records, { :type => :containsText, :operator => :equal, :text => user_name, :dxfId => light_grey, :priority => 1 })
+      end
+    end
+  end
+end
