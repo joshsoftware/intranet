@@ -577,7 +577,7 @@ describe User do
       user_project = FactoryGirl.create(:user_project,
         user: user,
         project: project,
-        start_date: Date.today - 2
+        start_date: Date.today
       )
       project.managers << manager_one
       project.managers << manager_two

@@ -77,7 +77,8 @@ resource "Website Apis" do
       do_request
       res = JSON.parse(response_body)
       expect(status).to eq 200
-      expect(res['news'][Date.today.year.to_s].count).to eq(5)
+      year = Date.current.year
+      expect(res["news"]["#{year}"].count).to eq(5)
     end
   end
 

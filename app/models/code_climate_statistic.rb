@@ -18,5 +18,6 @@ class CodeClimateStatistic
   field :test_coverage,           type: Float
   field :remarks,                 type: Array,   default: []
 
+  validates :repository_id, presence: true
   belongs_to :repository
 end
