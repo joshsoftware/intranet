@@ -566,6 +566,7 @@ describe LeaveApplicationsController do
 
     it 'should not deduct leave count if leave type updated to Optional' do
       sign_in @user
+      travel_to @leave.start_at - 1.month
       @leave.save
       leave_count = @user.employee_detail.available_leaves
       params = {
@@ -573,7 +574,7 @@ describe LeaveApplicationsController do
         leave_application: @leave.attributes.merge(leave_type: LEAVE_TYPES[:optional_holiday])
       }
       put :update, params
-
+      travel_back
       expect(flash[:success]).to eq('Your request has been updated successfully.' +
         ' Please wait for the approval.')
       expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)

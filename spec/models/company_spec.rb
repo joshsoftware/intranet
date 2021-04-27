@@ -92,9 +92,15 @@ RSpec.describe Company, type: :model do
     it 'should list records where company billing location matches with the given argument' do
       csv = Company.billing_location_report(COUNTRIES_ABBREVIATIONS[0])
 
-      expected_csv = "Company Name,Company Status,Project Name,Employee ID,Employee Name,Billable(Y/N),Allocation(hrs)\n"
-      expected_csv << "#{@company1.name},#{@company1.active ? 'Active' : 'Inactive'},#{@project1.name},#{@user1.employee_detail.try(:employee_id).try(:rjust, 3, '0')},#{@user1.name},#{@user_project1.billable ? 'Yes' : 'No'},#{@user_project1.allocation}\n"
-      expect(csv).to eq(expected_csv)
+      if csv.include?("\"")
+        expected_csv = "Company Name,Company Status,Project Name,Employee ID,Employee Name,Billable(Y/N),Allocation(hrs)\n\""
+        expected_csv << "#{@company1.name}\",#{@company1.active ? 'Active' : 'Inactive'},#{@project1.name},#{@user1.employee_detail.try(:employee_id).try(:rjust, 3, '0')},#{@user1.name},#{@user_project1.billable ? 'Yes' : 'No'},#{@user_project1.allocation}\n"
+        expect(csv).to eq(expected_csv)
+      else
+        expected_csv = "Company Name,Company Status,Project Name,Employee ID,Employee Name,Billable(Y/N),Allocation(hrs)\n"
+        expected_csv << "#{@company1.name},#{@company1.active ? 'Active' : 'Inactive'},#{@project1.name},#{@user1.employee_detail.try(:employee_id).try(:rjust, 3, '0')},#{@user1.name},#{@user_project1.billable ? 'Yes' : 'No'},#{@user_project1.allocation}\n"
+        expect(csv).to eq(expected_csv)
+      end
     end
   end
 
