@@ -533,13 +533,21 @@ class TimeSheet
       date = holiday[:date]
       country = holiday[:country]
       project_ids = TimeSheet.where(date: date).map(&:project_id).uniq
+      is_optional_holiday = HolidayList.is_optional_holiday?(date)
       project_ids.each do |project|
         user_ids = TimeSheet.where(date: date, project_id: project)
                             .only(:id, :user_id)
                             .pluck(:user_id).uniq
-        users = User.get_employees(country).where(:id.in => user_ids).pluck(:id)
-        users.each do |user|
-          timesheets = TimeSheet.where(date: date, project_id: project, user_id: user)
+        User.get_employees(country).where(:id.in => user_ids).each do |user|
+          if is_optional_holiday
+            optional_availed = user.leave_applications.where(
+              start_at: date,
+              leave_type: LeaveApplication::OPTIONAL,
+              leave_status: APPROVED
+            ).present?
+            next if !optional_availed
+          end
+          timesheets = TimeSheet.where(date: date, project_id: project, user_id: user.id)
           weekend_report += timesheets.map { |i| [ i.project.name,
                                                    i.user.name,
                                                    i.date.to_s,
