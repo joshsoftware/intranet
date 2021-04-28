@@ -36,7 +36,7 @@ class UserMailer < ActionMailer::Base
 
   def accept_leave(leave_application_id)
     get_leave(leave_application_id)
-    mail(to: @notification_emails, subject: "Congrats! #{@leave_type} Request got accepted")
+    mail(to: @notification_emails, subject: "Your #{@leave_type} request is been approved")
   end
 
   def send_accept_leave_notification(leave_id, emails)
