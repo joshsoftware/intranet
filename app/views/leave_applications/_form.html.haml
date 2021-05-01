@@ -21,7 +21,8 @@
 
     if ($('#leave_application_leave_type').val() == 'OPTIONAL'){
       $('#leave_list').html(input_leave_list)
-      date = $('#leave_application_leave_list').val()
+      date = $('#leave_application_start_at').val()
+      date ||= $('#leave_application_leave_list').val()
       $('#leave_application_leave_list').val(date).change()
     }
     else{

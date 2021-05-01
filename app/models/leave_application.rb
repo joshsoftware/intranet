@@ -92,6 +92,12 @@ class LeaveApplication
   end
 
   def validate_optional_leave
+    if start_at < Date.today + 1.month && start_at.month > 1
+      errors.add(
+        :start_at,
+        'Optional Holiday can not be applied within One month prior to Optional Holiday date'
+      )
+    end
     leaves = LeaveApplication.unrejected.where(
       user_id: user_id,
       leave_type: OPTIONAL,
