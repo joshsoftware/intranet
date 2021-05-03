@@ -140,3 +140,31 @@ $(document).ready ->
   updateUserList($('#active_or_all').val())
   $('#active_or_all').on 'change', ->
     updateUserList($('#active_or_all').val())
+
+@check_Browser_Version = () ->
+  `var raw`
+  CHROME_STABLE_VERSION = 85
+  FIREFOX_STABLE_VERSION = 79
+  SAFARI_STABLE_VERSION = 14
+  userAgent = navigator.userAgent
+
+  if userAgent.includes('Firefox/')
+    raw = userAgent.split('Firefox/')[1]
+    browser_version = if raw then parseFloat(raw.toString().split('.')[0]) else false
+    checkVersion browser_version, FIREFOX_STABLE_VERSION
+  else if userAgent.includes('Chrome/')
+    raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)
+    browser_version = if raw then parseInt(raw[2], 10) else false
+    checkVersion browser_version, CHROME_STABLE_VERSION
+  else if userAgent.includes('Safari/')
+    raw = userAgent.split('Version/')[1]
+    browser_version = if raw then parseFloat(raw.toString().split('.')[0]) else false
+    checkVersion browser_version, SAFARI_STABLE_VERSION
+  return
+
+checkVersion = (current_version, stable_version) ->
+  if current_version < stable_version
+    alert 'We\'re sorry, but this browser is not supported. Please update your browser version!!'
+    window.location.href = '/view/leave_applications'
+    return
+  return
