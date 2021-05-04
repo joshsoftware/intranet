@@ -207,7 +207,7 @@ class TimeSheet
   end
 
   def is_future_date?
-    if date > Date.today
+    if date.present? && date > Date.today
       text = "Can't fill the timesheet for future date."
       errors.add(:date, text)
       return false
