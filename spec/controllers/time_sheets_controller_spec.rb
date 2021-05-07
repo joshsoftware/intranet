@@ -1037,6 +1037,35 @@ RSpec.describe TimeSheetsController, type: :controller do
     end
   end
 
+  context 'Delete time_sheet' do
+    let!(:user) { FactoryGirl.create(:admin) }
+    let!(:project) { FactoryGirl.create(:project) }
+    let!(:employee) { FactoryGirl.create(:user) }
+
+    it 'successfully if all attributes are valid' do
+      sign_in user
+      FactoryGirl.create(:user_project,
+        user: user,
+        project: project,
+        start_date: Date.today
+      )
+      time_sheet = FactoryGirl.create(:time_sheet,
+        user: user,
+        project: project,
+        date: Date.today - 1,
+        from_time: "#{Date.today - 1} 10:00",
+        to_time: "#{Date.today - 1} 11:30"
+      )
+
+      delete :destroy, id: user.id,
+        time_sheet_date: Date.today - 1,
+        from_date: "#{Date.today - 1}",
+        to_date: "#{Date.today - 1}",
+        project_id: project.id
+      expect(flash[:notice]).to eq("TimeSheet deleted Successfully")
+    end
+  end
+
   # context 'Export project report' do
   #   let!(:user) { FactoryGirl.create(:admin) }
   #   let!(:user_one) { FactoryGirl.create(:user) }
