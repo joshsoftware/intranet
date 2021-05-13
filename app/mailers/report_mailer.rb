@@ -17,9 +17,9 @@ class ReportMailer < ActionMailer::Base
       content: data_file
     }
 
-    attachments["ResourceCategorisationReport - #{Date.today}.xlsx"] = attachment
+    attachments["EmployeeCategorisationReport - #{Date.today}.xlsx"] = attachment
     mail(
-      subject: "Resource Categorisation Report - #{Date.today}",
+      subject: "Employee Categorisation Report - #{Date.today}",
       to: emails
     )
   end

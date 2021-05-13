@@ -238,7 +238,7 @@ describe UsersController do
   end
 
   context "#resource_list_download" do
-    it 'should send Resource List csv' do
+    it 'should send Employee List csv' do
       user1 = FactoryGirl.create(:user, role: ROLE[:employee], status: STATUS[:approved])
       user2 = FactoryGirl.create(:user, role: ROLE[:employee], status: STATUS[:approved])
       sign_in user1
