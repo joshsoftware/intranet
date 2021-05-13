@@ -136,7 +136,7 @@ class UsersController < ApplicationController
 
   def resource_list_download
     @users = User.employees.approved
-    send_data @users.to_csv, filename: "ResourceList - #{Time.now.strftime("%d%b%y%k%M")}.csv"
+    send_data @users.to_csv, filename: "EmployeeList - #{Time.now.strftime("%d%b%y%k%M")}.csv"
   end
 
   def users_optional_holiday_list

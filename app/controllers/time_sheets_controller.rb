@@ -173,7 +173,7 @@ class TimeSheetsController < ApplicationController
 
   def export_resource_report
     ResourceCategorisationWorker.perform_async(current_user.email)
-    flash[:success] = 'You will receive resource categorisation report to your mail shortly.'
+    flash[:success] = 'You will receive employee categorisation report to your mail shortly.'
     redirect_to export_project_report_time_sheets_path
   end
 

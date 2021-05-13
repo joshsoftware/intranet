@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ResourceCategorisationService do
-  context 'Resource Categorisation Report - ' do
+  context 'Employee Categorisation Report - ' do
     before(:each) do
       @emp_one = FactoryGirl.create(:user, status: STATUS[:approved])
       @emp_two = FactoryGirl.create(:user, status: STATUS[:approved])
