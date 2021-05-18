@@ -236,7 +236,7 @@ RSpec.describe ResourceCategorisationService do
       ActionMailer::Base.deliveries = []
       @service.call
       expect(ActionMailer::Base.deliveries.count).to eq(1)
-      expect(ActionMailer::Base.deliveries.first.subject).to eq("Resource Categorisation Report - #{Date.today}")
+      expect(ActionMailer::Base.deliveries.first.subject).to eq("Employee Categorisation Report - #{Date.today}")
     end
   end
 end
