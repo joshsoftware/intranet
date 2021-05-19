@@ -88,6 +88,14 @@
                                                       %br/
                                                       Notification To: #{@notification_names.join(', ')}
                                                       %br
+                                                      %br
+                                                      - if @projects.length>0
+                                                        Here is the list of your projects:                                                       
+                                                        - @projects.each_with_index do |project, index|
+                                                          %br
+                                                          #{index + 1}. #{project}
+                                                      - else
+                                                        No Projects Assigned                                           
                                                       - if @older_leaves && @older_leaves.count > 0
                                                         %h4 Previously Approved Leaves
                                                         %table{:border => '1px solid black;', :style => 'border-collapse: collapse;', :width => '600'}
