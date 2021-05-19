@@ -88,6 +88,18 @@
                                                       %br/
                                                       Notification To: #{@notification_names.join(', ')}
                                                       %br
+                                                      %br
+                                                      - if !@projects.empty? || !@managed_projects.empty?
+                                                        Here is the list of #{@user.public_profile.name}'s current projects:                                                       
+                                                        - @projects.each do |project|
+                                                          %br
+                                                          #{project}              
+                                                        - @managed_projects.each do |managed_project|
+                                                          %br
+                                                          #{managed_project}                                    
+                                                      - else
+                                                        No Projects Assigned
+                                                      %br                                           
                                                       - if @older_leaves && @older_leaves.count > 0
                                                         %h4 Previously Approved Leaves
                                                         %table{:border => '1px solid black;', :style => 'border-collapse: collapse;', :width => '600'}
