@@ -318,6 +318,27 @@ describe UsersController do
     end
   end
 
+  context '#leave_application mailing' do
+    before(:each) do
+      @sender = FactoryGirl.create(:user, email: 'test@joshsoftware.com')
+      @hr = FactoryGirl.create(:hr)
+      @leave_application = FactoryGirl.create(:leave_application, user: @sender)
+      sign_in @hr
+      ActionMailer::Base.deliveries = []
+    end
+
+    it 'should send mail to HR after an employee - Request Leave' do
+      Sidekiq::Testing.inline! do
+        sender_email = @sender.email
+        receiver_email = @hr.email
+        leave_application_id = @leave_application.id
+      
+        UserMailer.delay.leave_application(sender_email, receiver_email, leave_application_id)
+
+        expect(ActionMailer::Base.deliveries.count).to eq(1)
+      end
+    end
+  end
   ##Code is changed for downloading excel sheet, searching & pagination
   # context 'download excel sheet of Employee' do
   #   let!(:userlist) { FactoryGirl.create_list(:user, 4, status: STATUS[:approved]) }
