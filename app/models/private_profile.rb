@@ -15,11 +15,14 @@ class PrivateProfile
 
   embedded_in :user
   embeds_many :contact_persons
+  embeds_many :bank_accounts
   has_many :addresses, autosave: true
 
   validates :date_of_joining, presence: true, if: :check_status_and_role?, on: :update
-  validates :previous_work_experience,:allow_blank => true, numericality: { only_integer: true }
+  validates :previous_work_experience, :allow_blank => true, numericality: { only_integer: true }
+  validate :number_of_bank_accounts, unless: 'bank_accounts.blank?'
 
+  accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :contact_persons
 
@@ -29,6 +32,10 @@ class PrivateProfile
       user.assign_leave('DOJ Updated') if user.eligible_for_leave?
       user.set_details("doj", self.date_of_joining)
     end
+  end
+
+  def number_of_bank_accounts
+    errors.add(:bank_accounts, 'cannot be added more than two.') if bank_accounts.size > 2
   end
 
   def check_status_and_role?
