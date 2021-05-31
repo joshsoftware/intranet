@@ -956,4 +956,26 @@ describe LeaveApplicationsController do
       expect(@user.reload.employee_detail.available_leaves).to eq(24)
     end
   end
+
+  context 'Next year leave' do
+    before(:each) do
+      @user = FactoryGirl.create(:user, status: STATUS[:approved])
+      @leave = FactoryGirl.build(:leave_application,
+        leave_type: LEAVE_TYPES[:leave],
+        user: @user,
+        start_at: Date.today.next_year,
+        end_at: (Date.today + 1).next_year
+      )
+      sign_in @user
+    end
+
+    it 'fail should as of applying date is greater than current year' do
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+      expect(flash[:error]).to eq('Invalid date, can not apply leave for the future year.')
+    end
+  end
 end

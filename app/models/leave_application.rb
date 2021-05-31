@@ -308,6 +308,13 @@ class LeaveApplication
   end
 
   def validate_date
+    if self.start_at.year > Date.today.year || self.end_at.year > Date.today.year
+      errors.add(
+        :base,
+        'Invalid date, can not apply leave for the future year.'
+      )
+    end
+
     if self.start_at_changed? or self.end_at_changed?
       # While updating leave application do not consider self..
       leave_applications = LeaveApplication.where(
