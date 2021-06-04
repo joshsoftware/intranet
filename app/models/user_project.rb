@@ -36,6 +36,7 @@ class UserProject
   scope :active_users, ->{where(:user_id.in => User.approved.pluck(:id), active: true)}
   scope :inactive_users, ->{where(:user_id.in => User.approved.pluck(:id), active: false)}
   scope :ex_users, ->{where(:user_id.nin => User.approved.pluck(:id))}
+  scope :inactive_and_ex_users, ->{where(active: false)}
 
   before_save do
     self.end_date = project.end_date if end_date.nil? && project.end_date.present?
