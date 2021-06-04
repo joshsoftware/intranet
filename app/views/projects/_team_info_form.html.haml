@@ -47,7 +47,7 @@
     = f.submit :Save, class: 'btn controls btn-info'
 
 
-- if @project.user_projects.ex_users.count > 0 || @project.user_projects.inactive_users.count > 0
+- if @project.user_projects.inactive_and_ex_users.count > 0
   %h3 Previous team members of #{@project.name}
   %table.table.table-bordered.table-responsive#sortable
     %thead
@@ -59,16 +59,7 @@
         %th.span2 Timesheet Required?
         %th.span2 Allocation (hrs/month)
     %tbody
-      - @project.user_projects.inactive_users.sort_by{|i| i.user.name }.each do |project_user_form|
-        %tr
-          %td.span2= project_user_form.user.name
-          %td.span2= project_user_form.user.status
-          %td.span2= project_user_form.start_date
-          %td.span2= project_user_form.end_date
-          %td.span2= project_user_form.time_sheet ? 'Yes' : 'No'
-          %td.span2= project_user_form.allocation
-
-      - @project.user_projects.ex_users.sort_by{|i| i.user.name }.each do |project_user_form|
+      - @project.user_projects.inactive_and_ex_users.sort_by{|i| i.end_date }.reverse.each do |project_user_form|
         %tr
           %td.span2= project_user_form.user.name
           %td.span2= project_user_form.user.status
