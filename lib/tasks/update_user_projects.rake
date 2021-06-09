@@ -16,14 +16,21 @@ task update_user_projects: :environment do
     end
   end
 
+  # update end date of active project set end date 31/Dec/2021 of each active project
+  active_project = Project.where(is_active: true, end_date: nil)
+  active_project.each do |project|
+    puts "Project Name: #{project.name}, End Date set 31/Dec/2021"
+    project.set(end_date: Date.today.end_of_year)
+  end
+
   # update user_project end_date whose project end_date is present
   active_pids = Project.nin(id: inactive_pids, end_date: nil).pluck(:id)
-  user_projects = UserProject.where(:id.in => active_pids, active: true)
+  user_projects = UserProject.where(:project_id.in => active_pids, active: true)
   user_projects.each do |up|
     if up.end_date.nil? || (up.end_date.present? && up.project.end_date < up.end_date)
-      print "\n Project Name: #{project.name} \t| Name: #{user_project.user.name}, " +
+      print "\n Project Name: #{up.project.name} \t| Name: #{up.user.name}, " +
             "End_date Was: #{up.end_date}, End_date Changed: #{up.project.end_date}"
-      user_project.update_attributes(end_date: up.project.end_date)
+      up.update_attributes(end_date: up.project.end_date)
     end
   end
 end
