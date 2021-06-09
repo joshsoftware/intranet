@@ -30,7 +30,7 @@ describe HolidayList do
 
   it 'should return next working day' do
     date = '26/06/2020'.to_date
-    next_date = HolidayList.next_working_day(date, COUNTRIES[0])
+    next_date = HolidayList.next_working_day(date, COUNTRIES[:india])
     expect(next_date).to eq('29/06/2020'.to_date)
   end
 end

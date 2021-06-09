@@ -252,7 +252,7 @@ class User
 
   def reject_future_leaves
     LeaveApplication.where(:start_at.gte => Date.today, user: self).each do |leave|
-      leave.update(leave_status: REJECTED, reject_reason: 'User Resigned')
+      leave.update(leave_status: LEAVE_STATUS[:rejected], reject_reason: 'User Resigned')
     end
   end
 
@@ -376,7 +376,7 @@ class User
     if role?(ROLE[:consultant])
       employee_ids = employee_id_array.select{ |id| id > 10000 }
       emp_id = employee_ids.empty? ? 10000 : employee_ids.max
-    elsif self.employee_detail.try(:location) == LOCATIONS[1]
+    elsif self.employee_detail.try(:location) == LOCATIONS[:plano]
       usa_employee_ids = employee_id_array.select{ |id| id > 9000 && id < 10000}
       emp_id = usa_employee_ids.empty? ? 9000 : usa_employee_ids.max
     else

@@ -1,19 +1,16 @@
 GENDER = ['Male', 'Female']
-ADDRESSES = ['Permanent Address', 'Temporary Address']
+ADDRESSES = {permanent: 'Permanent Address', temporary: 'Temporary Address'}
 BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 STATUS = {created: 'created', pending: 'pending', approved: 'approved', resigned: 'resigned'}
-LEAVE_STATUS = ['Pending', 'Approved', 'Rejected']
 INVALID_REDIRECTIONS = ["/users/sign_in", "/users/sign_up", "/users/password"]
 TSHIRT_SIZE = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
 OTHER = ['DevOps', 'QA-Automation', 'QA-Manual', 'UI/UX']
 LANGUAGE = ['Go', 'Python', 'Ruby', 'Java', 'PHP', 'Android', 'iOS']
 FRAMEWORK = ['ReactJs', 'Angular', 'Flutter', '.Net', 'NodeJs']
-PENDING = 'Pending'
-APPROVED = 'Approved'
-REJECTED = 'Rejected'
-LOCATIONS = ['Bengaluru', 'Plano', 'Pune']
-COUNTRIES = ['India', 'USA']
-COUNTRIES_ABBREVIATIONS = ['IN', 'US']
+LEAVE_STATUS = {pending: 'Pending', approved: 'Approved', rejected: 'Rejected'}
+LOCATIONS = {bengaluru: 'Bengaluru', plano: 'Plano', pune: 'Pune'}
+COUNTRIES = {india: 'India', usa: 'USA'}
+COUNTRIES_ABBREVIATIONS = {in: 'IN', us: 'US'}
 CityCountryMapping = [
   { city: 'Bengaluru', country: 'India'},
   { city: 'Pune', country: 'India'},

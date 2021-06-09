@@ -39,14 +39,14 @@
     %tr
       = pri.simple_fields_for :addresses do |a|
         %td
-          - if a.object.type_of_address == ADDRESSES[1]
+          - if a.object.type_of_address == ADDRESSES[:permanent]
             = a.label 'Same as permanent'
             .make-switch#address_button{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "Yes", "data-off-label": "NO"}
               = a.check_box :same_as_permanent_address, {}, 'true', 'false'
           %div{class: "#{a.object.type_of_address.downcase}"}
             %h4
               = a.object.type_of_address
-              - disable = (a.object.type_of_address == ADDRESSES[1] and a.object.same_as_permanent_address == true) ? true : false
+              - disable = (a.object.type_of_address == ADDRESSES[:permanent] and a.object.same_as_permanent_address == true) ? true : false
             = a.input :type_of_address, as: :hidden
             = a.input :address, as: :text, disabled: disable
             = a.input :city, disabled: disable                  

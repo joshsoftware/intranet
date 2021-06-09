@@ -172,7 +172,7 @@ class UsersController < ApplicationController
 
   def build_addresses
     if request.get?
-      ADDRESSES.each{|a| @user.private_profile.addresses.build({:type_of_address => a})} if @user.private_profile.addresses.empty?
+      ADDRESSES.values.each{|a| @user.private_profile.addresses.build({:type_of_address => a})} if @user.private_profile.addresses.empty?
       # need atleast two contact persons details
       2.times {@user.private_profile.contact_persons.build} if @user.private_profile.contact_persons.empty?
     end

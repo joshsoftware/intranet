@@ -95,10 +95,10 @@ class LeaveApplicationsController < ApplicationController
     if params[:leave_action].present?
       @leave_action = params[:leave_action]
       if params[:leave_action] == 'approve'
-        @status = APPROVED
+        @status = LEAVE_STATUS[:approved]
         call_function = :process_accept_application
       else
-        @status = REJECTED
+        @status = LEAVE_STATUS[:rejected]
         call_function = :process_reject_application
       end
       @message = LeaveApplication.process_leave(params[:id], @status, call_function, params[:reject_reason], current_user.id)

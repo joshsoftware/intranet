@@ -79,9 +79,9 @@ RSpec.describe HolidayListsController, type: :controller do
     end
 
     it 'render holiday list by location and leave type (Optional)' do
-      holiday = FactoryGirl.create(:holiday, holiday_type: HolidayList::OPTIONAL, country: COUNTRIES[1])
+      holiday = FactoryGirl.create(:holiday, holiday_type: HolidayList::OPTIONAL, country: COUNTRIES[:usa])
       params = {
-        location: COUNTRIES[1],
+        location: COUNTRIES[:usa],
         leave_type: HolidayList::OPTIONAL
       }
       get :holiday_list, params

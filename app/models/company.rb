@@ -10,7 +10,7 @@ class Company
   field :logo, type: String
   field :website, type: String
   field :active, type: Boolean, default: true
-  field :billing_location, type: String, default: COUNTRIES_ABBREVIATIONS[0]
+  field :billing_location, type: String, default: COUNTRIES_ABBREVIATIONS[:in]
 
   has_many :projects, dependent: :destroy
   embeds_many :contact_persons
@@ -22,7 +22,7 @@ class Company
   slug :name
 
   validates :name, uniqueness: true, presence: true
-  validates :billing_location, inclusion: { in: COUNTRIES_ABBREVIATIONS }
+  validates :billing_location, inclusion: { in: COUNTRIES_ABBREVIATIONS.values }
   validates :invoice_code, uniqueness: {scope: :billing_location}, length: {maximum: 3}, allow_blank: true
   validate :website_url
 

@@ -7,7 +7,7 @@
       %th= 'Select Country'
     %tbody
       %td= select_year(Date.today, start_year: Date.today.prev_year.year, end_year: Date.today.next_year.year)
-      %td= select_tag('country', options_for_select(COUNTRIES, @country))
+      %td= select_tag('country', options_for_select(COUNTRIES.values, @country))
 
     - if can? :edit, HolidayList
       .pull-right

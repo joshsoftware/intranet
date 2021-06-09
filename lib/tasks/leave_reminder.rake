@@ -1,7 +1,7 @@
 namespace :leave_reminder do
   desc 'Reminds admin and HR who are on leave tomorrow.'
   task daily: :environment do
-    country = COUNTRIES[0]
+    country = COUNTRIES[:india]
     unless HolidayList.is_holiday?(Date.today, country)
       next_working_day = HolidayList.next_working_day(Date.today, country)
       leaves = LeaveApplication.get_leaves_for_sending_reminder(next_working_day)
@@ -22,7 +22,7 @@ namespace :leave_reminder do
   task optional_holiday_reminder_next_month: :environment do
     date = Date.today.at_end_of_month + 1
     leaves = LeaveApplication.where(
-      leave_status: APPROVED,
+      leave_status: LEAVE_STATUS[:approved],
       leave_type: LeaveApplication::OPTIONAL,
       start_at: {
         '$gte': date,
@@ -34,7 +34,7 @@ namespace :leave_reminder do
 
   desc 'Reminds managers and HR whose leave beginning in next two days and leave is pending.'
   task :pending_leave => :environment do
-    country = COUNTRIES[0]
+    country = COUNTRIES[:india]
     unless HolidayList.is_holiday?(Date.today, country)
       LeaveApplication.pending_leaves_reminder(country)
     end

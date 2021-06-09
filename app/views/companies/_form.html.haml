@@ -15,8 +15,8 @@
         = f.input :gstno, label: 'GST Number'
         = f.input :invoice_code, label: 'Invoice Code', input_html: {maxlength: 3}
         = f.input :website
-        = f.input :billing_location, as: :radio_buttons, collection: COUNTRIES_ABBREVIATIONS, item_wrapper_class: 'inline',
-          checked: @company.billing_location || COUNTRIES_ABBREVIATIONS[0]
+        = f.input :billing_location, as: :radio_buttons, collection: COUNTRIES_ABBREVIATIONS.values, item_wrapper_class: 'inline',
+          checked: @company.billing_location || COUNTRIES_ABBREVIATIONS[:in]
         .control-group
           = label_tag 'Logo', nil, class: 'control-label'
           = f.file_field :logo, id: 'logo-upload', class: 'case_study_upload'

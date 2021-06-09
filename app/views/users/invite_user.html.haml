@@ -5,5 +5,5 @@
     = f.input :email
     = f.input :role, collection: User::ROLES, prompt: 'Select Role'
     = f.fields_for :employee_detail, wrapper: false do |e|
-      = e.input :location, as: :select, collection: LOCATIONS.sort, label: "Employee Location", prompt: 'Select Location'
+      = e.input :location, as: :select, collection: LOCATIONS.values.sort, label: "Employee Location", prompt: 'Select Location'
     = f.submit 'Send Invitation', class: 'btn controls'

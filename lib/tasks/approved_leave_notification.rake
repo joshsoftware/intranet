@@ -1,7 +1,7 @@
 desc 'Notify team members about the leave status'
 task approved_leave_notification: :environment do
   leaves = LeaveApplication.leaves.where(
-    leave_status: APPROVED,
+    leave_status: LEAVE_STATUS[:approved],
     start_at: Date.tomorrow
   ).reject { |leave| is_leave_overlapping?(leave) }
 
@@ -17,7 +17,7 @@ def is_leave_overlapping?(leave)
     user: leave.user,
     :end_at.gte => Date.tomorrow,
     :start_at.lte => Date.tomorrow,
-    leave_status: APPROVED,
+    leave_status: LEAVE_STATUS[:approved],
     :leave_type.in => [LeaveApplication::LEAVE, LeaveApplication::SPL]
   ).exists?
 end

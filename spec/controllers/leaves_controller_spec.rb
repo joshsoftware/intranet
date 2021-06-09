@@ -372,13 +372,13 @@ describe LeaveApplicationsController do
       teammate1 = FactoryGirl.create(:user)
       FactoryGirl.build(:user_project, project_id: project.id, user_id: @user.id)
       FactoryGirl.build(:user_project, project_id: project.id, user_id: teammate1.id)
-      expect(leave_application.leave_status).to eq(PENDING)
+      expect(leave_application.leave_status).to eq(LEAVE_STATUS[:pending])
       ActionMailer::Base.deliveries = []
       xhr :get, :process_leave, {
         id: leave_application.id,
         leave_action: :reject
       }
-      expect(leave_application.reload.leave_status).to eq(REJECTED)
+      expect(leave_application.reload.leave_status).to eq(LEAVE_STATUS[:rejected])
       expect(ActionMailer::Base.deliveries.count).to eq(0)
     end
 
@@ -388,7 +388,7 @@ describe LeaveApplicationsController do
       teammate1 = FactoryGirl.create(:user)
       FactoryGirl.build(:user_project, project_id: project.id, user_id: @user.id)
       FactoryGirl.build(:user_project, project_id: project.id, user_id: teammate1.id)
-      expect(leave_application.leave_status).to eq(PENDING)
+      expect(leave_application.leave_status).to eq(LEAVE_STATUS[:pending])
       xhr :get, :process_leave, {
         id: leave_application.id,
         leave_action: :approve
@@ -398,7 +398,7 @@ describe LeaveApplicationsController do
         id: leave_application.id,
         leave_action: :reject
       }
-      expect(leave_application.reload.leave_status).to eq(REJECTED)
+      expect(leave_application.reload.leave_status).to eq(LEAVE_STATUS[:rejected])
       expect(ActionMailer::Base.deliveries.count).to eq(1)
     end
 
@@ -585,14 +585,14 @@ describe LeaveApplicationsController do
       @leave.save
       params = {
         id: @leave.id,
-        leave_application: @leave.attributes.merge(leave_status: APPROVED)
+        leave_application: @leave.attributes.merge(leave_status: LEAVE_STATUS[:approved])
       }
       put :update, params
 
       leave_count = @user.reload.employee_detail.available_leaves
       expect(flash[:success]).to eq('Your request has been updated successfully.' +
         ' Please wait for the approval.')
-      expect(@leave.reload.leave_status).to eq(APPROVED)
+      expect(@leave.reload.leave_status).to eq(LEAVE_STATUS[:approved])
       expect(leave_count).to eq(24)
     end
   end
@@ -600,7 +600,7 @@ describe LeaveApplicationsController do
   context 'Leave type - SPL' do
     before(:each) do
       @admin = FactoryGirl.create(:admin)
-      @user = FactoryGirl.create(:user, status: APPROVED)
+      @user = FactoryGirl.create(:user, status: LEAVE_STATUS[:approved])
       @leave = FactoryGirl.build(
         :leave_application,
         leave_type: LeaveApplication::SPL,
@@ -619,7 +619,7 @@ describe LeaveApplicationsController do
       leave_count = @user.reload.employee_detail.available_leaves
       expect(flash[:success]).to eq('Your request has been submitted successfully.' +
         ' Please wait for the approval.')
-      expect(@user.leave_applications.last.leave_status).to eq(PENDING)
+      expect(@user.leave_applications.last.leave_status).to eq(LEAVE_STATUS[:pending])
       expect(leave_count).to eq(24)
     end
 
@@ -632,7 +632,7 @@ describe LeaveApplicationsController do
       }
 
       leave_count = @user.reload.employee_detail.available_leaves
-      expect(@leave.reload.leave_status).to eq(APPROVED)
+      expect(@leave.reload.leave_status).to eq(LEAVE_STATUS[:approved])
       expect(leave_count).to eq(24)
     end
   end
@@ -689,7 +689,7 @@ describe LeaveApplicationsController do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
         end_at: @end_date,
-        leave_status: APPROVED,
+        leave_status: LEAVE_STATUS[:approved],
         leave_type: LeaveApplication::WFH,
         user: @user
       )
@@ -709,7 +709,7 @@ describe LeaveApplicationsController do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
         end_at: @end_date,
-        leave_status: APPROVED,
+        leave_status: LEAVE_STATUS[:approved],
         leave_type: LeaveApplication::WFH,
         user: @user
       )
@@ -736,7 +736,7 @@ describe LeaveApplicationsController do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
         end_at: @end_date,
-        leave_status: APPROVED,
+        leave_status: LEAVE_STATUS[:approved],
         leave_type: LeaveApplication::LEAVE,
         user: @user
       )
@@ -755,7 +755,7 @@ describe LeaveApplicationsController do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
         end_at: @end_date,
-        leave_status: APPROVED,
+        leave_status: LEAVE_STATUS[:approved],
         leave_type: LeaveApplication::SPL,
         user: @user
       )
@@ -774,7 +774,7 @@ describe LeaveApplicationsController do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
         end_at: @end_date,
-        leave_status: APPROVED,
+        leave_status: LEAVE_STATUS[:approved],
         leave_type: LeaveApplication::WFH,
         user: @user
       )
@@ -793,7 +793,7 @@ describe LeaveApplicationsController do
       FactoryGirl.create(:leave_application,
         start_at: @start_date,
         end_at: @end_date,
-        leave_status: APPROVED,
+        leave_status: LEAVE_STATUS[:approved],
         leave_type: LeaveApplication::LEAVE,
         user: @user
       )
@@ -883,7 +883,7 @@ describe LeaveApplicationsController do
       xhr :get, :process_leave, params
 
       leave_count = @user.reload.employee_detail.available_leaves
-      expect(@optional_leave.reload.leave_status).to eq(APPROVED)
+      expect(@optional_leave.reload.leave_status).to eq(LEAVE_STATUS[:approved])
       expect(@optional_leave.leave_type).to eq(LeaveApplication::OPTIONAL)
       expect(leave_count).to eq(24)
     end
@@ -899,7 +899,7 @@ describe LeaveApplicationsController do
       xhr :get, :process_leave, params
 
       leave_count = @user.reload.employee_detail.available_leaves
-      expect(@optional_leave.reload.leave_status).to eq(REJECTED)
+      expect(@optional_leave.reload.leave_status).to eq(LEAVE_STATUS[:rejected])
       expect(@optional_leave.leave_type).to eq(LeaveApplication::OPTIONAL)
       expect(leave_count).to eq(24)
     end
@@ -925,7 +925,7 @@ describe LeaveApplicationsController do
       }
       xhr :get, :process_leave, params
 
-      expect(@optional_leave.reload.leave_status).to eq(APPROVED)
+      expect(@optional_leave.reload.leave_status).to eq(LEAVE_STATUS[:approved])
       expect(@leave.reload.number_of_days).to eq(2)
       expect(@user.reload.employee_detail.available_leaves).to eq(22)
     end
@@ -951,7 +951,7 @@ describe LeaveApplicationsController do
       }
       xhr :get, :process_leave, params
 
-      expect(@optional_leave.reload.leave_status).to eq(APPROVED)
+      expect(@optional_leave.reload.leave_status).to eq(LEAVE_STATUS[:approved])
       expect(@leave.reload.number_of_days).to eq(2)
       expect(@user.reload.employee_detail.available_leaves).to eq(24)
     end

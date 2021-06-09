@@ -951,7 +951,7 @@ class TimeSheet
     return false unless user.leave_applications.present?
     leave_applications = user.leave_applications.leaves.order('end_at asc').where(
       :end_at.gte => date,
-      leave_status: APPROVED
+      leave_status: LEAVE_STATUS[:approved]
     )
     leave_applications.each do |leave_application|
       return true if date.between?(leave_application.start_at, leave_application.end_at)
@@ -1086,7 +1086,7 @@ class TimeSheet
   def self.approved_leaves_count(user, from_date, to_date)
     user.leave_applications.where(
       start_at: {'$gte': from_date, '$lte': to_date},
-      leave_status: APPROVED,
+      leave_status: LEAVE_STATUS[:approved],
       :leave_type.in => [LeaveApplication::LEAVE, LeaveApplication::SPL]
     ).sum(:number_of_days)
   end
