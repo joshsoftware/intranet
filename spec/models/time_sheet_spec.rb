@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe TimeSheet, type: :model do
   context 'Validation' do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: '01/09/2018'.to_date) }
     let!(:user_project) { FactoryGirl.create(:user_project,
         user: user,
         project: project,
@@ -409,12 +409,12 @@ RSpec.describe TimeSheet, type: :model do
       expected_summary = [{
             emp_id: '1',
             user_name: user1.public_profile.name,
-            total_worked_hours: 2
+            total_worked_hours: '2h 0min'
           },
           {
             emp_id: '2',
             user_name: user2.public_profile.name,
-            total_worked_hours: 1
+            total_worked_hours: '1h 0min'
       }]
       timesheet_summary = timesheet_summary.sort_by { |timesheet| timesheet[:emp_id] }
       expect(timesheet_summary).to eq(expected_summary)
@@ -427,7 +427,7 @@ RSpec.describe TimeSheet, type: :model do
 
     context 'success' do
       it 'Should give the message to fill timesheet' do
-        project = FactoryGirl.create(:project)
+        project = FactoryGirl.create(:project, start_date: Date.today - 20)
         FactoryGirl.create(:user_project,
           user: user,
           project: project,
@@ -464,7 +464,7 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     context 'timesheet filled' do
-      let!(:project) { FactoryGirl.create(:project) }
+      let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 20) }
       before do
         FactoryGirl.create(:user_project,
           user: user,
@@ -527,7 +527,7 @@ RSpec.describe TimeSheet, type: :model do
 
   context 'Daily timesheet status' do
     let!(:user) { FactoryGirl.create(:user) }
-    let!(:project) { FactoryGirl.build(:project) }
+    let!(:project) { FactoryGirl.build(:project, start_date: Date.today - 20) }
     let!(:time_sheet) { FactoryGirl.build(:time_sheet) }
     before do
       project.name = 'Test project'
@@ -674,7 +674,7 @@ RSpec.describe TimeSheet, type: :model do
   context 'Employee timesheet report' do
     let!(:user) { FactoryGirl.create(:user) }
     let!(:time_sheet) { FactoryGirl.build(:time_sheet) }
-    let!(:project) { FactoryGirl.build(:project) }
+    let!(:project) { FactoryGirl.build(:project, start_date: Date.today - 20) }
     before do
       project.name = 'Test project'
       project.display_name = 'Test_project'
@@ -779,8 +779,8 @@ RSpec.describe TimeSheet, type: :model do
   context 'Individual timesheet report' do
     let!(:user) { FactoryGirl.create(:user) }
     let!(:time_sheet) { FactoryGirl.build(:time_sheet) }
-    let!(:test_project1) { FactoryGirl.build(:project) }
-    let!(:test_project2) { FactoryGirl.build(:project) }
+    let!(:test_project1) { FactoryGirl.build(:project, start_date: Date.today - 20) }
+    let!(:test_project2) { FactoryGirl.build(:project, start_date: Date.today - 20) }
 
     it 'Should give expected JSON' do
       test_project1.name = 'Test project1'
@@ -860,7 +860,7 @@ RSpec.describe TimeSheet, type: :model do
 
   context 'Get allocated hours should calculate allocated hours' do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: '01/08/2018') }
 
     context "between 'from date' and 'to date'" do
       it 'if there is no holiday' do
@@ -1032,7 +1032,7 @@ RSpec.describe TimeSheet, type: :model do
 
   context 'get leaves count should calculate leaves' do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: '01/08/2018') }
 
     it "between 'from date' and 'to date'" do
       FactoryGirl.create(:user_project,
@@ -1136,15 +1136,7 @@ RSpec.describe TimeSheet, type: :model do
 
   context 'Project report' do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
-    let!(:project) { FactoryGirl.create(:project) }
-
-    before do
-      travel_to Date.new(2021,02,8)
-    end
-
-    after do
-      travel_back
-    end
+    let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 20) }
 
     it 'Should give expected project report' do
       FactoryGirl.create(:user_project,
@@ -1187,11 +1179,13 @@ RSpec.describe TimeSheet, type: :model do
     it 'Should give project without timesheet' do
       test_project_one = FactoryGirl.create(:project,
         name: 'test1',
-        timesheet_mandatory: true
+        timesheet_mandatory: true,
+        start_date: Date.today - 1.year
       )
       test_project_two = FactoryGirl.create(:project,
         name: 'test2',
-        timesheet_mandatory: true
+        timesheet_mandatory: true,
+        start_date: Date.today - 1.year
       )
       FactoryGirl.create(:user_project,
         user: user,
@@ -1269,7 +1263,7 @@ RSpec.describe TimeSheet, type: :model do
     let!(:user_one) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:user_two) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:user_three) { FactoryGirl.create(:user, status: STATUS[:approved]) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: '01/08/2018') }
 
     before do
       travel_to Date.new(2021,02,8)
@@ -1417,7 +1411,7 @@ RSpec.describe TimeSheet, type: :model do
   context 'Get time sheet and calculate total minutes should' do
     let!(:user) { FactoryGirl.create(:user) }
     it 'give total working minutes' do
-      project = FactoryGirl.create(:project)
+      project = FactoryGirl.create(:project, start_date: Date.today - 20)
       FactoryGirl.create(:user_project,
         user: user,
         project: project,
@@ -1442,7 +1436,7 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it 'give the users without timesheet because user role is employee' do
-      project = FactoryGirl.create(:project)
+      project = FactoryGirl.create(:project, start_date: Date.today - 20)
       FactoryGirl.create(:user_project,
         user: user,
         project: project,
@@ -1467,7 +1461,7 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it 'give users without timesheet because role is intern' do
-      project = FactoryGirl.create(:project)
+      project = FactoryGirl.create(:project, start_date: Date.today - 20)
       user_two = FactoryGirl.create(:user, role: 'Intern')
       FactoryGirl.create(:user_project,
         user: user_two,
@@ -1486,7 +1480,7 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it 'not give the uses without timesheet because user role is manager' do
-      project = FactoryGirl.create(:project)
+      project = FactoryGirl.create(:project, start_date: Date.today - 20)
       user_two = FactoryGirl.create(:user, role: 'Manager')
       FactoryGirl.create(:user_project,
         user: user_two,
@@ -1503,7 +1497,7 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it 'not give the uses without timesheet because user role is admin' do
-      project = FactoryGirl.create(:project, timesheet_mandatory: true)
+      project = FactoryGirl.create(:project, timesheet_mandatory: true, start_date: Date.today - 20)
       user_two = FactoryGirl.create(:admin)
       FactoryGirl.create(:user_project,
         user: user_two,
@@ -1519,7 +1513,7 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it "consider project for calculating total minutes if project's timesheet mandatory field set to false" do
-      project_other = FactoryGirl.create(:project, timesheet_mandatory: false)
+      project_other = FactoryGirl.create(:project, timesheet_mandatory: false, start_date: Date.today - 20)
       FactoryGirl.create(:user_project,
         user: user,
         project: project_other,
@@ -1542,7 +1536,7 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it 'not consider project whose timesheet mandatory field set to false for users without timesheet list' do
-      project_other = FactoryGirl.create(:project, timesheet_mandatory: false)
+      project_other = FactoryGirl.create(:project, timesheet_mandatory: false, start_date: Date.today - 20)
       FactoryGirl.create(:user_project,
         user: user,
         project: project_other,
@@ -2161,7 +2155,7 @@ RSpec.describe TimeSheet, type: :model do
   context "Employee's weekend work" do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:user_hr) { FactoryGirl.create(:user, role: ROLE[:HR], status: STATUS[:approved]) }
-    let!(:project) { FactoryGirl.create(:project, timesheet_mandatory: true) }
+    let!(:project) { FactoryGirl.create(:project, timesheet_mandatory: true, start_date: Date.today - 20) }
 
     before do
       ActionMailer::Base.deliveries = []
@@ -2201,7 +2195,7 @@ RSpec.describe TimeSheet, type: :model do
   context "Employees Working Hour Report" do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:user_hr) { FactoryGirl.create(:user, role: ROLE[:HR], status: STATUS[:approved]) }
-    let!(:project) { FactoryGirl.create(:project, timesheet_mandatory: true) }
+    let!(:project) { FactoryGirl.create(:project, timesheet_mandatory: true, start_date: Date.today - 20) }
 
     before do
       ActionMailer::Base.deliveries = []
@@ -2268,7 +2262,7 @@ RSpec.describe TimeSheet, type: :model do
   context "User without time_sheet" do
     let!(:user) { FactoryGirl.create(:user, status: STATUS[:approved]) }
     let!(:userhr) { FactoryGirl.create(:user, role: ROLE[:HR], status: STATUS[:approved]) }
-    let!(:project) { FactoryGirl.create(:project, :timesheet_mandatory => true) }
+    let!(:project) { FactoryGirl.create(:project, :timesheet_mandatory => true, start_date: Date.today - 20) }
     before do
       ActionMailer::Base.deliveries = []
     end
@@ -2315,7 +2309,7 @@ RSpec.describe TimeSheet, type: :model do
     end
 
     it "Do not send mail if user projects timesheet mandatory false" do
-      project      = FactoryGirl.create(:project, :timesheet_mandatory => false)
+      project      = FactoryGirl.create(:project, :timesheet_mandatory => false, start_date: Date.today - 20)
       user_project = FactoryGirl.create(:user_project, :start_date => Date.today - 2,
        :user => user, :project => project)
       from_date = Date.today - 2

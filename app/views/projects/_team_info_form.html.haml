@@ -20,10 +20,10 @@
             = project_user_form.input :user_id, collection: users, input_html: {class: "user_select"}, label: false
           .span2.width15
             = project_user_form.input :start_date, label: false,
-              input_html: {type: :date, class: 'date-picker', style: 'height: 32px', value: project_user_form.object.start_date.try(:strftime, '%Y-%m-%d')}
+              input_html: {type: :date, class: 'date-picker', style: 'height: 32px', value: project_user_form.object.start_date.try(:strftime, '%Y-%m-%d') || Date.today.strftime('%Y-%m-%d'), min: @project.start_date.try(:strftime, '%Y-%m-%d'), max: @project.end_date.try(:strftime, '%Y-%m-%d')}
           .span2.width15
             = project_user_form.input :end_date, label: false,
-              input_html: {type: :date, class: 'date-picker', style: 'height: 32px', id: 'end-date', value: project_user_form.object.end_date.try(:strftime, '%Y-%m-%d')}
+              input_html: {type: :date, class: 'date-picker', style: 'height: 32px', id: 'end-date', value: project_user_form.object.end_date.try(:strftime, '%Y-%m-%d') || @project.end_date.try(:strftime, '%Y-%m-%d'), min: @project.start_date.try(:strftime, '%Y-%m-%d'), max: @project.end_date.try(:strftime, '%Y-%m-%d')}
           .span2.width10
             .make-switch{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "REQ", "data-off-label": "NREQ"}
               = project_user_form.check_box :time_sheet

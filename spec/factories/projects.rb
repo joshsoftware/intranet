@@ -7,6 +7,7 @@ FactoryGirl.define do
     database { 'MongoDB' }
     other_details { Faker::App.name }
     start_date { Date.today }
+    end_date { Date.today + 6.month }
     billing_frequency 'Monthly'
     type_of_project 'T&M'
     batch_name 'Alpha'

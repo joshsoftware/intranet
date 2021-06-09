@@ -72,6 +72,7 @@ class Company
 
   def update_projects_end_date
     projects.where(is_active: true).each do |project|
+      end_date = project.end_date > Date.today ? Date.today : project.end_date 
       project.update_attributes(end_date: Date.today, is_active: false)
     end
   end
