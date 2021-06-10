@@ -316,8 +316,14 @@ class User
     manager_ids = projects.pluck(:manager_ids).flatten.uniq
     user_role = ['Finance', 'HR', 'Admin']
     user_designation = [
-      'Senior Accountant', 'Assistant Vice President - Sales',
-      'Senior Manager- Sales', 'Assistant Manager - Accounts'
+      'Senior Accountant', 'Assistant Vice President - Sales', 'Senior Manager- Sales',
+      'Assistant Manager - Accounts', 'Account Manager', 'Business Development Executive',
+      'Business Development Manager', 'Business Support Manager', 'Co-Founder & Director',
+      'Consultant', 'Director', 'Finance Manager', 'HR Executive', 'Head - Presales',
+      'Head of Human Resource', 'Manager - Talent Acquisition', 'Marketing Manager',
+      'Office Assistant', 'People & Culture Manager', 'Senior Executive',
+      'Senior Manager - Talent Acquisition', 'Senior Sales Executive', 'Vice President - Delivery',
+      'Vice President – Engineering', 'Vice President – Global Strategy and Growth'
     ]
 
     if manager_ids.compact.blank?
