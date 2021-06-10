@@ -16,6 +16,9 @@ class Ability
       can :read, :dashboard
       can [:index, :holiday_list], HolidayList
       can :manage, Company
+      cannot :manage, LeaveApplication
+      can [:new, :create], LeaveApplication, user_id: user.id
+      can [:edit, :update], LeaveApplication, leave_status: 'Pending', user_id: user.id
     elsif user.role? 'Manager'
       employee_abilities(user.id)
       can :manage, Project
