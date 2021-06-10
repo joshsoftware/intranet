@@ -56,7 +56,7 @@ describe UsersController do
 
   context "update" do
     let!(:user) { FactoryGirl.create(:user) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 20) }
 
     before(:each) do
       sign_in user
@@ -117,19 +117,19 @@ describe UsersController do
       FactoryGirl.create(:user_project,
         user: user,
         project: first_project,
-        start_date: DateTime.now - 1
+        start_date: Date.today
       )
       FactoryGirl.create(:user_project,
         user: user,
         project: second_project,
-        start_date: DateTime.now - 1
+        start_date: Date.today
       )
       user_project = FactoryGirl.create(:user_project,
         user_id: user.id,
         project_id: project.id,
-        start_date: DateTime.now - 1
+        start_date: Date.today
       )
-      project_ids << ""
+      project_ids << ''
       project_ids << first_project.id
       project_ids << second_project.id
       patch :update, id: user.id, user: { project_ids: project_ids }
@@ -238,7 +238,7 @@ describe UsersController do
   end
 
   context "#resource_list_download" do
-    it 'should send Resource List csv' do
+    it 'should send Employee List csv' do
       user1 = FactoryGirl.create(:user, role: ROLE[:employee], status: STATUS[:approved])
       user2 = FactoryGirl.create(:user, role: ROLE[:employee], status: STATUS[:approved])
       sign_in user1

@@ -9,13 +9,16 @@ resource "Project Apis" do
   let!(:repository) { create(:repository, project_id: project.id) }
   get '/api/v1/projects' do
     example 'Get all Project details' do
-      UserProject.create( user_id: employees.first.id,
-                          project_id: project.id,
-                          start_date: DateTime.now - 2 )
-      
-      UserProject.create( user_id: employees.last.id,
-                          project_id: project.id,
-                          start_date: DateTime.now - 2 )
+      FactoryGirl.create(
+        :user_project,
+        user_id: employees.first.id,
+        project_id: project.id
+      )
+      FactoryGirl.create(
+        :user_project,
+        user_id: employees.last.id,
+        project_id: project.id
+      )
       user_ids = [{ 'id' => manager.id.to_s, 'name' => manager.name },
                   { 'id' => employees.first.id.to_s, 'name' => employees.first.name },
                   { 'id' => employees.last.id.to_s, 'name' => employees.last.name }]

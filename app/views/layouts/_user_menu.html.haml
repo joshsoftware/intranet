@@ -8,7 +8,7 @@
         = link_to "Schedules", main_app.schedules_path, role: 'menuitem'
   - if can? :resource_list, User
     %li
-      = link_to 'Resource List', main_app.resource_list_path, role: 'menuitem'
+      = link_to 'Employee List', main_app.resource_list_path, role: 'menuitem'
 
   - if can? :manage, Project
     %li

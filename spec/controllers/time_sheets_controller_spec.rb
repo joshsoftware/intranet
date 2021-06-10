@@ -19,8 +19,8 @@ RSpec.describe TimeSheetsController, type: :controller do
 
   #   it 'Should success' do
   #     params = {
-  #       'user_id' => USER_ID, 
-  #       'channel_id' => CHANNEL_ID, 
+  #       'user_id' => USER_ID,
+  #       'channel_id' => CHANNEL_ID,
   #       'text' => "England_Hockey #{Date.yesterday}  6 7 abcd efghigk lmnop"
   #     }
 
@@ -32,9 +32,9 @@ RSpec.describe TimeSheetsController, type: :controller do
 
   #   it 'should fail because validation trigger on timesheet data' do
   #     params = {
-  #       'user_id' => USER_ID, 
-  #       'channel_id' => CHANNEL_ID, 
-  #       'text' => 'England 14-07-2018  6 7 abcd efghigk lmnop' 
+  #       'user_id' => USER_ID,
+  #       'channel_id' => CHANNEL_ID,
+  #       'text' => 'England 14-07-2018  6 7 abcd efghigk lmnop'
   #     }
 
   #     post :create, params
@@ -246,10 +246,10 @@ RSpec.describe TimeSheetsController, type: :controller do
 
   context 'index' do
     let!(:user) { FactoryGirl.create(:admin) }
-    let!(:project1) { FactoryGirl.create(:project) }
+    let!(:project1) { FactoryGirl.create(:project, start_date: Date.today - 20) }
 
     it 'Should success' do
-      project2 = FactoryGirl.create(:project)
+      project2 = FactoryGirl.create(:project, start_date: Date.today - 20)
       FactoryGirl.create(:user_project,
         user: user,
         project: project1,
@@ -379,11 +379,11 @@ RSpec.describe TimeSheetsController, type: :controller do
 
   context 'Show' do
     let!(:user) { FactoryGirl.create(:admin) }
-    let!(:project1) { FactoryGirl.create(:project) }
+    let!(:project1) { FactoryGirl.create(:project, start_date: Date.today - 20) }
 
     it 'users timesheet' do
       sign_in user
-      project2 = FactoryGirl.create(:project)
+      project2 = FactoryGirl.create(:project, start_date: Date.today - 20)
       FactoryGirl.create(:user_project,
         user: user,
         project: project1,
@@ -468,8 +468,8 @@ RSpec.describe TimeSheetsController, type: :controller do
   context 'Project report' do
     let!(:user_one) { FactoryGirl.create(:admin) }
     let!(:user_two) { FactoryGirl.create(:admin) }
-    let!(:project) { FactoryGirl.create(:project) }
-    
+    let!(:project) { FactoryGirl.create(:project, start_date: '01/08/2018'.to_date) }
+
     it 'Should success' do
       FactoryGirl.create(:user_project,
         user: user_one,
@@ -531,7 +531,7 @@ RSpec.describe TimeSheetsController, type: :controller do
 
   context 'Individual project report' do
     let!(:user) { FactoryGirl.create(:admin) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: '01/08/2018'.to_date) }
 
     it 'Should success' do
       FactoryGirl.create(:user_project,
@@ -577,7 +577,7 @@ RSpec.describe TimeSheetsController, type: :controller do
 
   context 'Update' do
     let!(:user) { FactoryGirl.create(:admin) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 20) }
     let!(:employee) { FactoryGirl.create(:user) }
 
     context 'should successfully update timesheet' do
@@ -1093,7 +1093,7 @@ RSpec.describe TimeSheetsController, type: :controller do
 
   context 'Add timesheet' do
     let!(:user) { FactoryGirl.create(:user) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 10) }
     let!(:user_project) { FactoryGirl.create(:user_project,
         user: user,
         project: project,
@@ -1105,9 +1105,9 @@ RSpec.describe TimeSheetsController, type: :controller do
       params = {
         time_sheets_attributes: {
           "0" => {
-            project_id: "#{project.id}", 
+            project_id: "#{project.id}",
             date: "#{Date.today - 1}",
-            from_time: "#{Date.today - 1} 10:00", 
+            from_time: "#{Date.today - 1} 10:00",
             to_time: "#{Date.today - 1} 11:00",
             duration: nil,
             description: "testing API and call with client"
@@ -1200,12 +1200,12 @@ RSpec.describe TimeSheetsController, type: :controller do
     end
 
     it 'Should not add timesheet because validation failure' do
-      params = { 
+      params = {
         time_sheets_attributes: {
           "0" => {
-            project_id: "#{project.id}", 
+            project_id: "#{project.id}",
             date: "#{Date.today - 1}",
-            from_time: "#{Date.today - 1} 10:00", 
+            from_time: "#{Date.today - 1} 10:00",
             to_time: "#{Date.today - 1} 9:00",
             description: "testing API and call with client"
           }

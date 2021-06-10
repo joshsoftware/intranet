@@ -72,14 +72,22 @@ class Project
 
   # validates_uniqueness_of :code, allow_blank: true, allow_nil: true
 
-  MANERIAL_ROLE = ['Admin', 'Manager']
-  validates :display_name, format: { with: /\A[ ]*[\S]*[ ]*\Z/, message: "Name should not contain white space" }
-  validates :start_date, :billing_frequency, :type_of_project, presence: true
-  validates_presence_of :end_date, unless: -> { is_active? }
+  MANERIAL_ROLE = [ROLE[:admin], ROLE[:manager]]
+  validates :display_name, format: { with: /\A[ ]*[\S]*[ ]*\Z/, message: 'Name should not contain white space' }
+  validates :start_date, :end_date, :billing_frequency, :type_of_project, presence: true
   validates :billing_frequency, inclusion: { in: BILLING_FREQUENCY_TYPES, allow_nil: true }
   validates :type_of_project, inclusion: { in: TYPE_OF_PROJECTS, allow_nil: true }
   validates :batch_name, inclusion: { in: TYPE_OF_BATCHES, allow_nil: true }
   validate :start_date_less_than_end_date, if: 'end_date.present?'
+  validate :validate_end_date, if: 'end_date.present?'
+
+  def validate_end_date
+    if is_active?
+      errors.add(:end_date, 'should not be less than today. As project is active') if end_date < Date.today
+    else
+      errors.add(:end_date, 'should not be greater than today. As project is inactive') if end_date > Date.today
+    end
+  end
 
   def start_date_less_than_end_date
     if end_date < start_date
@@ -98,7 +106,7 @@ class Project
   after_destroy :call_monitor_service
 
   after_save do
-    update_user_projects unless is_active?
+    update_user_projects if (is_active_changed? && !is_active?) || end_date_changed?
     call_monitor_service if is_active_changed? || manager_ids_changed?
   end
 
@@ -137,7 +145,7 @@ class Project
     elsif manager_ids_change.last.empty?
       return manager_ids_was, 'Manager Removed'
     elsif (manager_ids_change.last - manager_ids_was).empty?
-      return (manager_ids_was - manager_ids_change.last), 'Manger Removed'
+      return (manager_ids_was - manager_ids_change.last), 'Manager Removed'
     else
       return (manager_ids_change.last - manager_ids_was), 'Manager Added'
     end
@@ -228,10 +236,9 @@ class Project
       ]
       projects.each do |project|
         end_date = project.end_date.blank? ? (Date.today + 6.months).end_of_month : project.end_date
-        user_ids = UserProject.where(project_id: project.id, :end_date => nil).pluck(:user_id).uniq
-        users = User.approved.order_by("public_profile.first_name" => :asc)
+        users = project.users.approved.order_by('public_profile.first_name': :asc)
         users.each do |user|
-          up = UserProject.where(project_id: project.id, user_id: user.id, :end_date => nil).first
+          up = UserProject.where(project_id: project.id, user_id: user.id, active: true).first
           csv << [
             project.name,
             project.start_date,
@@ -305,7 +312,7 @@ class Project
   end
 
   def users
-    user_id = user_projects.where(end_date: nil).pluck(:user_id)
+    user_id = user_projects.where(active: true).pluck(:user_id)
     User.in(id: user_id)
   end
 
@@ -388,11 +395,18 @@ class Project
 
   def update_user_projects
     user_projects.where(active: true).each do |user_project|
-      user_project.update_attributes(end_date: end_date, active: false)
+      user_project.update_attributes(end_date: end_date) if change_end_date?(user_project)
+      user_project.update_attributes(active: false) unless is_active?
     end
   end
 
+  def change_end_date?(user_project)
+    user_project.end_date.nil? ||
+    user_project.end_date >= end_date ||
+    user_project.end_date == end_date_was
+  end
+
   def technology_details_record_is_blank?(attributes)
-    attributes[:name].blank?  and attributes[:version].blank?
+    attributes[:name].blank? and attributes[:version].blank?
   end
 end

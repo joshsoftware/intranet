@@ -73,6 +73,26 @@ describe PrivateProfile do
     end
   end
 
+  context 'Validation of joining date' do
+    let!(:user) { FactoryGirl.create(:user) }
+
+    before do
+      @private_profile = user.private_profile
+    end
+
+    it 'should fails because joining date is future date' do
+      @private_profile.date_of_joining = Date.tomorrow
+      expect(user.valid?).to be_falsy
+      expect(@private_profile.errors.full_messages).to eq(
+        ['Date of joining should not a date from future.']
+      )
+    end
+
+    it 'should pass because joining date is current date or past date' do
+      expect(user.valid?).to_not be_falsy 
+    end
+  end
+
   context 'validation should not trigger' do
     let!(:user){ FactoryGirl.create(:user) }
 

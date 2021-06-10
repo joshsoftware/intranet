@@ -6,6 +6,6 @@ FactoryGirl.define do
     reason { "Sick" }
     contact_number { Faker::Number.number(10) }
     association :user
-    leave_type LeaveApplication::LEAVE
+    leave_type LEAVE_TYPES[:leave]
   end
 end

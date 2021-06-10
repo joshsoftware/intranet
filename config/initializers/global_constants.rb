@@ -51,3 +51,10 @@ DAILY_OFFICE_ENTRY_LIMIT = 30
 OFFICE_ENTRY_PASS_MAIL_RECEPIENT=["shailesh.kalekar@joshsoftware.com", "sameert@joshsoftware.com", "hr@joshsoftware.com"]
 
 ROLLBAR_ISSUES_URL = 'https://api.rollbar.com/api/1/items'
+
+CUSTOM_MANAGERS = { 
+  bengaluru: 'amit.singh@joshsoftware.com', ui_ux: 'sai@joshsoftware.com',
+  admin: 'shailesh.kalekar@joshsoftware.com', default: 'sameert@joshsoftware.com'
+}
+
+LEAVE_TYPES = {leave: 'LEAVE', wfh: 'WFH', optional_holiday: 'OPTIONAL HOLIDAY', spl: 'SPL'}

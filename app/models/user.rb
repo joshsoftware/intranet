@@ -263,7 +263,7 @@ class User
 
   def add_or_remove_projects(params)
     return_value_of_add_project = return_value_of_remove_project = true
-    existing_project_ids = UserProject.where(user_id: id, end_date: nil).pluck(:project_id)
+    existing_project_ids = UserProject.where(user_id: id, active: true).pluck(:project_id)
     existing_project_ids.map!(&:to_s)
     params[:user][:project_ids].shift
     ids_for_add_project = params[:user][:project_ids].present? ? params[:user][:project_ids] - existing_project_ids : []
@@ -276,7 +276,8 @@ class User
   def add_projects(project_ids)
     return_value = true
     project_ids.each do |project_id|
-      return_value = UserProject.create!(user_id: id, project_id: project_id, start_date: DateTime.now - 7.days, end_date: nil) rescue false
+      project = Project.where(id: project_id).first
+      return_value = UserProject.create!(user_id: id, project_id: project_id, start_date: DateTime.now - 7.days, end_date: project.end_date) rescue false
       if return_value == false
         break
       end
@@ -287,7 +288,7 @@ class User
   def remove_projects(project_ids)
     return_value = true
     project_ids.each do |project_id|
-      user_project = UserProject.where(user_id: id, project_id: project_id, end_date: nil).first
+      user_project = UserProject.where(user_id: id, project_id: project_id, active: true).first
       return_value = user_project.update_attributes!(end_date: DateTime.now) rescue false
       if return_value == false
         break
@@ -304,7 +305,6 @@ class User
   def get_managers_emails_for_timesheet
     project_ids = user_projects.where(
       active: true,
-      end_date: nil,
       time_sheet: true
     ).pluck(:project_id)
 
@@ -314,7 +314,31 @@ class User
 
   def get_managers_names
     manager_ids = projects.pluck(:manager_ids).flatten.uniq
-    User.in(id: manager_ids, status: STATUS[:approved]).collect(&:name)
+    user_role = ['Finance', 'HR', 'Admin']
+    user_designation = [
+      'Senior Accountant', 'Assistant Vice President - Sales', 'Senior Manager- Sales',
+      'Assistant Manager - Accounts', 'Account Manager', 'Business Development Executive',
+      'Business Development Manager', 'Business Support Manager', 'Co-Founder & Director',
+      'Consultant', 'Director', 'Finance Manager', 'HR Executive', 'Head - Presales',
+      'Head of Human Resource', 'Manager - Talent Acquisition', 'Marketing Manager',
+      'Office Assistant', 'People & Culture Manager', 'Senior Executive',
+      'Senior Manager - Talent Acquisition', 'Senior Sales Executive', 'Vice President - Delivery',
+      'Vice President – Engineering', 'Vice President – Global Strategy and Growth'
+    ]
+
+    if manager_ids.compact.blank?
+      emp_designation = employee_detail.designation.try(:name)
+      if employee_detail.try(:location).eql?(LOCATIONS[0]) #Bengaluru
+        return User.where(email: CUSTOM_MANAGERS[:bengaluru]).collect(&:name)
+      elsif user_role.include?(role) || user_designation.include?(emp_designation)
+        return User.where(email: CUSTOM_MANAGERS[:admin]).collect(&:name)
+      elsif UI_UX_DESIGNATION.include?(emp_designation)
+        return User.where(email: CUSTOM_MANAGERS[:ui_ux]).collect(&:name)
+      else
+        return User.where(email: CUSTOM_MANAGERS[:default]).collect(&:name)
+      end
+    end
+    User.in(id: manager_ids).collect(&:name)
   end
 
   def self.get_hr_emails
@@ -322,8 +346,7 @@ class User
   end
 
   def project_ids
-    project_ids = user_projects.where(active: true, end_date: nil)
-                               .pluck(:project_id)
+    project_ids = user_projects.where(active: true).pluck(:project_id)
   end
 
   def project_details
@@ -348,7 +371,7 @@ class User
   end
 
   def projects
-    project_ids = user_projects.where(active: true, end_date: nil).pluck(:project_id)
+    project_ids = user_projects.where(active: true).pluck(:project_id)
     Project.in(id: project_ids)
   end
 

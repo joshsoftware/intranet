@@ -19,6 +19,10 @@ $(document).ready ->
     hideSpinner();
     return
 
+  $(".members").select2();
+  $('#project_start_date').on 'change', ->
+    $('#project_end_date').attr('min', $(this).val())
+
   $('body').on 'click', (e) ->
     $('[data-toggle="popover"]').each ->
       if !$(this).is(e.target) and $(this).has(e.target).length == 0 and $('.popover').has(e.target).length == 0

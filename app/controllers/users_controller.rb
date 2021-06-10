@@ -76,6 +76,8 @@ class UsersController < ApplicationController
         #UserMailer.delay.verification(@user.id)
         redirect_to public_profile_user_path(@user)
       else
+        tab = (profile == "private_profile") ? 'Private Profile' : 'Public Profile'
+        flash[:error] = "#{tab}: Error #{@user.generate_errors_message}"
         render "public_profile"
       end
     end
@@ -136,13 +138,13 @@ class UsersController < ApplicationController
 
   def resource_list_download
     @users = User.employees.approved
-    send_data @users.to_csv, filename: "ResourceList - #{Time.now.strftime("%d%b%y%k%M")}.csv"
+    send_data @users.to_csv, filename: "EmployeeList - #{Time.now.strftime("%d%b%y%k%M")}.csv"
   end
 
   def users_optional_holiday_list
     optional_holiday = current_user.leave_applications.unrejected.where(
       :start_at.gte => Date.current.beginning_of_year,
-      leave_type: LeaveApplication::OPTIONAL
+      leave_type: LEAVE_TYPES[:optional_holiday]
     ).pluck(:start_at)
     render json: {user_optional_holiday: optional_holiday}
   end

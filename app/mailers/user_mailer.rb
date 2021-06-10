@@ -36,7 +36,7 @@ class UserMailer < ActionMailer::Base
 
   def accept_leave(leave_application_id)
     get_leave(leave_application_id)
-    mail(to: @notification_emails, subject: "Congrats! #{@leave_type} Request got accepted")
+    mail(to: @notification_emails, subject: "Your #{@leave_type} request has been approved")
   end
 
   def send_accept_leave_notification(leave_id, emails)
@@ -188,7 +188,7 @@ class UserMailer < ActionMailer::Base
   end
 
   def get_leave_type(leave_type)
-    leave_type == LeaveApplication::WFH ? leave_type : LeaveApplication::LEAVE.capitalize
+    leave_type == LEAVE_TYPES[:wfh] ? leave_type : LEAVE_TYPES[:leave].capitalize
   end
 
   def get_leave_message

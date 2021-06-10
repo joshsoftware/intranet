@@ -116,7 +116,7 @@ describe User do
 
   context 'Timesheet' do
     let!(:user) { FactoryGirl.create(:user) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 20) }
 
     it 'Should give the project report' do
       FactoryGirl.create(:user_project,
@@ -148,11 +148,11 @@ describe User do
 
   context 'Add or remove project' do
     let!(:user) { FactoryGirl.create(:user) }
-    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: Date.today - 20) }
 
     it 'Should add project' do
       project_ids = []
-      project_ids << ""
+      project_ids << ''
       project_ids << project.id
       params = { user: { project_ids: project_ids } }
       user.add_or_remove_projects(params)
@@ -161,27 +161,30 @@ describe User do
         project_id: project.id
       )
       expect(user_project.start_date).to eq(Date.today - 7.days)
+      expect(user.user_projects.first).to eq(user_project)
     end
 
     describe 'Remove project' do
-      it 'Project count grater than tow' do
+      it 'Project count greater than two' do
         project_ids = []
         first_project = FactoryGirl.create(:project)
         second_project = FactoryGirl.create(:project)
-        FactoryGirl.create(:user_project,
+        FactoryGirl.create(
+          :user_project,
           user: user,
           project: first_project,
-          start_date: DateTime.now - 1)
-        FactoryGirl.create(:user_project,
+        )
+        FactoryGirl.create(
+          :user_project,
           user: user,
           project: second_project,
-          start_date: DateTime.now - 1)
-        user_project = FactoryGirl.create(:user_project,
+        )
+        user_project = FactoryGirl.create(
+          :user_project,
           user: user,
           project: project,
-          start_date: DateTime.now - 1
         )
-        project_ids << ""
+        project_ids << ''
         project_ids << first_project.id
         project_ids << second_project.id
         params = { user: { project_ids: project_ids } }
@@ -191,12 +194,12 @@ describe User do
 
       it 'Project count is one' do
         project_ids = []
-        user_project = FactoryGirl.create(:user_project,
+        user_project = FactoryGirl.create(
+          :user_project,
           user: user,
           project: project,
-          start_date: DateTime.now - 1
         )
-        project_ids << ""
+        project_ids << ''
         params = { user: { project_ids: project_ids } }
         user.add_or_remove_projects(params)
         expect(user_project.reload.end_date).to eq(Date.today)
@@ -222,7 +225,7 @@ describe User do
     let!(:user) { FactoryGirl.create(:user) }
 
     it 'Should give the managers emails of particular user' do
-      project = FactoryGirl.create(:project)
+      project = FactoryGirl.create(:project, start_date: Date.today - 20)
       manager_one = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
       manager_two = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
       user_project = FactoryGirl.create(:user_project,
@@ -240,17 +243,19 @@ describe User do
 
     it 'Should give the managers email ids of all projects whose timesheet' +
        ' is mandatory for particular Employee' do
-      project_1 = FactoryGirl.create(:project)
-      project_2 = FactoryGirl.create(:project, timesheet_mandatory: false)
+      project_1 = FactoryGirl.create(:project, start_date: Date.today - 20)
+      project_2 = FactoryGirl.create(:project, timesheet_mandatory: false, start_date: Date.today - 20)
       manager_1 = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
       manager_2 = FactoryGirl.create(:user, role: ROLE[:manager], status: STATUS[:approved])
-      user_project_1 = FactoryGirl.create(:user_project,
+      user_project_1 = FactoryGirl.create(
+        :user_project,
         user: user,
         project: project_1,
         start_date: Date.today - 2,
         time_sheet: true
       )
-      user_project_2 = FactoryGirl.create(:user_project,
+      user_project_2 = FactoryGirl.create(
+        :user_project,
         user: user,
         project: project_2,
         start_date: Date.today - 4
@@ -263,8 +268,8 @@ describe User do
     end
 
     it 'Should skip the email if already added' do
-      project_one = FactoryGirl.create(:project)
-      project_two = FactoryGirl.create(:project)
+      project_one = FactoryGirl.create(:project, start_date: Date.today - 20)
+      project_two = FactoryGirl.create(:project, start_date: Date.today - 20)
       FactoryGirl.create(:user_project,
         user: user,
         project: project_one,
@@ -284,7 +289,7 @@ describe User do
     end
 
     it 'Should not give the emails if manager is not assigned to project' do
-      project = FactoryGirl.create(:project)
+      project = FactoryGirl.create(:project, start_date: Date.today - 20)
       FactoryGirl.create(:user_project,
         user: user,
         project: project,
@@ -296,7 +301,7 @@ describe User do
 
     context 'Get user project from user' do
       let!(:user) { FactoryGirl.create(:user) }
-      let!(:project) { FactoryGirl.create(:project) }
+      let!(:project) { FactoryGirl.create(:project, start_date: '01/08/2018'.to_date) }
 
       context 'should give the user record' do
         it "if user's project start date is less than from date & end date is nil" do
@@ -313,7 +318,7 @@ describe User do
           )
           expect(user_projects.count).to eq(1)
           expect(user_projects[0].start_date.to_s).to eq('01/08/2018')
-          expect(user_projects[0].end_date).to eq(nil)
+          expect(user_projects[0].end_date).to eq(Date.today + 6.month)
         end
 
         it "if user's project start date is greater than from date & end date is nil" do
@@ -330,7 +335,7 @@ describe User do
           )
           expect(user_projects.count).to eq(1)
           expect(user_projects[0].start_date.to_s).to eq('06/09/2018')
-          expect(user_projects[0].end_date).to eq(nil)
+          expect(user_projects[0].end_date).to eq(Date.today + 6.month)
         end
 
         it "if user's project start date is greater than from date & end date is less than to date" do
@@ -559,6 +564,58 @@ describe User do
       months += today.month - date_of_joining.month - (today.day >= date_of_joining.day ? 0 : 1)
       experience = previous_work_experience + months
       expect(user.experience_as_of_today).to eq(experience)
+    end
+  end
+
+  describe 'get_managers_names' do
+    let!(:user) { FactoryGirl.create(:user) }
+
+    it 'should return manager name of respective employee' do
+      project = FactoryGirl.create(:project)
+      manager_one = FactoryGirl.create(:manager)
+      manager_two = FactoryGirl.create(:manager)
+      user_project = FactoryGirl.create(:user_project,
+        user: user,
+        project: project,
+        start_date: Date.today - 2
+      )
+      project.managers << manager_one
+      project.managers << manager_two
+      managers_names = user.get_managers_names
+      expect(managers_names.count).to eq(2)
+      expect(managers_names[0]).to eq(manager_one.name)
+      expect(managers_names[1]).to eq(manager_two.name)
+    end
+
+    context 'if emp has not assigned any project then should return default manager name and if' do
+
+      it 'employee work in Bengaluru' do
+        user.employee_detail.set(location: LOCATIONS[0]) #Bengaluru
+        default_manager = FactoryGirl.create(:user, email: CUSTOM_MANAGERS[:bengaluru])
+        managers_names = user.get_managers_names
+        expect(managers_names.count).to eq(1)
+      end
+
+      it 'employee role is admin' do
+        user.set(role: ROLE[:admin])
+        default_manager = FactoryGirl.create(:user, email: CUSTOM_MANAGERS[:admin], role: ROLE[:admin], status: STATUS[:approved])
+        managers_names = user.get_managers_names
+        expect(managers_names.count).to eq(1)
+      end
+
+      it 'employee designation is UI/UX Designer' do
+        designation = FactoryGirl.create(:designation, name: UI_UX_DESIGNATION[1])  # 'UI/UX Designer'
+        user.employee_detail.designation = designation
+        default_manager = FactoryGirl.create(:user, email: CUSTOM_MANAGERS[:ui_ux])
+        managers_names = user.get_managers_names
+        expect(managers_names.count).to eq(1)
+      end
+
+      it 'employee has no any role and designation then assign default manager' do
+        default_manager = FactoryGirl.create(:user, email: CUSTOM_MANAGERS[:default])
+        managers_names = user.get_managers_names
+        expect(managers_names.count).to eq(1)
+      end
     end
   end
 end

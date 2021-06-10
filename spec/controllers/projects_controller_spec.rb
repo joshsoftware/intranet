@@ -68,9 +68,8 @@ describe ProjectsController do
       manager = create(:manager)
       employees = create_list(:employee, 2).collect(&:id)
       project_attributes.merge!(manager_ids: [manager.id.to_s], company_id: create(:company).id,
-      user_projects_attributes: [{user_id: employees.first.to_s, start_date: Date.current},
-                                 {user_id: employees.last.to_s, start_date: Date.current}])
-
+      user_projects_attributes: [{user_id: employees.first.to_s, start_date: Date.current, end_date: Date.current},
+                                 {user_id: employees.last.to_s, start_date: Date.current, end_date: Date.current}])
       post :create, { project: project_attributes }
       expect(Project.count).to eq(1)
       expect(assigns[:project].manager_ids).to eq([manager.id])
@@ -87,8 +86,8 @@ describe ProjectsController do
     let!(:employees) { create_list(:employee, 2) }
     let!(:params) do
       { billing_frequency: "Adhoc", type_of_project: "Fixbid",  manager_ids: [manager.id, manager2.id],
-        user_projects_attributes: [{ user_id: employees.first.id.to_s, start_date: Date.current },
-                                   { user_id: employees.last.id.to_s, start_date: Date.current }]
+        user_projects_attributes: [{ user_id: employees.first.id.to_s, start_date: Date.current, end_date: Date.current },
+                                   { user_id: employees.last.id.to_s, start_date: Date.current, end_date: Date.current }]
       }
     end
 
@@ -187,7 +186,8 @@ describe ProjectsController do
   end
 
   describe 'DELETE team member' do
-    let!(:project) { FactoryGirl.build(:project) }
+    let!(:project) { FactoryGirl.create(:project, start_date: Date.yesterday) }
+
     it 'Should delete manager' do
       user = FactoryGirl.build(:user, role: 'Manager')
       project.managers << user
@@ -203,11 +203,12 @@ describe ProjectsController do
 
     it 'Should delete employee' do
       user = FactoryGirl.create(:user)
-      user_project = UserProject.create(user_id: user.id,
+      user_project = FactoryGirl.create(
+        :user_project,
+        user_id: user.id,
         project_id: project.id,
-        start_date: DateTime.now - 1
+        start_date: Date.yesterday
       )
-      project.save
       delete :remove_team_member, :format => :js,
         id: project.id,
         user_id: user.id,
@@ -216,12 +217,13 @@ describe ProjectsController do
     end
 
     it 'Should delete manager who added as team member' do
-      user = FactoryGirl.create(:user, role: 'Manager')
-      user_project = UserProject.create(user_id: user.id,
+      user = FactoryGirl.create(:user, role: ROLE[:manager])
+      user_project = FactoryGirl.create(
+        :user_project,
+        user_id: user.id,
         project_id: project.id,
-        start_date: DateTime.now - 2
+        start_date: Date.yesterday
       )
-      project.save
       delete :remove_team_member, :format => :js,
         id: project.id,
         user_id: user.id,
@@ -232,7 +234,6 @@ describe ProjectsController do
     it 'Should delete Admin who added as manager' do
       user = FactoryGirl.create(:admin)
       project.managers << user
-      project.save
       delete :remove_team_member, :format => :js,
         id: project.id,
         user_id: user.id,
@@ -243,11 +244,12 @@ describe ProjectsController do
 
     it 'Should delete Admin who added as team member' do
       user = FactoryGirl.create(:admin)
-      user_project = UserProject.create(user_id: user.id,
+      user_project = FactoryGirl.create(
+        :user_project,
+        user_id: user.id,
         project_id: project.id,
-        start_date: DateTime.now - 2
+        start_date: Date.yesterday
       )
-      project.save
       delete :remove_team_member, :format => :js,
         id: project.id,
         user_id: user.id,
@@ -273,8 +275,8 @@ describe ProjectsController do
               :active => "true",
               :user_id => user_three.id,
               :project_id => project.id,
-              :start_date => "09/01/2020",
-              :end_date => "",
+              :start_date => project.start_date,
+              :end_date => project.end_date,
               :time_sheet => "0",
               :allocation => "50",
             }
@@ -303,8 +305,8 @@ describe ProjectsController do
               :active => "false",
               :user_id => user_three.id,
               :project_id => project.id,
-              :start_date => "09/01/2020",
-              :end_date => "",
+              :start_date => '',
+              :end_date => '',
               :time_sheet => "0",
               :allocation => "50",
             }
@@ -334,8 +336,8 @@ describe ProjectsController do
               :active => "true",
               :user_id => user_two.id,
               :project_id => project.id,
-              :start_date => "09/01/2020",
-              :end_date => "",
+              :start_date => project.start_date,
+              :end_date => project.end_date,
               :time_sheet => "0",
               :allocation => "50",
             }

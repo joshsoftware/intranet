@@ -2,27 +2,27 @@ require 'rails_helper'
 
 RSpec.describe UserProject, type: :model do
   context 'validation' do
-    
+
     it 'Should success' do
       user_project = FactoryGirl.create(:user_project)
       expect(user_project).to be_present
     end
-    
+
     it 'Should fail because user id not present' do
       user_project = FactoryGirl.build(:user_project)
       user_project.user_id = nil
-      user_project.save
+      user_project.valid?
       expect(user_project.errors.full_messages).to eq(["User can't be blank"])
     end
-    
+
     it 'Should fail because project id not present' do
       user_project = FactoryGirl.build(:user_project)
       user_project.project_id = nil
-      user_project.save
+      user_project.valid?
       expect(user_project.errors.full_messages).
         to eq(["Project can't be blank"])
     end
-    
+
     it 'Should fail because start date not present' do
       user_project = FactoryGirl.build(:user_project)
       user_project.start_date = nil
@@ -62,6 +62,12 @@ RSpec.describe UserProject, type: :model do
         to eq(160)
     end
 
+    it 'Should assign end date of project if end date is not present' do
+      project = FactoryGirl.create(:project)
+      user_project = FactoryGirl.create(:user_project, project: project)
+      expect(user_project.end_date).to eq(project.end_date)
+    end
+
     context 'end_date compulsory if user is inactive' do
       it 'Should fail because end date not present' do
         user_project = FactoryGirl.build(:user_project)
@@ -69,7 +75,7 @@ RSpec.describe UserProject, type: :model do
         user_project.end_date = nil
         user_project.save
         expect(user_project.errors.full_messages).
-          to eq(["End date is mandatory to mark inactive"])
+          to eq(["End date can't be blank"])
       end
 
       it 'Should pass if end_date is present' do
@@ -84,9 +90,16 @@ RSpec.describe UserProject, type: :model do
     it 'should validate end_date greater than start_date' do
       user = FactoryGirl.create(:user)
       project = FactoryGirl.create(:project)
-      user_project = FactoryGirl.build(:user_project, user: user, project: project, start_date: Date.today, end_date: Date.yesterday)
+      user_project = FactoryGirl.build(:user_project, user: user, project: project, start_date: Date.tomorrow, end_date: Date.today)
       user_project.save
       expect(user_project.errors[:end_date]).to eq(['should not be less than start date.'])
+    end
+
+    it 'should validate end_date not to be greater than end_date of project' do
+      project = FactoryGirl.create(:project, end_date: Date.today)
+      user_project = FactoryGirl.build(:user_project, project: project, start_date: Date.yesterday, end_date: Date.tomorrow)
+      user_project.save
+      expect(user_project.errors[:end_date]).to eq(['should not be greater than project end date'])
     end
 
     context 'user_id should be unique for active users' do
@@ -111,7 +124,7 @@ RSpec.describe UserProject, type: :model do
   end
 
   context 'Trigger - should call code monitor service' do
-    before(:each) do 
+    before(:each) do
       @project = build(:project)
       stub_request(:get, "http://localhost?event_type=Project%20Active&project_id=#{@project.id}").
         with(
