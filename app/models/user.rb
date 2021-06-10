@@ -299,6 +299,10 @@ class User
 
   def get_managers_emails
     manager_ids = projects.pluck(:manager_ids).flatten.uniq
+
+    if manager_ids.compact.blank?
+      manager_ids = get_default_manager_id
+    end
     User.in(id: manager_ids, status: STATUS[:approved]).pluck(:email)
   end
 
@@ -312,8 +316,7 @@ class User
     User.in(id: manager_ids, status: STATUS[:approved]).pluck(:email)
   end
 
-  def get_managers_names
-    manager_ids = projects.pluck(:manager_ids).flatten.uniq
+  def get_default_manager_id
     user_role = ['Finance', 'HR', 'Admin']
     user_designation = [
       'Senior Accountant', 'Assistant Vice President - Sales', 'Senior Manager- Sales',
@@ -326,17 +329,23 @@ class User
       'Vice President – Engineering', 'Vice President – Global Strategy and Growth'
     ]
 
+    emp_designation = employee_detail.designation.try(:name)
+    if employee_detail.try(:location).eql?(LOCATIONS[0]) #Bengaluru
+      return User.where(email: CUSTOM_MANAGERS[:bengaluru]).collect(&:id)
+    elsif user_role.include?(role) || user_designation.include?(emp_designation)
+      return User.where(email: CUSTOM_MANAGERS[:admin]).collect(&:id)
+    elsif UI_UX_DESIGNATION.include?(emp_designation)
+      return User.where(email: CUSTOM_MANAGERS[:ui_ux]).collect(&:id)
+    else
+      return User.where(email: CUSTOM_MANAGERS[:default]).collect(&:id)
+    end
+  end
+
+  def get_managers_names
+    manager_ids = projects.pluck(:manager_ids).flatten.uniq
+
     if manager_ids.compact.blank?
-      emp_designation = employee_detail.designation.try(:name)
-      if employee_detail.try(:location).eql?(LOCATIONS[0]) #Bengaluru
-        return User.where(email: CUSTOM_MANAGERS[:bengaluru]).collect(&:name)
-      elsif user_role.include?(role) || user_designation.include?(emp_designation)
-        return User.where(email: CUSTOM_MANAGERS[:admin]).collect(&:name)
-      elsif UI_UX_DESIGNATION.include?(emp_designation)
-        return User.where(email: CUSTOM_MANAGERS[:ui_ux]).collect(&:name)
-      else
-        return User.where(email: CUSTOM_MANAGERS[:default]).collect(&:name)
-      end
+      manager_ids = get_default_manager_id
     end
     User.in(id: manager_ids).collect(&:name)
   end
