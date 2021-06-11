@@ -133,7 +133,6 @@ class User
 
   def self.leave_notification_emails(user_ids)
     emails = [
-      User.approved.where(role: 'HR').pluck(:email),
       'hr@joshsoftware.com',
       'shailesh.kalekar@joshsoftware.com',
       'sameert@joshsoftware.com',
