@@ -16,7 +16,7 @@ class UserMailer < ActionMailer::Base
     mail(to: receiver_emails , subject: "#{@updated_user.public_profile.name} Profile has been updated")
   end
 
-  def leave_application(sender_email, receivers, leave_application_id)
+  def leave_application(sender_email, receivers, leave_application_id, reminder = false)
     @user = User.find_by(email: sender_email)
     @projects = @user.projects.where(is_active: 'true').pluck(:name)
     @project_ids = @user.projects.where(is_active: 'true').pluck(:id)
@@ -29,7 +29,11 @@ class UserMailer < ActionMailer::Base
     )
     @leave_application = LeaveApplication.where(id: leave_application_id).first
     @leave_type = get_leave_type(@leave_application.leave_type)
-    mail(from: @user.email, to: receivers, subject: "#{@user.name} has applied for #{@leave_type}")
+    if reminder
+      mail(to: receivers, subject: "REMINDER : #{@user.name} has applied for #{@leave_type}")
+    else
+      mail(from: @user.email, to: receivers, subject: "#{@user.name} has applied for #{@leave_type}")
+    end
   end
 
   def reject_leave(leave_application_id)

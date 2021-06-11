@@ -140,3 +140,8 @@ end
 every :day, :at => '00:05am' do
   rake "delete_data:soft_delete_entry_pass_old_entries"
 end
+
+
+every :monday, :at => '06:00am' do
+  rake "leave_reminder:weekly_pending_leave_reminder"
+end

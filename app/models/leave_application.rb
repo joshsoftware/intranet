@@ -269,6 +269,19 @@ class LeaveApplication
     end
   end
 
+  def self.weekly_pending_leave_reminder
+    leave_applications = LeaveApplication.where(
+      :start_at.gte => Date.today.beginning_of_year,
+      :leave_status => PENDING
+    )
+
+    leave_applications.each do |leave_application|
+      user = leave_application.user
+      managers = user.get_managers_emails
+      UserMailer.delay.leave_application(user.email, managers, leave_application.id, true)
+    end
+  end
+
   private
 
   def deduct_available_leave_send_mail
