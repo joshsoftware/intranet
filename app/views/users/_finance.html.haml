@@ -1,0 +1,50 @@
+= simple_form_for(@private_profile, url: private_profile_user_path, :html => { method: :put, class: "form-horizontal private-profile", multipart: true}) do |finance|  
+  %h4 Finance Details
+  %table{style: "width:100%;"}
+
+  - if can_access?('BankAccounts') || current_user == @user
+    %h4 Bank Account Details
+    %table{style: "width:100%;"}
+      %tr
+        %th.form-heading Salary Account
+        %th.form-heading Personal Account
+      %tr
+        = finance.simple_fields_for :bank_accounts do |b|
+          %td
+            = b.input :bank_name, label: 'Name Of Bank', placeholder: 'Enter name of bank'
+            = b.input :name_on_passbook, label: 'Name On Passbook', placeholder: 'Enter name on passbook'
+            = b.input :account_number, label: 'Account Number', placeholder: 'Enter your account number'
+            = b.input :ifsc_code, label: 'IFSC Code', placeholder: 'Enter IFSC code'
+  %br
+  %center
+    = finance.submit "Update Profile", class: 'btn'
+    
+- if can? :edit, User
+  = simple_form_for(@user,:url => user_path(@user), :html => { method: :put, class: "form-horizontal", multipart: true}) do |f|
+    = f.simple_fields_for :employee_detail do |e|
+      = e.label 'Joining Bonus Paid'
+      .make-switch{ tabindex: 0, 'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'Yes', 'data-off-label': 'No'}
+        = e.check_box :joining_bonus_paid, {}, 'Yes', 'No'
+    = f.submit :Save, class: "btn controls"
+
+:css
+  .make-switch{ margin-left: 18px;}
+
+:javascript
+  $('#address_button').on('switch-change', function(e, data){
+    var $el = $(data.el)
+      , value = data.value;
+
+    if(value)
+    {
+      $('div.temporary .control-group .controls input').attr('disabled', 'disabled')
+      $('div.temporary .control-group .controls textarea').attr('disabled', 'disabled')
+      $('#private_profile_addresses_attributes_1_type_of_address').removeAttr('disabled')
+    }
+    else
+    {
+      $('div.temporary .control-group .controls input').removeAttr('disabled')
+      $('div.temporary .control-group .controls textarea').removeAttr('disabled')
+    }
+
+  });

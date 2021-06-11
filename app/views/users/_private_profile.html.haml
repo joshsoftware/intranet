@@ -27,21 +27,6 @@
     %tr
       %td
         = pri.input :tshirt_size, collection: TSHIRT_SIZE, prompt: 'Select'
-
-  - if can_access?('BankAccounts') || current_user == @user
-    %h4 Bank Account Details
-    %table{style: "width:100%;"}
-      %tr
-        %th.form-heading Salary Account
-        %th.form-heading Personal Account
-      %tr
-        = pri.simple_fields_for :bank_accounts do |b|
-          %td
-            = b.input :bank_name, label: 'Name Of Bank', placeholder: 'Enter name of bank'
-            = b.input :name_on_passbook, label: 'Name On Passbook', placeholder: 'Enter name on passbook'
-            = b.input :account_number, label: 'Account Number', placeholder: 'Enter your account number'
-            = b.input :ifsc_code, label: 'IFSC Code', placeholder: 'Enter IFSC code'
-
   %h4 Emergency Contact Details
   %table{style: "width:100%;"}
     %tr
