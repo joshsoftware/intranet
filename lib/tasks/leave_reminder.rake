@@ -39,4 +39,9 @@ namespace :leave_reminder do
       LeaveApplication.pending_leaves_reminder(country)
     end
   end
+
+  desc 'Send mail to each manager with a list of leaves pending for action by that.'
+  task :weekly_pending_leave_reminder => :environment do
+    LeaveApplication.weekly_pending_leave_reminder
+  end
 end

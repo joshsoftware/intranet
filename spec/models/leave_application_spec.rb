@@ -59,7 +59,7 @@ describe LeaveApplication do
     end
   end
 
-  context 'Method specs ' do
+  context 'Method specs' do
 
     before do
       @user = FactoryGirl.create(:user)
@@ -95,7 +95,7 @@ describe LeaveApplication do
       expect(Sidekiq::Extensions::DelayedMailer.jobs.size).to eq(1)
     end
 
-    context 'self.process_leave ' do
+    context 'self.process_leave' do
 
       before do
         @user = FactoryGirl.create(:user)
@@ -280,6 +280,32 @@ describe LeaveApplication do
 
         it 'should not send mail if leave application is empty' do
           LeaveApplication.pending_leaves_reminder(COUNTRIES[0])
+          expect(ActionMailer::Base.deliveries.count).to eq(0)
+        end
+      end
+
+      context 'Weekly pending Leave reminder mail' do
+        before(:each) do
+          @sender = FactoryGirl.create(:user, email: 'test@joshsoftware.com')
+          admin = FactoryGirl.create(:admin, status: STATUS[:approved])
+          project = FactoryGirl.create(:project, manager_ids: [admin.id])
+          user_project = FactoryGirl.create(:user_project, user: @sender, project: project)
+          ActionMailer::Base.deliveries = []
+        end
+
+        it 'send reminder mail if leave status is pending' do
+          @leave_application = FactoryGirl.create(:leave_application, user: @sender)
+          Sidekiq::Testing.inline! do
+            sender_email = @sender.email
+            receiver_email = @sender.get_managers_emails
+            leave_application_id = @leave_application.id
+            UserMailer.delay.leave_application(sender_email, receiver_email, leave_application_id, true)
+            expect(ActionMailer::Base.deliveries.count).to eq(1)
+          end
+        end
+
+        it 'should not send mail if leave application is empty' do
+          LeaveApplication.weekly_pending_leave_reminder
           expect(ActionMailer::Base.deliveries.count).to eq(0)
         end
       end
