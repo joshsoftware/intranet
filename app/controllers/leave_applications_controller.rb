@@ -41,7 +41,7 @@ class LeaveApplicationsController < ApplicationController
       flash[:error] = @leave_application.errors.full_messages.join("\n")
       render 'edit' and return
     end
-    redirect_to ((can? :manage, LeaveApplication) ? leave_applications_path : view_leaves_path) and return
+    redirect_to view_leaves_path and return
   end
 
   def view_leave_status
