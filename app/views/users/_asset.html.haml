@@ -20,19 +20,19 @@
       %tr
         - if a.object.persisted?
           %td
-            = a.label 'Recovered'
+            = a.label 'Returned'
             .make-switch{'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'Yes', 'data-off-label': 'No'}
               = a.check_box :recovered
         %td
-          = a.input :date_of_recovery, input_html: {type: 'date', class: 'date-picker', label: 'Recovery Date', value: a.object.date_of_recovery.try(:strftime, "%Y-%m-%d")}
+          = a.input :date_of_return, input_html: {type: 'date', class: 'date-picker', label: 'Return Date', value: a.object.date_of_return.try(:strftime, "%Y-%m-%d")}
       %tr
         %td
-          = a.input :before_image, input_html: {'aria-label': 'Choose file', role: 'button'}
+          = a.input :before_image, :label => 'Image before issuing the asset', input_html: {'aria-label': 'Choose file', role: 'button'}
           - if a.object.persisted? && a.object.before_image.present?
             .asset
               = link_to '', download_document_user_path(id: a.object.id, image: 'before_image'), class: 'icon-download', role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}, title: 'Download Image'
         %td
-          = a.input :after_image, input_html: { 'aria-label': 'Choose file', role: 'button' }
+          = a.input :after_image, :label => 'Image after returning the asset', input_html: { 'aria-label': 'Choose file', role: 'button' }
           - if a.object.persisted? && a.object.after_image.present?
             .asset
               = link_to '', download_document_user_path(id: a.object.id, image: 'after_image'), class: 'icon-download', role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}, title: 'Download Image'
@@ -40,7 +40,7 @@
         .remove_asset.pull-right
           = a.link_to_remove '', class: 'btn icon-remove', 'aria-label': 'Remove the document', role: 'button', title: 'Remove Asset'
   = f.link_to_add 'Add new asset', :assets, 'aria-label': 'Add new Asset', class: 'btn controls'
-  = f.submit :save, value: 'Upload', 'aria-label': 'Upload Assets', class: "btn"
+  = f.submit :save, value: 'Save', 'aria-label': 'Upload Assets', class: "btn"
 
 - if @previous_assets.present?
   %h4 Previous Assets
@@ -51,7 +51,7 @@
         %th Model
         %th Serial Number
         %th Date Of Issue
-        %th Date Of Recovery
+        %th Date Of Recturn
         %th Valid Till
         %th Before Image
         %th After Image
@@ -62,7 +62,7 @@
           %td= asset.model
           %td= asset.serial_number
           %td= asset.date_of_issue
-          %td= asset.date_of_recovery
+          %td= asset.date_of_return
           %td= asset.valid_till
           %td= link_to 'Download', download_document_user_path(id: asset.id, image: 'before_image'), role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}, title: 'Download Image'
           %td= link_to 'Download', download_document_user_path(id: asset.id, image: 'after_image'), role: 'button', 'aria-label': 'Download the document', data: {'no-turbolink' =>  true}, title: 'Download Image'

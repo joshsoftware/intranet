@@ -10,7 +10,7 @@ class Asset
   field :model, type: String, default: ''
   field :serial_number, type: String, default: ''
   field :date_of_issue, type: Date, default: Date.today
-  field :date_of_recovery, type: Date
+  field :date_of_return, type: Date
   field :valid_till, type: Date
   field :recovered, type: Boolean, default: false
 
@@ -20,7 +20,7 @@ class Asset
   belongs_to :user
 
   validates :type, :name, :date_of_issue, :recovered, presence: true
-  validates :date_of_recovery, presence: true, if: 'recovered || after_image.present?'
+  validates :date_of_return, presence: true, if: 'recovered || after_image.present?'
   validates :type, inclusion: { in: ASSET_TYPES.values}
   validate :custom_validations
 
@@ -29,9 +29,9 @@ class Asset
     image_validation
     if errors.blank?
       errors.add(
-        :date_of_recovery,
+        :date_of_return,
         'should be greater or equal to date of issue'
-      ) if date_of_recovery && date_of_issue > date_of_recovery
+      ) if date_of_return && date_of_issue > date_of_return
       errors.add(
         :valid_till,
         'should be greater or equal to date of issue'
@@ -47,7 +47,7 @@ class Asset
       errors.add(
         :after_image,
         'should be present'
-      ) if date_of_recovery.present? && !after_image.present?
+      ) if date_of_return.present? && !after_image.present?
     when ASSET_TYPES[:software]
       errors.add(:serial_number, 'should be present') unless serial_number.present?
     end

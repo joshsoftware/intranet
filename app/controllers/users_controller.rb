@@ -39,7 +39,8 @@ class UsersController < ApplicationController
         flash.notice = "#{current_tab} updated Successfully"
         redirect_to public_profile_user_path(@user)
       else
-        @current_assets = @user.assets.reject{|asset| asset.recovered}
+        # @current_assets = @user.assets.reject{|asset| asset.recovered}
+        @current_assets = @user.assets.where(recovered: false).order_by(:date_of_issue.desc)
         flash[:error] = "#{current_tab}: Error #{@user.generate_errors_message}"
         render 'public_profile'
       end
@@ -168,7 +169,7 @@ class UsersController < ApplicationController
       :skip_unassigned_project_ts_mail, :designation_track, :joining_bonus_paid, :notification_emails => [] ],
       attachments_attributes: [:id, :name, :document, :_destroy],
       assets_attributes: [:id, :name, :model, :serial_number, :type, :date_of_issue,
-      :date_of_recovery, :valid_till, :before_image, :after_image, :recovered, :_destroy]
+      :date_of_return, :valid_till, :before_image, :after_image, :recovered, :_destroy]
     )
   end
 
