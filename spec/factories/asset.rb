@@ -5,7 +5,7 @@ FactoryGirl.define do
     type { ASSET_TYPES[:hardware] }
     serial_number { 'S0001' }
     date_of_issue { Date.today }
-    date_of_recovery { Date.today + 6.months }
+    date_of_return { Date.today + 6.months }
     valid_till { Date.today + 6.months }
     before_image { fixture_file_upload('spec/fixtures/files/sample1.png') }
     after_image { fixture_file_upload('spec/fixtures/files/sample1.png') }
