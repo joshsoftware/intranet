@@ -47,13 +47,12 @@ class LeaveApplicationsController < ApplicationController
   def view_leave_status
     @available_leaves = current_user.employee_detail.try(:available_leaves)
     @users = User.employees.collect{ |u| [u.name, u.id, {id: u.status}] }
-    @skip_past_leaves = false
     if MANAGEMENT.include? current_user.role
       @pending_leaves = LeaveApplication.where(:user_id.in => user_ids)
         .any_of(search_conditions)
         .pending
         .order_by(:start_at.asc).includes(:user).to_a
-      @skip_past_leaves = true
+        check_any_condition
       @processed_leaves = LeaveApplication.where(:user_id.in => user_ids)
         .any_of(search_conditions)
         .processed
@@ -156,6 +155,15 @@ class LeaveApplicationsController < ApplicationController
       User.pluck(:id)
     else
       User.approved.pluck(:id)
+    end
+  end
+
+  def check_any_condition
+    if params[:project_id].present? || params[:user_id].present? ||
+      params[:form].present? || params[:to].present?
+      @skip_past_leaves = false
+    else
+      @skip_past_leaves = true
     end
   end
 
