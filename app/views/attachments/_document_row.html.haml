@@ -2,9 +2,17 @@
   %h4
     .remove_underline
       = link_to doc.name, doc.document.url, role: 'button','aria-label': "Click here to view the document #{doc.name}", data: { :colorbox => true, :colorbox_height => '700px', :colorbox_width => '700px', :colorbox_iframe => true }
+
       = link_to "", download_document_attachment_path(doc), role: 'button', 'aria-label': 'Download document', class: "icon-download"
+- if can? :manage, Attachment
+  %td
+    %h4.pull-center
+      - visibility = doc.is_visible_to_all ? "Visible" : "Hidden"
+      - status_class = visibility == "Visible" ? 'label-success' : 'label-warning'
+      .label{class: status_class}
+        = visibility
 %td
-  %h4.pull-right
+  %h4.text-right
     -if can? :mannage, Attachment
       = link_to "", edit_attachment_path(doc), class: "icon-edit", data: {"no-turbolink" => true}, remote: true
       = link_to "", attachment_path(doc), data: {method: :delete, confirm: "Are you sure?"}, class: "icon-trash"

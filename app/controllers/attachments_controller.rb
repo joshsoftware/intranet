@@ -6,8 +6,14 @@ class AttachmentsController < ApplicationController
 
   def index
     @company_docs = Attachment.company_documents
+    @show_all = params[:all].present?
     @attachment = Attachment.new
     @policies = Policy.all
+    respond_to do |format|
+      format.html
+      format.js
+      format.json { render json: @company_docs.to_json }
+    end
   end
 
   def create
