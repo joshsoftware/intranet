@@ -1,23 +1,15 @@
+.form-heading
 %h2
   Documents
 - if can? :manage, Attachment
-  = link_to "Add Document", "#document_modal_new", "data-toggle" => "modal",  data: {'no-turbolink' =>  true}
-.form-horizontal
-  - unless @company_docs.empty?
-    %table.table.table-hover{ role: 'table', 'aria-label': 'Documents Table' }
-      %thead
-        %th Document Name
-        %th.pull-right Manage
-      %tbody
-        - @company_docs.each do |doc|
-          - if doc.is_visible_to_all or (can? :manage, Attachment) 
-            %tr
-              = render partial: 'document_row', locals: {doc: doc}
-  - else
-    %h4
-      = "No Documents to Download"
-  = render partial: "document_modal", locals: {title: "New Document", form_type: "new"}
-  .doc-form
+  = link_to "Add Document", "#document_modal_new", "data-toggle" => "modal",  data: {'no-turbolink' =>  true}, class: 'btn btn-primary mb-5'
+.align.align-right
+  - if can? :manage, Attachment
+    %button{ type: 'button', id: 'doc_show', role: 'button',class: 'btn btn-primary mb-5'} Show All
+%br
+%br
+.form-horizontal#attachment_list
+  = render 'attachments_list', documents: @company_docs
 
 :css 
   .table td{ border-top: 1px solid white; padding: 0px;}
