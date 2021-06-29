@@ -70,6 +70,46 @@ describe User do
     end
   end
 
+  describe 'generate_errors_message ' do
+    let!(:user){ FactoryGirl.create(:user) }
+
+    it 'should return validation errors for all associated ' +
+       'and embedded model invalid fields' do
+        user.attachments.create(name: 'Test', document: nil)
+        user.assets.create(
+          name: 'Quick Heal Antivirus',
+          type: ASSET_TYPES[:software],
+          serial_number: nil,
+          date_of_issue: Date.today
+        )
+        user.valid?
+        expect(user.generate_errors_message).to eq(
+          "Document can't be blank Serial number should be present"
+        )
+    end
+  end
+
+  describe 'get_errors ' do
+    let!(:user){ FactoryGirl.create(:user) }
+
+    it 'should return validation errors if attachments are invalid' do
+      user.attachments.create(name: 'Test', document: nil)
+      user.valid?
+      expect(user.get_errors(user.attachments)).to eq("Document can't be blank")
+    end
+
+    it 'should return validation errors if assets are invalid' do
+      user.assets.create(
+        name: 'Quick Heal Antivirus',
+        type: ASSET_TYPES[:software],
+        serial_number: nil,
+        date_of_issue: Date.today
+      )
+      user.valid?
+      expect(user.get_errors(user.assets)).to eq('Serial number should be present')
+    end
+  end
+
   context "sent mail for approval" do
 
     before (:each) do

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe PrivateProfile do
-  
+
   it { should have_fields(
                           :pan_number,
                           :personal_email,
