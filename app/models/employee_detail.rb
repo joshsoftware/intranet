@@ -30,7 +30,8 @@ class EmployeeDetail
   after_update :delete_team_cache, if: Proc.new{ updated_at_changed? }
   validates :location, presence: true
   validates :division, inclusion: { in: DIVISION_TYPES.values, allow_nil: true }
-
+  validates :next_assessment_month, length: { maximum: 2 , message: ''}
+   
   before_save do
     self.notification_emails.try(:reject!, &:blank?)
   end
