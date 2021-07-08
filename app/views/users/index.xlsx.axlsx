@@ -7,7 +7,7 @@ wb.add_worksheet(name: 'Employees') do |sheet|
     Skills CoreTechnicalSkills PanNo PersonalEmail PassportNo Qualification PreviousWorkExperience(Months)
     PreviousCompany #{"ContactPerson 1 Name"} #{"ContactPerson 1 Relation"} #{"ContactPerson 1 PhoneNo"}
     #{"ContactPerson 2 Name"} #{"ContactPerson 2 Relation"} #{"ContactPerson 2 PhoneNo"} PermanentAddress
-    TemporaryAddress
+    TemporaryAddress AsseementMonth1 AsseementMonth2 AssessmentPlatform
   )
 
   @usersxls.each_with_index do |u,i|
@@ -26,7 +26,7 @@ wb.add_worksheet(name: 'Employees') do |sheet|
       p.end_of_probation, u.employee_detail.date_of_relieving, u.employee_detail.reason_of_resignation,
       u.public_profile.skills, u.public_profile.technical_skills.join(', '), p.pan_number, p.personal_email,
       p.passport_number, p.qualification, p.previous_work_experience, p.previous_company, contact_details,
-      address[ADDRESSES[0]], address[ADDRESSES[1]]
+      address[ADDRESSES[0]], address[ADDRESSES[1]], u.employee_detail.assessment_month[0],u.employee_detail.assessment_month[1], u.employee_detail.assessment_platform
     ].flatten
   end
 end
