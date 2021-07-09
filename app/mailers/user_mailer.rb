@@ -18,6 +18,9 @@ class UserMailer < ActionMailer::Base
 
   def leave_application(sender_email, receivers, leave_application_id)
     @user = User.find_by(email: sender_email)
+    @projects = @user.projects.where(is_active: 'true').pluck(:name)
+    @project_ids = @user.projects.where(is_active: 'true').pluck(:id)
+    @managed_projects = @user.managed_projects.where(:id.nin => @project_ids, is_active: 'true').pluck(:name)
     @receivers = receivers
     @notification_names = @user.employee_detail.present? ? @user.employee_detail.get_notification_names : []
     @older_leaves = LeaveApplication.get_users_past_leaves(@user.id)

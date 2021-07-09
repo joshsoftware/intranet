@@ -43,7 +43,7 @@
           - if (pending_leave) or can? :manage, LeaveApplication
             %td.action_style.action{id: "#{appr_leave.id}"}
               - if pending_leave and can? :edit, appr_leave
-                .btn.btn-mini.btn_style= link_to 'Edit', edit_leave_application_path(appr_leave), role: 'button'
+                .btn.btn-mini.btn_style= link_to 'Edit', edit_leave_application_path(appr_leave), role: 'button', onclick: 'check_Browser_Version();'
                 - if can? :manage, appr_leave
                   %button.process_btn.btn_style{ class: 'btn btn-success btn-mini', data: {action: 'approve'}} Approve
                   %button.process_btn.btn_style{ class: 'btn btn-danger btn-mini', data: {action: 'reject'}} Reject

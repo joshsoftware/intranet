@@ -62,6 +62,22 @@ class TimeSheetsController < ApplicationController
     @time_sheet_date = params[:time_sheet_date]
   end
 
+  def destroy
+    @from_date = params[:'from_date']
+    @to_date = params[:'to_date']
+    @user = User.find_by(id: params['id'])
+    @time_sheet_date = params[:time_sheet_date]
+    @project_id = params[:project_id]
+    @time_sheets = @user.time_sheets.where(date: params[:time_sheet_date].to_date, project_id: @project_id)
+    if @time_sheets.destroy
+      flash[:notice] = "TimeSheet deleted Successfully"
+      redirect_to users_time_sheets_path(@user.id, from_date: @from_date, to_date: @to_date)
+    else
+      flash[:notice] = "Error in deleting TimeSheet"
+      redirect_to time_sheets_path(from_date: @from_date, to_date: @to_date)
+    end
+  end
+
   def update_timesheet
     unless current_ability.can? :update_timesheet, TimeSheet.where(user_id: params[:user_id]).first
       flash[:error] = "Invalid access"

@@ -566,6 +566,7 @@ describe LeaveApplicationsController do
 
     it 'should not deduct leave count if leave type updated to Optional' do
       sign_in @user
+      travel_to @leave.start_at - 1.month
       @leave.save
       leave_count = @user.employee_detail.available_leaves
       params = {
@@ -573,7 +574,7 @@ describe LeaveApplicationsController do
         leave_application: @leave.attributes.merge(leave_type: LEAVE_TYPES[:optional_holiday])
       }
       put :update, params
-
+      travel_back
       expect(flash[:success]).to eq('Your request has been updated successfully.' +
         ' Please wait for the approval.')
       expect(@user.reload.employee_detail.available_leaves).to eq(leave_count)
@@ -954,6 +955,28 @@ describe LeaveApplicationsController do
       expect(@optional_leave.reload.leave_status).to eq(APPROVED)
       expect(@leave.reload.number_of_days).to eq(2)
       expect(@user.reload.employee_detail.available_leaves).to eq(24)
+    end
+  end
+
+  context 'Next year leave' do
+    before(:each) do
+      @user = FactoryGirl.create(:user, status: STATUS[:approved])
+      @leave = FactoryGirl.build(:leave_application,
+        leave_type: LEAVE_TYPES[:leave],
+        user: @user,
+        start_at: Date.today.next_year,
+        end_at: (Date.today + 1).next_year
+      )
+      sign_in @user
+    end
+
+    it 'fail should as of applying date is greater than current year' do
+      params = {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+      post :create, params
+      expect(flash[:error]).to eq('Invalid date, can not apply leave for the future year.')
     end
   end
 end

@@ -13,6 +13,8 @@ class ResourceCategorisationService
   def generate_resource_report
     bench_resources = []
     shared_resources = []
+    keys = ['billable', 'non_billable', 'investment', 'shared', 'bench']
+    report_key = ['resource_report', 'project_wise_resource_report']
     include_roles = [ROLE[:employee], ROLE[:intern], ROLE[:manager], ROLE[:consultant]]
 
     users = User.approved.where(
@@ -36,7 +38,12 @@ class ResourceCategorisationService
       record[:investment] = investment_allocation
 
       if is_shared_resource?(user)
-        shared_allocation = 160 - (billable_allocation + investment_allocation + non_billable_allocation)
+        user_level = get_level(user)
+        if user_level.eql?('Project Manager')
+          shared_allocation = 160 - (billable_allocation + investment_allocation)
+        else
+          shared_allocation = 160 - (billable_allocation + investment_allocation + non_billable_allocation)
+        end
         shared_allocation = shared_allocation < 0 ? 0 : shared_allocation
         record[:shared] = shared_allocation
         record[:total_allocation] = total_allocation + shared_allocation
@@ -55,16 +62,37 @@ class ResourceCategorisationService
         add_resource_record(user).merge(record)
       ) if bench_allocation == 160
 
-      @report[:resource_report] << add_resource_record(user).merge(record)
+      @report[:resource_report][:records] << add_resource_record(user).merge(record)
     end
 
-    @report[:resource_report] = @report[:resource_report].sort_by { |k,v| k[:name] }
+    @report[:resource_report][:records] = @report[:resource_report][:records].sort_by { |k,v| k[:name] }
     shared_resources = shared_resources.sort_by { |k,v| k[:name] }
     bench_resources = bench_resources.sort_by { |k,v| k[:name] }
-    @report[:resource_report].append({blank_row: true})
-    shared_resources.append({blank_row: true})
-    @report[:resource_report] = @report[:resource_report] + shared_resources + bench_resources
-    @report[:project_wise_resource_report] = @report[:project_wise_resource_report].sort_by { |k,v| k[:project] }
+    @report[:resource_report][:records] = @report[:resource_report][:records] + shared_resources + bench_resources
+    @report[:project_wise_resource_report][:records] = @report[:project_wise_resource_report][:records].sort_by { |k,v| k[:project] }
+
+    report_key.each do |report|
+      total_count = {
+        billable: [0, 0, 0],
+        non_billable: [0, 0, 0],
+        investment: [0, 0, 0],
+        shared: [0, 0, 0],
+        bench: [0, 0, 0]
+      }
+      @report[:"#{report}"][:records].each do |record|
+        keys.each do |key|
+          value = record[:"#{key}"].to_i
+          if value == 160
+            total_count[:"#{key}"][0] += 1
+          elsif value > 0 and value < 160
+            total_count[:"#{key}"][1] += 1
+          else
+            total_count[:"#{key}"][2] += 1
+          end
+        end
+      end
+      @report[:"#{report}"][:total_count] = total_count
+    end
     @report
   end
 
@@ -137,7 +165,7 @@ class ResourceCategorisationService
 
       next if allocation == 0
       allocation_type = 'non_billable' if user_project.billable == false
-      @report[:project_wise_resource_report] << add_project_wise_record(user).merge(
+      @report[:project_wise_resource_report][:records] << add_project_wise_record(user).merge(
         code: user_project.project.code,
         "#{allocation_type}": allocation,
         shared: shared,
@@ -218,8 +246,14 @@ class ResourceCategorisationService
 
   def load_projects
     @report = {
-      resource_report: [],
-      project_wise_resource_report: []
+      resource_report: {
+        records: [],
+        total_count: {}
+      },
+      project_wise_resource_report: {
+        records: [],
+        total_count: {}
+      }
     }
 
     devops_project = Project.where(name: 'DevOps Work').first

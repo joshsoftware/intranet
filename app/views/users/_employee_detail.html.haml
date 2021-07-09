@@ -2,8 +2,9 @@
   = f.simple_fields_for :employee_detail do |e|
     = e.input :employee_id, label: "Employee Id", disabled: true
     = e.input :location, as: :select, collection: LOCATIONS.sort, label: "Employee Location", prompt: 'Select Location', selected: e.object.try(:location)
-    = e.input :designation, as: :select, collection: Designation.all.sort_by(&:name), input_html: {class: 'designations'}, prompt: 'Select Designation', selected: e.object.try(:designation_id)
+    = e.input :designation, as: :select, collection: Designation.all.sort_by(&:name), input_html: {class: 'designations'}, prompt: 'Select Designation', selected: e.object.try(:designation_id), required: true
     = e.input :designation_track, as: :select, collection: EmployeeDetail::DESIGNATION_TRACKS, prompt: 'Select Designation Track', selected: e.object.try(:designation_track), hint: 'This track will be used to show designation hierarchy under assessments.'
+    = e.input :next_assessment_month, collection: (ASSESSMENT_MONTHS), input_html: {class: 'months', multiple: true, style: 'width:240px;', 'data-placeholder': 'Select Assessment Months'}, label: 'Assessment Months', selected: e.object.try(:next_assessment_month), include_hidden: false,include_blank: false
     = e.input :division, as: :select, collection: DIVISION_TYPES.values, input_html: {class: 'divisions'}, prompt: 'Select Division', selected: e.object.try(:division)
     = e.input :description, as: :text, input_html: {class: 'text-description'}
     = e.input :date_of_relieving, input_html: { type: 'date', class: 'date-picker', value: @user.employee_detail.date_of_relieving.try(:strftime, "%Y-%m-%d")}
@@ -86,3 +87,4 @@
   $(".notification_emails").select2();
   $(".project_ids").select2();
   $(".designations").select2();
+  $('.months').select2();

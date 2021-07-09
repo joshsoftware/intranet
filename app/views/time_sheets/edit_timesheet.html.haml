@@ -16,6 +16,9 @@
           %td= time_sheet.input :date, input_html: {class: 'timesheet-input date-picker', type: 'date', value: time_sheet.object.date.try(:strftime, "%Y-%m-%d") }, label: false
           %td= time_sheet.input :duration, collection: TimeSheet::DURATION_HASH.invert.to_a, input_html: {class: "duration_select"}, placeholder: 'Select', label: false
           %td= time_sheet.input :description, as: :text, label: false
+          - if (current_user.role == ROLE[:admin] || current_user.role == ROLE[:manager])
+            %td= link_to '', time_sheet_path(@user.id, time_sheet_date: @time_sheet_date, from_date: @from_date, to_date: @to_date, project_id: time_sheet.object.project_id),
+            data: { method: 'DELETE', confirm: 'Are you sure?  you want to delete TimeSheet?' }, class: 'icon-trash'
   = f.submit :Update, class: "btn edit-timesheet-update"
 
   .note* If by any chance you need to enter timesheet for more than 12 hours for any project, then kindly get in touch with HR &amp; manager of your project.

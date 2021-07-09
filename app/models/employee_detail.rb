@@ -19,6 +19,7 @@ class EmployeeDetail
   field :source, type: String
   field :division, type: String
   field :joining_bonus_paid, type: Boolean, default: false
+  field :next_assessment_month, type: Array, default: []
 
   belongs_to :designation
 
