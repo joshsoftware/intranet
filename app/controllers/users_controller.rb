@@ -72,7 +72,6 @@ class UsersController < ApplicationController
       #
       #update_attribute was getting called on embedded_document so slug which is defined in parent was not getting updated so
       #update_attributes is caaled on user insted of public_profile/private_profile
-      byebug
       if @user.update_attributes(profile => params.require(profile).permit!)
         flash.notice = 'Profile Updated Successfully'
         #UserMailer.delay.verification(@user.id)
