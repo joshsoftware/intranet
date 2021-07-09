@@ -46,6 +46,9 @@ class User
   has_and_belongs_to_many :schedules
   has_and_belongs_to_many :managed_projects, class_name: 'Project', foreign_key: 'managed_project_ids', inverse_of: :managers
 
+  has_many :bank_accounts
+  validate :number_of_bank_accounts, unless: 'bank_accounts.blank?'
+
   after_update :delete_team_cache, if: :website_fields_changed?
   before_create :associate_employee_id
   after_update do
@@ -539,4 +542,16 @@ class User
         }
       ])
   end
+end
+
+def number_of_bank_accounts
+  errors.add(:bank_accounts, 'cannot be added more than two.') if bank_accounts.size > 2
+end
+
+def get_instructions
+  @instructions = "1. Salary Account required to be from HDFC Bank only.<br />2. If you are facing any issues, please get in contact with HR/Admin."
+end
+
+def set_salary_bank_name
+  @bank_name = "HDFC Bank"
 end

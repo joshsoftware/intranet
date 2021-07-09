@@ -1,5 +1,6 @@
 GENDER = ['Male', 'Female']
 ADDRESSES = ['Permanent Address', 'Temporary Address']
+BANK_ACCOUNTS = ['Salary Account', 'Personal Account']
 BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 STATUS = {created: 'created', pending: 'pending', approved: 'approved', resigned: 'resigned'}
 LEAVE_STATUS = ['Pending', 'Approved', 'Rejected']

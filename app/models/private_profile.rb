@@ -15,15 +15,12 @@ class PrivateProfile
 
   embedded_in :user
   embeds_many :contact_persons
-  embeds_many :bank_accounts
   has_many :addresses, autosave: true
 
   validates :date_of_joining, presence: true, if: :check_status_and_role?, on: :update
-  validate :number_of_bank_accounts, unless: 'bank_accounts.blank?'
   validate :validate_date_of_joining, if: 'date_of_joining_changed?'
   validates :previous_work_experience, :allow_blank => true, numericality: { only_integer: true, greater_than_or_equal_to: 0}
 
-  accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :contact_persons
 
@@ -35,10 +32,6 @@ class PrivateProfile
     end
   end
 
-  def number_of_bank_accounts
-    errors.add(:bank_accounts, 'cannot be added more than two.') if bank_accounts.size > 2
-  end
-  
   def validate_date_of_joining
     errors.add(:date_of_joining, 'should not a date from future.') if date_of_joining.try(:future?)
   end

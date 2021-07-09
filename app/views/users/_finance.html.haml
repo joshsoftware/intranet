@@ -1,37 +1,67 @@
-= simple_form_for(@private_profile, url: private_profile_user_path, :html => { method: :put, class: "form-horizontal private-profile", multipart: true}) do |finance|  
-  %h4 Finance Details
+= simple_form_for(@user,:url => user_path(@user), :html => { method: :put, class: "form-horizontal", multipart: true}) do |finance|  
+  
+  %h3 Finance Details
   %table{style: "width:100%;"}
+    %tr
+    - if can? :edit, User
+      = finance .simple_fields_for :employee_detail do |e|
+        = e.label 'Joining Bonus Paid'
+        .make-switch{ tabindex: 0, 'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'Yes', 'data-off-label': 'No'}
+          = e.check_box :joining_bonus_paid, {}, 'Yes', 'No'
+        = finance.submit :Save, class: "btn controls"
+      %br
 
   - if can_access?('BankAccounts') || current_user == @user
     %h4 Bank Account Details
     %table{style: "width:100%;"}
       %tr
-        %th.form-heading Salary Account
+        %th.form-heading= link_to 'Salary Account ?', 'javascript:void(0)', 'data-toggle': 'popover', 'title': 'Instructions', 'data-placement': 'top',
+          'data-html': 'true', 'data-content': get_instructions, class: 'SalaryAccountInstructions', 'tabindex': '0'
         %th.form-heading Personal Account
+
+        -# = finance.simple_fields_for :bank_accounts do |b|
+        -#   %td
+        -#     - if b.object.account_type == BANK_ACCOUNTS[1]
+        -#       = b.label 'Same as Salary Account'
+        -#       .make-switch#bank_account_button{ tabindex: 0, "data-on": "success", "data-off": "warning", "data-on-label": "Yes", "data-off-label": "NO"}
+        -#         = b.check_box :same_as_salary_account, method, {}, 'true', 'false'
+        -#     %div{class: "#{b.object.account_type.downcase}"}
+        -#     %h4
+        -#       = b.object.account_type
+        -#       - disable = (b.object.account_type == BANK_ACCOUNTS[1] and b.object.same_as_salary_account == true) ? true : false 
+        -#     = b.input :account_type, as: :hidden
+        -#     - if b.object.account_type == BANK_ACCOUNTS[0]
+        -#       = b.input :bank_name, input_html: {value: set_salary_bank_name },required: false, disabled: true
+        -#     - if b.object.account_type == BANK_ACCOUNTS[1] and !disable 
+        -#       = b.input :bank_name, label: 'Name Of Bank', placeholder: 'Enter name of bank',required: false, disabled: disable
+        -#     = b.input :name_on_passbook, label: 'Name On Passbook', placeholder: 'Enter name on passbook', disabled: disable
+        -#     = b.input :account_number, label: 'Account Number', placeholder: 'Enter your account number', disabled: disable
+        -#     = b.input :ifsc_code, label: 'IFSC Code', placeholder: 'Enter IFSC code', disabled: disable
+      
       %tr
         = finance.simple_fields_for :bank_accounts do |b|
           %td
-            = b.input :bank_name, label: 'Name Of Bank', placeholder: 'Enter name of bank'
+            = b.input :account_type, input_html: {value: "Salary Account"},disabled: true,required: false, as: :hidden
+            = b.input :bank_name, input_html: {value: set_salary_bank_name }, label: 'Name Of Bank', placeholder: 'Enter name of bank',required: false,disabled: true
             = b.input :name_on_passbook, label: 'Name On Passbook', placeholder: 'Enter name on passbook'
             = b.input :account_number, label: 'Account Number', placeholder: 'Enter your account number'
             = b.input :ifsc_code, label: 'IFSC Code', placeholder: 'Enter IFSC code'
-  %br
-  %center
-    = finance.submit "Update Profile", class: 'btn'
-    
-- if can? :edit, User
-  = simple_form_for(@user,:url => user_path(@user), :html => { method: :put, class: "form-horizontal", multipart: true}) do |f|
-    = f.simple_fields_for :employee_detail do |e|
-      = e.label 'Joining Bonus Paid'
-      .make-switch{ tabindex: 0, 'data-on': 'success', 'data-off': 'warning', 'data-on-label': 'Yes', 'data-off-label': 'No'}
-        = e.check_box :joining_bonus_paid, {}, 'Yes', 'No'
-    = f.submit :Save, class: "btn controls"
+          %td
+            = b.input :account_type, input_html: {value: "Personal Account"},disabled: true,required: false, as: :hidden
+            = b.input :bank_name, label: 'Name Of Bank', placeholder: 'Enter name of bank',required: false
+            = b.input :name_on_passbook, label: 'Name On Passbook', placeholder: 'Enter name on passbook',required: false
+            = b.input :account_number, label: 'Account Number', placeholder: 'Enter your account number',required: false
+            = b.input :ifsc_code, label: 'IFSC Code', placeholder: 'Enter IFSC code',required: false
+      
+    %br
+    %center
+      = finance.submit "Update Profile", class: 'btn'
 
 :css
   .make-switch{ margin-left: 18px;}
 
 :javascript
-  $('#address_button').on('switch-change', function(e, data){
+  $('#bank_account_button').on('switch-change', function(e, data){
     var $el = $(data.el)
       , value = data.value;
 
@@ -39,7 +69,7 @@
     {
       $('div.temporary .control-group .controls input').attr('disabled', 'disabled')
       $('div.temporary .control-group .controls textarea').attr('disabled', 'disabled')
-      $('#private_profile_addresses_attributes_1_type_of_address').removeAttr('disabled')
+      $('#user_bank_account_attributes_1_account_type').removeAttr('disabled')
     }
     else
     {
@@ -48,3 +78,5 @@
     }
 
   });
+
+  $('.SalaryAccountInstructions').popover();
