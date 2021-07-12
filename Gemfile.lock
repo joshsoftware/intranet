@@ -165,7 +165,8 @@ GEM
     acts_as_list_mongoid (0.2.5.1)
       mongoid (>= 2.0.1)
       mongoid_embedded_helper (>= 0.2.5)
-    addressable (2.4.0)
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
     arel (6.0.4)
     authority (3.0.0)
       activesupport (>= 3.0.0)
@@ -948,7 +949,9 @@ GEM
     mail (2.7.0)
       mini_mime (>= 0.1.1)
     mime-types (2.99.3)
-    mimemagic (0.3.2)
+    mimemagic (0.3.10)
+      nokogiri (~> 1)
+      rake
     mini_magick (4.3.6)
     mini_mime (1.0.0)
     mini_portile2 (2.1.0)
@@ -1021,6 +1024,7 @@ GEM
       cocaine (~> 0.5.5)
       mime-types
       mimemagic (~> 0.3.0)
+    public_suffix (3.1.1)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.11)
