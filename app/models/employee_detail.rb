@@ -19,7 +19,8 @@ class EmployeeDetail
   field :source, type: String
   field :division, type: String
   field :joining_bonus_paid, type: Boolean, default: false
-  field :next_assessment_month, type: Array, default: []
+  field :assessment_month, type: Array, default: []
+  field :assessment_platform
 
   belongs_to :designation
 
@@ -30,7 +31,9 @@ class EmployeeDetail
   after_update :delete_team_cache, if: Proc.new{ updated_at_changed? }
   validates :location, presence: true
   validates :division, inclusion: { in: DIVISION_TYPES.values, allow_nil: true }
-
+  validates :assessment_platform, inclusion: { in: ASSESSMENT_PLATFORM }, allow_nil: false, on: :update
+  validates :assessment_month, length: { maximum: 2 , message: ''}
+   
   before_save do
     self.notification_emails.try(:reject!, &:blank?)
   end
