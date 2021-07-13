@@ -64,3 +64,5 @@ ASSESSMENT_PLATFORM = ['PLAI', 'Snowflake', 'None']
 ASSET_TYPES = {hardware: 'Hardware', software: 'Software', other: 'Other'}
 
 REJECT_FUTURE_OPTIONAL_LEAVE_BY = 'hr@joshsoftware.com'
+
+ASSESSMENT_PLATFORM = ['PLAI', 'Snowflake', 'None']
