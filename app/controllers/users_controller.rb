@@ -41,6 +41,7 @@ class UsersController < ApplicationController
         flash.notice = "#{tab} updated Successfully"
         redirect_to public_profile_user_path(@user)
       else
+        load_emails_and_projects
         flash[:error] = "#{tab}: Error #{@user.generate_errors_message}"
         render 'public_profile'
       end
@@ -53,7 +54,6 @@ class UsersController < ApplicationController
   def public_profile
     profile = params.has_key?("private_profile") ? "private_profile" : "public_profile"
     update_profile(profile)
-    load_emails_and_projects
     @user.attachments.first || @user.attachments.build
   end
 
@@ -63,6 +63,7 @@ class UsersController < ApplicationController
   end
 
   def update_profile(profile)
+    load_emails_and_projects
     user_profile = (profile == "private_profile") ? @private_profile : @public_profile
     if request.put?
       #Need to change these permit only permit attributes which should be updated by user
@@ -159,7 +160,8 @@ class UsersController < ApplicationController
       :status, :role, :visible_on_website, :website_sequence_number, :allow_backdated_timesheet_entry,
       employee_detail_attributes: [:id, :employee_id, :location, :date_of_relieving, :source,
       :reason_of_resignation, :designation, :division, :description, :is_billable,
-      :skip_unassigned_project_ts_mail, :designation_track, :joining_bonus_paid, :notification_emails, :next_assessment_month => [] ],
+      :skip_unassigned_project_ts_mail, :designation_track, :joining_bonus_paid,
+      :assessment_platform, :assessment_month => [], :notification_emails => [] ],
       attachments_attributes: [:id, :name, :document, :_destroy]
     )
   end
