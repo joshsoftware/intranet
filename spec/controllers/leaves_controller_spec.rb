@@ -638,6 +638,46 @@ describe LeaveApplicationsController do
     end
   end
 
+  context 'Leave type - UNPAID' do
+    before(:each) do
+      @admin = FactoryGirl.create(:admin)
+      @user = FactoryGirl.create(:user, status: APPROVED)
+      @leave = FactoryGirl.build(
+        :leave_application,
+        leave_type: LEAVE_TYPES[:unpaid],
+        user: @user
+      )
+    end
+
+    it 'should not deduct leave count while submitting form' do
+      sign_in @user
+
+      post :create, {
+        user_id: @user.id,
+        leave_application: @leave.attributes
+      }
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(flash[:success]).to eq('Your request has been submitted successfully.' +
+        ' Please wait for the approval.')
+      expect(@user.leave_applications.last.leave_status).to eq(PENDING)
+      expect(leave_count).to eq(24)
+    end
+
+    it 'should not deduct leave count after approving the UNPAID request' do
+      sign_in @admin
+      @leave.save
+      get :process_leave, {
+        id: @leave.id,
+        leave_action: :approve
+      }
+
+      leave_count = @user.reload.employee_detail.available_leaves
+      expect(@leave.reload.leave_status).to eq(APPROVED)
+      expect(leave_count).to eq(24)
+    end
+  end
+
   context "Leave history search querying user_ids" do
     before(:each) do
       @employee_one = FactoryGirl.create(:user, status: STATUS[:approved])

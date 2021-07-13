@@ -319,7 +319,7 @@ describe LeaveApplication do
           number_of_days: 1, leave_status: APPROVED, user: @user
         )
         FactoryGirl.create(
-          :leave_application, start_at: Date.today + 6.months + 1, end_at: Date.today + 6.months + 1,
+          :leave_application, start_at: Date.today + 2.months + 3, end_at: Date.today + 2.months + 3,
           number_of_days: 1, leave_status: APPROVED, leave_type: LEAVE_TYPES[:wfh], user: @user
         )
         FactoryGirl.create(
@@ -387,6 +387,24 @@ describe LeaveApplication do
         employee_detail = user.employee_detail
         available_leaves = employee_detail.available_leaves
         wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LEAVE_TYPES[:spl])
+        expect(employee_detail.available_leaves).to eq(available_leaves)
+        wfh_application.process_reject_application
+        expect(employee_detail.available_leaves).to eq(available_leaves)
+      end
+    end
+
+    context 'when request is for UNPAID' do
+      it 'should not deduct leave from available leave' do
+        employee_detail = user.employee_detail
+        available_leaves = employee_detail.available_leaves
+        leave_application = create(:leave_application, user: user, number_of_days: 1, leave_type: LEAVE_TYPES[:unpaid])
+        expect(employee_detail.available_leaves).to eq(available_leaves)
+      end
+
+      it 'rejected leave should not be added to available leaves' do
+        employee_detail = user.employee_detail
+        available_leaves = employee_detail.available_leaves
+        wfh_application = create(:leave_application, user: user, number_of_days: 2, leave_type: LEAVE_TYPES[:unpaid])
         expect(employee_detail.available_leaves).to eq(available_leaves)
         wfh_application.process_reject_application
         expect(employee_detail.available_leaves).to eq(available_leaves)
