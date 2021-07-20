@@ -159,7 +159,8 @@ class UsersController < ApplicationController
       :status, :role, :visible_on_website, :website_sequence_number, :allow_backdated_timesheet_entry,
       employee_detail_attributes: [:id, :employee_id, :location, :date_of_relieving, :source,
       :reason_of_resignation, :designation, :division, :description, :is_billable,
-      :skip_unassigned_project_ts_mail, :designation_track, :joining_bonus_paid, :notification_emails, :next_assessment_month => [] ],
+      :skip_unassigned_project_ts_mail, :designation_track, :joining_bonus_paid, :notification_emails,
+      :assessment_platform, :next_assessment_month => [] ],
       attachments_attributes: [:id, :name, :document, :_destroy]
     )
   end
