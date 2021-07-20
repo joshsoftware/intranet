@@ -539,7 +539,7 @@ class TimeSheet
           if is_optional_holiday
             optional_availed = user.leave_applications.where(
               start_at: date,
-              leave_type: LeaveApplication::OPTIONAL,
+              leave_type: LEAVE_TYPES[:optional_holiday],
               leave_status: APPROVED
             ).present?
             next if !optional_availed

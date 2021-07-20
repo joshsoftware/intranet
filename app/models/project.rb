@@ -51,6 +51,7 @@ class Project
   field :type_of_project
   field :is_activity, type: Boolean, default: false
   field :domains, type: Array, default: []
+  field :follow_client_holiday_calendar, type: Boolean, default: false
   slug :name
 
   has_many :technology_details
@@ -78,7 +79,7 @@ class Project
   validates :billing_frequency, inclusion: { in: BILLING_FREQUENCY_TYPES, allow_nil: true }
   validates :type_of_project, inclusion: { in: TYPE_OF_PROJECTS, allow_nil: true }
   validates :batch_name, inclusion: { in: TYPE_OF_BATCHES, allow_nil: true }
-  validate :start_date_less_than_end_date, if: 'end_date.present?'
+  validate :start_date_less_than_end_date, if: 'start_date.present? && end_date.present?'
   validate :validate_end_date, if: 'end_date.present?'
 
   def validate_end_date
@@ -112,6 +113,54 @@ class Project
 
   after_update do
     Rails.cache.delete('views/website/portfolio.json') if updated_at_changed?
+  end
+
+  def self.client_holiday_calendar_validation(project)
+    if project.follow_client_holiday_calendar
+      users = UserProject.where(project_id: project.id, active: true).pluck(:user_id)
+      user_name = []
+      user_ids = []
+      managers_email = []
+      users.each do |user_id|
+        user_project = UserProject.where(:user_id => user_id, :project_id => project.id, :allocation => 0)
+        next if user_project.exists?
+        leave_application = LeaveApplication.get_user_upcoming_optional_leave(user_id)
+
+        if leave_application.exists?
+          user_name << User.where(id: user_id).first.try(:name)
+          processed_by = nil
+          processed_by = project.manager_ids.first if project.manager_ids.present?
+          reject_reason = "Rejected optional leave by System: Project #{project.name} is aligned with client's holiday calender."
+          leave_application.each do |leave|
+            LeaveApplication.process_leave(leave.id, REJECTED, :process_reject_application, reject_reason, processed_by)
+          end
+        end
+
+        managers_email = Project.get_project_managers_emails(project)
+        managers_email = User.default_managers_email if managers_email.empty?
+        user_ids << user_id
+      end
+
+      UserMailer.delay.future_leave_details(user_ids, managers_email, project.name) if !user_ids.empty?
+      if user_name.present?
+        message = "following employees future optional holidays are rejected: #{user_name.uniq.join(', ')}."
+        return message
+      end
+    end
+  end
+
+  def self.get_project_managers_emails(project)
+    managers_email = []
+    project.manager_ids.each do |manager_id|
+      managers_email  << User.where(id: manager_id).first.email
+    end
+    managers_email
+  end
+
+  def self.check_change_flag_and_employee(project)
+    client_calendar_flag = project.follow_client_holiday_calendar
+    employee_number = UserProject.where(project_id: project.id, active: true).count
+    return client_calendar_flag, employee_number
   end
 
   def call_monitor_service

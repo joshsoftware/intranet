@@ -11,6 +11,7 @@ FactoryGirl.define do
     billing_frequency 'Monthly'
     type_of_project 'T&M'
     batch_name 'Alpha'
+    follow_client_holiday_calendar false
 
     association :company
   end
