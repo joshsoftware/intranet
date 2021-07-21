@@ -281,19 +281,6 @@ class UsersController < ApplicationController
   end
 
   def get_blog_url(url)
-    if url.include?('medium')
-      medium_url(url)
-    elsif url.include?('blogspot')
-      "#{url}/feeds/posts/default?q=KEYWORD"
-    else
-      "#{url}/feed"
-    end
-  end
-
-  def medium_url(url)
-    domain_name = 'https://medium.com/'
-    parse_url = url.split(/\'medium.com\''|\//)
-    medium_id = parse_url.select { |i| i.start_with?('@') }.first
-    domain_name + 'feed/' + medium_id
+    "#{url}/feed"
   end
 end
