@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   before_action :load_user, only: [:edit, :update, :show, :public_profile, :private_profile, :get_feed]
   before_action :load_profiles, only: [:public_profile, :private_profile, :update, :edit]
   before_action :build_addresses, only: [:public_profile, :private_profile, :edit]
+  before_action :build_bank_accounts
   before_action :authorize, only: [:public_profile, :edit]
   before_action :authorize_document_download, only: :download_document
   after_action :notify_document_download, only: :download_document
@@ -177,6 +178,16 @@ class UsersController < ApplicationController
       ADDRESSES.each{|a| @user.private_profile.addresses.build({:type_of_address => a})} if @user.private_profile.addresses.empty?
       # need atleast two contact persons details
       2.times {@user.private_profile.contact_persons.build} if @user.private_profile.contact_persons.empty?
+      # atmost two bank accounts
+      # bank_account_count = 2 - @user.bank_accounts.size
+      # bank_account_count.times {@user.bank_accounts.build}
+    end
+  end
+    
+  def build_bank_accounts
+    if request.get?
+      # atmost two bank accounts
+      BANK_ACCOUNTS.each{|account| @user.bank_accounts.build({:account_type => account})} if @user.bank_accounts.empty?
     end
   end
 

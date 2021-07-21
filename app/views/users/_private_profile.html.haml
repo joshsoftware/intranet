@@ -1,6 +1,6 @@
 = simple_form_for(@private_profile, url: private_profile_user_path, :html => { method: :put, class: "form-horizontal private-profile", multipart: true}) do |pri|
   %h4 Personal Details
-  %table{style: "width:100%;"}  
+  %table{style: "width:100%;"}
     %tr
       %td
         = pri.input :pan_number
@@ -49,9 +49,9 @@
               - disable = (a.object.type_of_address == ADDRESSES[1] and a.object.same_as_permanent_address == true) ? true : false
             = a.input :type_of_address, as: :hidden
             = a.input :address, as: :text, disabled: disable
-            = a.input :city, disabled: disable                  
+            = a.input :city, disabled: disable
             = a.input :pin_code, disabled: disable
-            = a.input :state, disabled: disable                
+            = a.input :state, disabled: disable
             = a.input :landline_no, disabled: disable, label: 'Landline/Mobile No', input_html: { maxlength: 10 }
   %br
   %center
@@ -63,7 +63,7 @@
   $('#address_button').on('switch-change', function(e, data){
     var $el = $(data.el)
       , value = data.value;
-   
+
     if(value)
     {
       $('div.temporary .control-group .controls input').attr('disabled', 'disabled')
@@ -75,5 +75,5 @@
       $('div.temporary .control-group .controls input').removeAttr('disabled')
       $('div.temporary .control-group .controls textarea').removeAttr('disabled')
     }
-  
+
   });

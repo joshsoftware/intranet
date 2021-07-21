@@ -1,14 +1,19 @@
 wb = xlsx_package.workbook
 
 wb.add_worksheet(name: 'Employees') do |sheet|
-  sheet.add_row %W(
-    Sr.No EmployeeId Name Email Role Designation Division Status Location Gender MobileNo
-    BloodGroup DateOfBirth DateOfJoining EndOfProbation DateOfRelieving ReasonOfResignation
-    Skills CoreTechnicalSkills PanNo PersonalEmail PassportNo Qualification PreviousWorkExperience(Months)
-    PreviousCompany #{"ContactPerson 1 Name"} #{"ContactPerson 1 Relation"} #{"ContactPerson 1 PhoneNo"}
-    #{"ContactPerson 2 Name"} #{"ContactPerson 2 Relation"} #{"ContactPerson 2 PhoneNo"} PermanentAddress
-    TemporaryAddress
-  )
+
+  headers = ['Sr.No', 'EmployeeId', 'Name', 'Email', 'Role', 'Designation', 'Division', 'Status', 'Location', 'Gender', 'MobileNo',
+  'BloodGroup', 'DateOfBirth', 'DateOfJoining', 'EndOfProbation', 'DateOfRelieving', 'ReasonOfResignation',
+  'Skills', 'CoreTechnicalSkills', 'PanNo', 'PersonalEmail', 'PassportNo', 'Qualification', 'PreviousWorkExperience(Months)',
+  'PreviousCompany', "#{"ContactPerson 1 Name"}", "#{"ContactPerson 1 Relation"}", "#{"ContactPerson 1 PhoneNo"}",
+  "#{"ContactPerson 2 Name"}", "#{"ContactPerson 2 Relation"}", "#{"ContactPerson 2 PhoneNo"}", 'PermanentAddress',
+  'TemporaryAddress']
+
+  if [ROLE[:HR], ROLE[:finance]].include?(current_user.role)
+    headers += ['Salary Bank Account Details', 'Personal Bank Account Details']
+  end
+
+  sheet.add_row headers
 
   @usersxls.each_with_index do |u,i|
     p = u.private_profile
@@ -20,7 +25,7 @@ wb.add_worksheet(name: 'Employees') do |sheet|
       end
     end
 
-    sheet.add_row [
+    data_row = [
       i+1, u.employee_id, u.name, u.email, u.role, u.designation.try(:name), u.employee_detail.division, u.status, u.employee_detail.location,
       u.public_profile.gender, u.mobile_number, u.public_profile.blood_group, u.date_of_birth, u.date_of_joining,
       p.end_of_probation, u.employee_detail.date_of_relieving, u.employee_detail.reason_of_resignation,
@@ -28,5 +33,10 @@ wb.add_worksheet(name: 'Employees') do |sheet|
       p.passport_number, p.qualification, p.previous_work_experience, p.previous_company, contact_details,
       address[ADDRESSES[0]], address[ADDRESSES[1]]
     ].flatten
+
+    p.bank_accounts.each do |b|
+      data_row += [" Bank Name: #{b.bank_name}, Name On Passbook: #{b.name_on_passbook}, Account Number: #{b.account_number}, IFSC Code: #{b.ifsc_code}"]
+    end if [ROLE[:HR], ROLE[:finance]].include?(current_user.role)
+    sheet.add_row data_row
   end
 end

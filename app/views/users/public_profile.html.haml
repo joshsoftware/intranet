@@ -19,6 +19,10 @@
       %li.document-tab
         %a{data: {toggle: 'tab'}, href: '#document'}
           Documents
+    - if can_access?('BankAccounts') || current_user == @user
+      %li.finance-tab
+        %a{data: {toggle: 'tab'}, href: '#finance'}
+          Finance
 
   .tab-content
     .tab-pane.active#public
@@ -29,6 +33,8 @@
       = render partial: 'employee_detail'
     .tab-pane#document
       = render partial: 'document'
+    .tab-pane#finance
+      = render partial: 'finance'    
 
 :javascript
   error = #{!@private_profile.errors.full_messages.empty?}
