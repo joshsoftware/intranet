@@ -26,10 +26,12 @@
   = pub.hint '(Note: Mention your skills which are not covered in technical skills)', class: 'skill'
   = pub.input :skype_id, label: 'Skype Id'
   = pub.input :pivotal_tracker_id, label: 'Pivotal Tracker Id'
-  = pub.input :github_handle
+  = pub.input :github_handle, :wrapper_html => {class: 'input-prepend'} do
+    %span.add-on https://github.com/
+    = pub.input_field :github_handle, style: 'width: 178px;'
   = pub.hint '(Note: Mention only github-handle not url)', class: 'skill'
   = pub.input :twitter_handle, :wrapper_html => {class: 'input-prepend'} do
-    %span.add-on @
+    %span.add-on https://twitter.com/
     = pub.input_field :twitter_handle, style: 'width: 178px;'
   = pub.hint '(Note: Mention only twitter-handle not url)', class: 'skill'
   = pub.input :gitlab_handle, label: 'GitLab Handle'
