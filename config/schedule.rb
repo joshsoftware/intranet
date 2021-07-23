@@ -121,9 +121,9 @@ every :sunday, :at => '11:00pm' do
   rake "weekly_codeclimate_statistics"
 end
 
-every :monday, :at => '09:00am' do
-  rake "weekly_project_summary"
-end
+# every :monday, :at => '09:00am' do
+#   rake "weekly_project_summary"
+# end
 
 every :monday, :at => '09:00am' do
   rake "fetch_rollbar_statistics"
