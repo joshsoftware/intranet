@@ -187,7 +187,7 @@ class UserMailer < ActionMailer::Base
     @leave_application = LeaveApplication.where(id: id).first
     @leave_type = get_leave_type(@leave_application.leave_type)
     @user = @leave_application.user
-    @processed_by = User.find(@leave_application.processed_by)
+    @processed_by = User.where(id: @leave_application.try(:processed_by))
     @notification_emails = [
       @user.email,
       User.leave_notification_emails(@user.id)
