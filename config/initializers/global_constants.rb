@@ -57,7 +57,7 @@ CUSTOM_MANAGERS = {
   admin: 'shailesh.kalekar@joshsoftware.com', default: 'sameert@joshsoftware.com'
 }
 
-LEAVE_TYPES = {leave: 'LEAVE', wfh: 'WFH', optional_holiday: 'OPTIONAL HOLIDAY', spl: 'SPL'}
+LEAVE_TYPES = {leave: 'LEAVE', wfh: 'WFH', optional_holiday: 'OPTIONAL HOLIDAY', spl: 'SPL', unpaid: 'UNPAID'}
 
 ASSESSMENT_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
